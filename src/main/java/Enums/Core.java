@@ -1,17 +1,27 @@
 package Enums;
+import java.util.HashMap;
 import java.util.List;
 
-public enum Core {
-    PHEONIX_FEATHER("Pheonix Feather"),
-    DRAGON_HEARTSTRING("Dragon Heartstring");
-    public final String label;
+import static Enums.EnumMethods.returnFormattedEnum;
 
-    private Core(String label) {
-        this.label = label;
-    }
+public enum Core {
+    PHEONIX_FEATHER,
+    DRAGON_HEARTSTRING,
+    TEST;
 
     public static List<String> getCoreList() {
         Core[] coreValues = Core.values();
         return EnumMethods.getEnumList(coreValues);
     }
+
+    public static Core setCore(String core) {
+        HashMap<String, Core> coreHashMap = new HashMap<>();
+        Core[] coreValues = Core.values();
+
+        for(Core coreValue:coreValues) {
+            coreHashMap.put(returnFormattedEnum(coreValue), coreValue);
+        }
+        return coreHashMap.get(core);
+    }
+
 }

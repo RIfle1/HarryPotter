@@ -1,16 +1,14 @@
 package Main;
 
-import Enums.Core;
-import Enums.Pet;
+import static Main.ConsoleLogic.*;
 
 public class Main {
-    public static void main(String[] args) {
-        for(String core:Core.getCoreList()) {
-            System.out.println(core);
-        }
+    public static void main(String[] args) throws InterruptedException {
+        gameCredits();
+        characterCreation();
 
-        for(String pet:Pet.getPetList()) {
-            System.out.println(pet);
-        }
+
     }
+
+
 }
