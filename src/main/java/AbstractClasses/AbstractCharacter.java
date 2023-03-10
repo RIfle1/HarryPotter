@@ -1,21 +1,23 @@
 package AbstractClasses;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-@NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @Setter
 public abstract class AbstractCharacter {
+
+    public AbstractCharacter(double healthPoints, double defensePoints) {
+        this.healthPoints = healthPoints;
+        this.defensePoints = defensePoints;
+    }
+
     private double healthPoints;
     private double defensePoints;
-    private double attackDamage;
-    private double attackChance;
 
-
+    public static void takeDamage(AbstractCharacter abstractCharacter, double attackDamage) {
+        double calculatedDamage = (attackDamage / (abstractCharacter.defensePoints / attackDamage));
+        abstractCharacter.healthPoints -= calculatedDamage;
+    }
     public static double attack(double baseAttackDamage, double addedAttackDamage, double baseAttackChance, double addedAttackChance) {
         double attackChance = baseAttackChance + addedAttackChance;
         double attackDamage = baseAttackDamage + addedAttackDamage;

@@ -1,18 +1,18 @@
 package Main;
 import Classes.*;
 import Enums.*;
+import lombok.val;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class ConsoleLogic {
     static Scanner scanner = new Scanner(System.in);
+    public static final String[] yesOrNo = {"Yes", "No"};
 
     // Read the user's choice
-
 
     public static String returnChoiceString() {
         System.out.println("-> ");
@@ -43,7 +43,7 @@ public class ConsoleLogic {
         }
     }
 
-    public static void printChoices(Array[] choicesList) {
+    public static void printChoices(String[] choicesList) {
         for(int i = 0; i < choicesList.length; i++) {
             System.out.printf("(%d) %s\n", i + 1, choicesList[i]);
         }
@@ -74,19 +74,22 @@ public class ConsoleLogic {
 
     // Method to continue
     public static void continuePrompt(){
-        System.out.println("\nPress anything to continue...");
-        scanner.next();
+        System.out.println("\nType anything and then enter to continue...");
+        System.out.println(scanner.next());
+
     }
 
-    public static void gameCredits() throws InterruptedException {
+    public static void gameCredits() {
         String welcomeText = "Welcome to Harry Potter Text RPG, Made by Filips Barakats";
         printHeader(welcomeText);
-        Thread.sleep(1000);
+        continuePrompt();
+    }
 
+    public static void checkSaves() {
         // Check if there are any previous characters
         String newCharacterText = "No saved characters have been found, new character creation will now proceed.";
         printHeader(newCharacterText);
-        Thread.sleep(1000);
+        continuePrompt();
     }
 
     public static void characterCreation() throws InterruptedException {
@@ -125,6 +128,13 @@ public class ConsoleLogic {
         wand = wandCreation();
 
         house = sortingHat();
+        printHeader("The sorting hat thinks you should be in the house of " + EnumMethods.returnFormattedEnum(house.getHouseName())+". Do you accept?");
+        printChoices(yesOrNo);
+        int answer = returnChoiceInt() - 1;
+        if(answer == 1) {
+            house = houseChoice();
+        }
+        printHeader("Congratulations!, You are now part of the " + EnumMethods.returnFormattedEnum(house.getHouseName()) + " House.");
 
         System.out.println(
                 firstName +
@@ -172,11 +182,11 @@ public class ConsoleLogic {
         return new House(houseName);
     }
 
-    public static House sortingHat() throws InterruptedException {
+    public static House sortingHat() {
         HouseName houseName;
 
         printHeader("The sorting hat has been placed on your head.");
-        Thread.sleep(1000);
+        continuePrompt();
 
         printHeader("You come here with preferences and preconceptions — certain expectations.");
         List<String> questionList1 = new ArrayList<>();
@@ -187,7 +197,7 @@ public class ConsoleLogic {
 
         printHeader("Hmm. I wonder. Hmm. I detect something in you. A certain sense of — hmm — what is it?");
         HashMap<String, HouseName> questionMap2 = new HashMap<>();
-        List<String> questionList2 = new ArrayList<>();
+        var questionList2 = new ArrayList<String>();
         questionMap2.put("Daring.", HouseName.GRYFFINDOR);
         questionMap2.put("Curiosity.", HouseName.RAVENCLAW);
         questionMap2.put("Loyalty.", HouseName.HUFFLEPUFF);
