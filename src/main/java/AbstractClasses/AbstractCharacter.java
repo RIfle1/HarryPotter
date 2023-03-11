@@ -5,12 +5,10 @@ import lombok.*;
 @Getter
 @Setter
 public abstract class AbstractCharacter {
-
     public AbstractCharacter(double healthPoints, double defensePoints) {
         this.healthPoints = healthPoints;
         this.defensePoints = defensePoints;
     }
-
     private double healthPoints;
     private double defensePoints;
 

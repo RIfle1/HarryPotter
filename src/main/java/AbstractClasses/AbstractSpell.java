@@ -1,25 +1,39 @@
 package AbstractClasses;
 
-import Classes.Spell;
-import lombok.AllArgsConstructor;
+import Enums.CharacterState;
+import Enums.SpellType;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import javax.xml.stream.events.Characters;
 
 @Getter
 @Setter
 public abstract class AbstractSpell {
-    public AbstractSpell(String spellName, double spellDamage, double spellDefense, double spellChance, int spellCoolDown) {
+
+    public AbstractSpell(String spellName, SpellType spellType, String spellDescription, String spellSpecialAttackLine, CharacterState characterState, double spellLevelRequirement, double[] spellDamage, double[] spellDefense, double[] spellEffectiveDistance, double spellChance, int spellCoolDown) {
         this.spellName = spellName;
+        this.spellType = spellType;
+        this.spellDescription = spellDescription;
+        this.spellSpecialAttackLine = spellSpecialAttackLine;
+        this.characterState = characterState;
+        this.spellLevelRequirement = spellLevelRequirement;
         this.spellDamage = spellDamage;
         this.spellDefense = spellDefense;
+        this.spellEffectiveDistance = spellEffectiveDistance;
         this.spellChance = spellChance;
         this.spellCoolDown = spellCoolDown;
     }
 
     private String spellName;
-    private double spellDamage;
-    private double spellDefense;
+    private SpellType spellType;
+    private String spellDescription;
+    private String spellSpecialAttackLine;
+    private CharacterState characterState;
+    private double spellLevelRequirement;
+    private double[] spellDamage;
+    private double[] spellDefense;
+    private double[] spellEffectiveDistance;
     private double spellChance;
     private int spellCoolDown;
 
@@ -40,5 +54,4 @@ public abstract class AbstractSpell {
         printSpell(AbstractSpell);
 
     }
-    public abstract double specialAttack();
 }

@@ -1,98 +1,19 @@
 package Main;
-import Classes.*;
+import Classes.House;
+import Classes.Potion;
+import Classes.Spell;
+import Classes.Wand;
 import Enums.*;
-import lombok.val;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.Array;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
-public class ConsoleLogic {
-    static Scanner scanner = new Scanner(System.in);
-    public static final String[] yesOrNo = {"Yes", "No"};
+import static Main.ConsoleFunctions.*;
 
-    // Read the user's choice
+public class CharacterCreation {
 
-    public static String returnChoiceString() {
-        System.out.println("-> ");
-        return scanner.next();
-    }
-
-    public static int returnChoiceInt() {
-        int input;
-
-        do{
-            System.out.println("-> ");
-            try{
-                input = Integer.parseInt(scanner.next());
-            }
-            catch(Exception e) {
-                input = -1;
-                System.out.println("Input must be an integer");
-            }
-        }
-        while(input < 1);
-        return input;
-    }
-
-
-    public static void printChoices(List<String> choicesList) {
-        for(int i = 0; i < choicesList.toArray().length; i++) {
-            System.out.printf("(%d) %s\n", i + 1, choicesList.get(i));
-        }
-    }
-
-    public static void printChoices(String[] choicesList) {
-        for(int i = 0; i < choicesList.length; i++) {
-            System.out.printf("(%d) %s\n", i + 1, choicesList[i]);
-        }
-    }
-
-    // Method to clear the console
-    public static void clearConsole() {
-        for(int i=0; i< 100; i++) {
-            System.out.println();
-        }
-    }
-
-    // Method to print a separator
-    public static void printSeparator(int n) {
-        for(int i=0; i<n; i++) {
-            System.out.print("-");
-        }
-        System.out.println();
-    }
-
-    // Method to print a heading
-    public static void printHeader(String title){
-        clearConsole();
-        printSeparator(title.length());
-        System.out.println(title);
-        printSeparator(title.length());
-    }
-
-    // Method to continue
-    public static void continuePrompt(){
-        System.out.println("\nType anything and then enter to continue...");
-        System.out.println(scanner.next());
-
-    }
-
-    public static void gameCredits() {
-        String welcomeText = "Welcome to Harry Potter Text RPG, Made by Filips Barakats";
-        printHeader(welcomeText);
-        continuePrompt();
-    }
-
-    public static void checkSaves() {
-        // Check if there are any previous characters
-        String newCharacterText = "No saved characters have been found, new character creation will now proceed.";
-        printHeader(newCharacterText);
-        continuePrompt();
-    }
-
-    public static void characterCreation() throws InterruptedException {
+    public static void characterInit() {
         String firstName;
         String lastName;
 
@@ -103,7 +24,7 @@ public class ConsoleLogic {
         House house;
 
         List<Spell> knownSpells;
-        List<Potions> potions;
+        List<Potion> potions;
 
         double experience;
 
@@ -138,11 +59,11 @@ public class ConsoleLogic {
 
         System.out.println(
                 firstName +
-                lastName +
-                gender +
-                pet +
-                wand.getSize() +
-                EnumMethods.returnFormattedEnum(wand.getCore()) + " " +
+                        lastName +
+                        gender +
+                        pet +
+                        wand.getSize() +
+                        EnumMethods.returnFormattedEnum(wand.getCore()) + " " +
                         house.getHouseName()
 
         );
@@ -213,4 +134,5 @@ public class ConsoleLogic {
 
         return new House(houseName);
     }
+
 }

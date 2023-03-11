@@ -14,7 +14,7 @@ public enum HouseName {
     public final String houseSpec;
     public final double value;
 
-    private HouseName(String houseSpec, double value) {
+    HouseName(String houseSpec, double value) {
         this.houseSpec = houseSpec;
         this.value = value;
     }
