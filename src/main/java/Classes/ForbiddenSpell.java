@@ -5,6 +5,10 @@ import Enums.CharacterState;
 import Enums.SpellType;
 import lombok.Builder;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
+
 public class ForbiddenSpell extends AbstractSpell {
     @Builder
     public ForbiddenSpell(String spellName, SpellType spellType, String spellDescription, String spellSpecialAttackLine, CharacterState characterState, double spellLevelRequirement, double[] spellDamage, double[] spellDefense, double[] spellEffectiveDistance, double spellChance, int spellCoolDown) {
@@ -39,4 +43,22 @@ public class ForbiddenSpell extends AbstractSpell {
             .spellCoolDown(4)
             .build();
 
+
+    public static List<ForbiddenSpell> getForbiddenSpellList() {
+        List<ForbiddenSpell> forbiddenSpellList = new ArrayList<>();
+        Field[] declaredFields = ForbiddenSpell.class.getDeclaredFields();
+
+        for (Field field : declaredFields) {
+            if (java.lang.reflect.Modifier.isStatic(field.getModifiers())) {
+                if (ForbiddenSpell.class.isAssignableFrom(field.getType())) {
+                    try {
+                        forbiddenSpellList.add((ForbiddenSpell) field.get(null));
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+        return forbiddenSpellList;
+    }
 }

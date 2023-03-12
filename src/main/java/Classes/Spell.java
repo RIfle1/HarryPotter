@@ -3,10 +3,13 @@ package Classes;
 import AbstractClasses.AbstractSpell;
 import Enums.CharacterState;
 import Enums.SpellType;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -197,5 +200,34 @@ public class Spell extends AbstractSpell {
             .spellChance(0.6)
             .spellCoolDown(1)
             .build();
+
+
+    public static List<Spell> getAllSpells(){
+        List<Spell> spellList = new ArrayList<>();
+        Field[] declaredFields = Spell.class.getDeclaredFields();
+
+        for(Field field:declaredFields) {
+            if (java.lang.reflect.Modifier.isStatic(field.getModifiers())) {
+                if (Spell.class.isAssignableFrom(field.getType())) {
+                    try {
+                        spellList.add((Spell) field.get(null));
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+
+        return spellList;
+    }
+
+    public static List<String> getAllSpellsNamesList() {
+        List<String> spellNameList = new ArrayList<>();
+
+        for(Spell spell:Spell.getAllSpells()) {
+            spellNameList.add(spell.getSpellName());
+        }
+        return spellNameList;
+    }
 
 }

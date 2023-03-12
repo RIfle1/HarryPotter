@@ -1,11 +1,16 @@
 package AbstractClasses;
 
+import Classes.Spell;
 import Enums.CharacterState;
 import Enums.SpellType;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.xml.stream.events.Characters;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @Getter
 @Setter
@@ -54,4 +59,5 @@ public abstract class AbstractSpell {
         printSpell(AbstractSpell);
 
     }
+
 }
