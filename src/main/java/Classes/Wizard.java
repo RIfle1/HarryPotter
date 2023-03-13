@@ -1,6 +1,7 @@
 package Classes;
 
 import AbstractClasses.AbstractCharacter;
+import AbstractClasses.AbstractItem;
 import Enums.Core;
 import Enums.Gender;
 import Enums.HouseName;
@@ -13,8 +14,8 @@ import java.util.List;
 @Setter
 public class Wizard extends AbstractCharacter {
     @Builder
-    public Wizard(double healthPoints, double defensePoints, List<Potion> potionList, List<Spell> spellList, double level, String firstName, String lastName, Gender gender, Pet pet, Wand wand, House house, double experience, double charisma, double strength, double intelligence, double luck) {
-        super(healthPoints, defensePoints, potionList, spellList, level);
+    public Wizard(double healthPoints, double defensePoints, List<AbstractItem> itemList, List<Potion> activePotionsList, List<Spell> spellList, double level, String firstName, String lastName, Gender gender, Pet pet, Wand wand, House house, double experience, double charisma, double strength, double intelligence, double luck) {
+        super(healthPoints, defensePoints, itemList, activePotionsList, spellList, level);
         this.firstName = firstName;
         this.lastName = lastName;
         this.gender = gender;
@@ -44,14 +45,16 @@ public class Wizard extends AbstractCharacter {
     private final double baseLevelExperience = 100;
     private final int maxLevel = 10;
     private final double levelIncrement = 0.2;
-    public static void updateLevel(Wizard wizard) {
-        double currentExperience = wizard.getExperience();
-        for(double i = 0; i < wizard.maxLevel * wizard.levelIncrement; i+= wizard.levelIncrement) {
-            double requiredExperience = wizard.baseLevelExperience + wizard.baseLevelExperience * i;
+
+
+    public void updateLevel() {
+        double currentExperience = this.getExperience();
+        for(double i = 0; i < this.maxLevel * this.levelIncrement; i+= this.levelIncrement) {
+            double requiredExperience = this.baseLevelExperience + this.baseLevelExperience * i;
             if(currentExperience / (requiredExperience) >= 1) {
                 currentExperience -= requiredExperience;
-                double previousLevel = wizard.getLevel();
-                wizard.setLevel(previousLevel + 1);
+                double previousLevel = this.getLevel();
+                this.setLevel(previousLevel + 1);
 
             }
             else {
@@ -60,10 +63,16 @@ public class Wizard extends AbstractCharacter {
         }
     }
 
+    public void updateWizardStats(double addExperience) {
+        this.setExperience(addExperience);
+        this.updateLevel();
+        this.updateSpells();
+    }
+
     public static Wizard testWizard = Wizard.builder()
             .healthPoints(100)
             .defensePoints(200)
-            .level(0)
+            .level(1)
             .firstName("Test Wizard First Name")
             .lastName("Test Wizard Last Name")
             .gender(Gender.MALE)
@@ -71,7 +80,8 @@ public class Wizard extends AbstractCharacter {
             .wand(new Wand(Core.PHEONIX_FEATHER, 12))
             .house(new House(HouseName.GRYFFINDOR))
             .spellList(new ArrayList<Spell>())
-            .potionList(new ArrayList<Potion>())
+            .itemList(new ArrayList<AbstractItem>())
+            .activePotionsList(new ArrayList<Potion>())
             .experience(0)
             .charisma(0)
             .strength(0)

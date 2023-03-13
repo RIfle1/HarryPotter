@@ -1,9 +1,18 @@
 package Main;
 
-import AbstractClasses.AbstractSpell;
-import Classes.ForbiddenSpell;
+import AbstractClasses.AbstractCharacter;
+import AbstractClasses.AbstractItem;
+import Classes.Enemy;
+import Classes.Potion;
 import Classes.Spell;
 import Classes.Wizard;
+import Enums.Difficulty;
+import Enums.EnemyName;
+import Enums.EnemyType;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
 
 public class Main {
     public static void main(String[] args) {
@@ -11,19 +20,10 @@ public class Main {
 //        checkSaves();
 //        CharacterCreation.characterInit();
 
-//        Wizard.testWizard.setExperience(360);
-//        Wizard.updateLevel(Wizard.testWizard);
-//        System.out.println(Wizard.testWizard.getLevel());
+        List<Enemy> enemies = Enemy.generateEnemies(10, 10, 1, EnemyName.BASILISK, Difficulty.DEATH_WISH);
 
+        Wizard.testWizard.updateSpells();
+        Wizard.testWizard.attack(Spell.avadaKedavra, enemies.get(0));
 
-//        System.out.println(Spell.getSpellList());
-//        System.out.println(ForbiddenSpell.getForbiddenSpellList());
-//
-//        Wizard.updateLevel(Wizard.testWizard);
-//        Wizard.updateSpells(Wizard.testWizard);
-//        System.out.println(Wizard.testWizard.getSpellList());
-
-//        System.out.println(Spell.getAllSpellsNamesList());
-        System.out.println(Spell.confringo.test());
     }
 }

@@ -1,10 +1,13 @@
 package Enums;
 
+import lombok.Getter;
+
 import java.util.HashMap;
 import java.util.List;
 
 import static Enums.EnumMethods.returnFormattedEnum;
 
+@Getter
 public enum CharacterState {
     STANDING(0),
     LEVITATING(0.1),
@@ -14,7 +17,7 @@ public enum CharacterState {
     ON_FIRE(0.4),
     CURSED(0.7);
 
-    public final double damageMultiplier;
+    private final double damageMultiplier;
 
     CharacterState(double damageMultiplier) {
         this.damageMultiplier = damageMultiplier;

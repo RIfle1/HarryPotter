@@ -1,5 +1,226 @@
 package Classes;
 
-public class Potion {
+import AbstractClasses.AbstractItem;
+import Enums.ItemType;
+import Enums.PotionType;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
+
+@Getter
+@Setter
+public class Potion extends AbstractItem {
+    @Builder
+    public Potion(String itemName, String itemDescription, ItemType itemType, double itemDropChance, PotionType potionType, double potionDuration, double potionValue) {
+        super(itemName, itemDescription, itemType, itemDropChance);
+        this.potionType = potionType;
+        this.potionDuration = potionDuration;
+        this.potionValue = potionValue;
+    }
+
+    private PotionType potionType;
+    private double potionDuration;
+    private double potionValue;
+
+    public static Potion minorHealthPotion = Potion.builder()
+            .itemName("Minor Health Potion")
+            .itemDescription("A minor healing potion which heals 40hp.")
+            .itemType(ItemType.CONSUMABLE)
+            .itemDropChance(0.8)
+            .potionType(PotionType.HEALTH)
+            .potionDuration(0)
+            .potionValue(40)
+            .build();
+
+    public static Potion mediumHealthPotion = Potion.builder()
+            .itemName("Medium Health Potion")
+            .itemDescription("A medium healing potion which heals 70hp.")
+            .itemType(ItemType.CONSUMABLE)
+            .itemDropChance(0.5)
+            .potionType(PotionType.HEALTH)
+            .potionDuration(0)
+            .potionValue(70)
+            .build();
+
+    public static Potion highHealthPotion = Potion.builder()
+            .itemName("High Health Potion")
+            .itemDescription("A high healing potion which heals 100hp.")
+            .itemType(ItemType.CONSUMABLE)
+            .itemDropChance(0.2)
+            .potionType(PotionType.HEALTH)
+            .potionDuration(0)
+            .potionValue(100)
+            .build();
+
+    public static Potion minorDefensePotion = Potion.builder()
+            .itemName("Minor Defense Potion")
+            .itemDescription("A minor defense potion which adds 40 defense.")
+            .itemType(ItemType.CONSUMABLE)
+            .itemDropChance(0.8)
+            .potionType(PotionType.DEFENSE)
+            .potionDuration(0)
+            .potionValue(40)
+            .build();
+
+    public static Potion mediumDefensePotion = Potion.builder()
+            .itemName("Medium Defense Potion")
+            .itemDescription("A medium defense potion which adds 70 defense.")
+            .itemType(ItemType.CONSUMABLE)
+            .itemDropChance(0.5)
+            .potionType(PotionType.DEFENSE)
+            .potionDuration(0)
+            .potionValue(70)
+            .build();
+
+    public static Potion highDefensePotion = Potion.builder()
+            .itemName("High Defense Potion")
+            .itemDescription("A high defense potion which adds 100 defense.")
+            .itemType(ItemType.CONSUMABLE)
+            .itemDropChance(0.2)
+            .potionType(PotionType.DEFENSE)
+            .potionDuration(0)
+            .potionValue(100)
+            .build();
+
+    public static Potion minorRegenerationPotion = Potion.builder()
+            .itemName("Minor Regeneration Potion")
+            .itemDescription("A minor regeneration potion which regenerates 10 hp per turn.")
+            .itemType(ItemType.CONSUMABLE)
+            .itemDropChance(0.8)
+            .potionType(PotionType.REGENERATION)
+            .potionDuration(3)
+            .potionValue(10)
+            .build();
+
+    public static Potion mediumRegenerationPotion = Potion.builder()
+            .itemName("Medium Regeneration Potion")
+            .itemDescription("A minor regeneration potion which regenerates 15 hp per turn.")
+            .itemType(ItemType.CONSUMABLE)
+            .itemDropChance(0.5)
+            .potionType(PotionType.REGENERATION)
+            .potionDuration(5)
+            .potionValue(15)
+            .build();
+
+    public static Potion highRegenerationPotion = Potion.builder()
+            .itemName("High Regeneration Potion")
+            .itemDescription("A minor regeneration potion which regenerates 25 hp per turn.")
+            .itemType(ItemType.CONSUMABLE)
+            .itemDropChance(0.2)
+            .potionType(PotionType.REGENERATION)
+            .potionDuration(7)
+            .potionValue(0.2)
+            .build();
+
+    public static Potion minorDamagePotion = Potion.builder()
+            .itemName("Minor Damage Potion")
+            .itemDescription("A minor damage potion which increases damage by 10%.")
+            .itemType(ItemType.CONSUMABLE)
+            .itemDropChance(0.8)
+            .potionType(PotionType.DAMAGE)
+            .potionDuration(2)
+            .potionValue(0.1)
+            .build();
+
+    public static Potion mediumDamagePotion = Potion.builder()
+            .itemName("Medium Damage Potion")
+            .itemDescription("A minor damage potion which increases damage by 15%.")
+            .itemType(ItemType.CONSUMABLE)
+            .itemDropChance(0.5)
+            .potionType(PotionType.DAMAGE)
+            .potionDuration(4)
+            .potionValue(0.15)
+            .build();
+
+    public static Potion highDamagePotion = Potion.builder()
+            .itemName("High Damage Potion")
+            .itemDescription("A minor damage potion which increases damage by 25%.")
+            .itemType(ItemType.CONSUMABLE)
+            .itemDropChance(0.2)
+            .potionType(PotionType.DAMAGE)
+            .potionDuration(6)
+            .potionValue(0.25)
+            .build();
+
+    public static Potion minorCooldownPotion = Potion.builder()
+            .itemName("Minor Cooldown Potion")
+            .itemDescription("A minor cooldown potion which reduces all spells cooldown by 2 turns.")
+            .itemType(ItemType.CONSUMABLE)
+            .itemDropChance(0.8)
+            .potionType(PotionType.COOLDOWN)
+            .potionDuration(0)
+            .potionValue(2)
+            .build();
+
+    public static Potion mediumCooldownPotion = Potion.builder()
+            .itemName("Medium Cooldown Potion")
+            .itemDescription("A minor cooldown potion which reduces all spells cooldown by 4 turns.")
+            .itemType(ItemType.CONSUMABLE)
+            .itemDropChance(0.5)
+            .potionType(PotionType.COOLDOWN)
+            .potionDuration(0)
+            .potionValue(4)
+            .build();
+
+    public static Potion highCooldownPotion = Potion.builder()
+            .itemName("High Cooldown Potion")
+            .itemDescription("A minor cooldown potion which reduces all spells cooldown by 6 turns.")
+            .itemType(ItemType.CONSUMABLE)
+            .itemDropChance(0.2)
+            .potionType(PotionType.COOLDOWN)
+            .potionDuration(0)
+            .potionValue(6)
+            .build();
+
+    public static Potion invincibilityPotion = Potion.builder()
+            .itemName("Invincibility Potion")
+            .itemDescription("An invincibility potion which makes you invincible to all attacks.")
+            .itemType(ItemType.CONSUMABLE)
+            .itemDropChance(0.1)
+            .potionType(PotionType.INVINCIBILITY)
+            .potionDuration(0)
+            .potionValue(-1)
+            .build();
+
+    public static List<Potion> getAllPotions(){
+        List<Potion> potionList = new ArrayList<>();
+        Field[] declaredFields = Potion.class.getDeclaredFields();
+
+        for(Field field:declaredFields) {
+            if (java.lang.reflect.Modifier.isStatic(field.getModifiers())) {
+                if (Potion.class.isAssignableFrom(field.getType())) {
+                    try {
+                        potionList.add((Potion) field.get(null));
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+
+        return potionList;
+    }
+
+    public static List<String> getAllPotionsNamesList() {
+        List<String> potionNameList = new ArrayList<>();
+
+        for(Potion potion: getAllPotions()) {
+            potionNameList.add(potion.getItemName());
+        }
+        return potionNameList;
+    }
+
+    public static List<String> getPotionsNamesList(List<Potion> potionList) {
+        List<String> potionNameList = new ArrayList<>();
+
+        for(Potion potion: potionList) {
+            potionNameList.add(potion.getItemName());
+        }
+        return potionNameList;
+    }
 }

@@ -6,6 +6,7 @@ import java.util.List;
 import static Enums.EnumMethods.returnFormattedEnum;
 
 public enum SpellType {
+    ANCIENT,
     ESSENTIAL,
     CONTROL,
     FORCE,

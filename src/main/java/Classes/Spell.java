@@ -1,8 +1,8 @@
 package Classes;
 
-import AbstractClasses.AbstractSpell;
 import Enums.CharacterState;
 import Enums.SpellType;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,15 +13,25 @@ import java.util.List;
 
 @Getter
 @Setter
-public class Spell extends AbstractSpell {
-    @Builder
-    public Spell(String spellName, SpellType spellType, String spellDescription, String spellSpecialAttackLine, CharacterState characterState, double spellLevelRequirement, double[] spellDamage, double[] spellDefense, double[] spellEffectiveDistance, double spellChance, int spellCoolDown) {
-        super(spellName, spellType, spellDescription, spellSpecialAttackLine, characterState, spellLevelRequirement, spellDamage, spellDefense, spellEffectiveDistance, spellChance, spellCoolDown);
-    }
+@Builder
+@AllArgsConstructor
+public class Spell {
+
+    private String spellName;
+    private SpellType spellType;
+    private String spellDescription;
+    private String spellSpecialAttackLine;
+    private CharacterState characterState;
+    private double spellLevelRequirement;
+    private double[] spellDamage;
+    private double[] spellDefense;
+    private double[] spellEffectiveDistance;
+    private double spellChance;
+    private int spellCoolDown;
 
     public static Spell ancientMagicThrow = Spell.builder()
             .spellName("Ancient Magic Throw")
-            .spellType(SpellType.ESSENTIAL)
+            .spellType(SpellType.ANCIENT)
             .spellDescription("Summons and then throws special environmental objects at the targeted enemy. Particularly useful for breaking through Shield Charms.")
             .spellSpecialAttackLine("You've thrown an object at the enemy!")
             .spellLevelRequirement(1)
@@ -82,7 +92,7 @@ public class Spell extends AbstractSpell {
             .spellSpecialAttackLine("You've cancelled the enemy's spell!")
             .spellLevelRequirement(5)
             .spellDamage(new double[]{60, 70})
-            .spellDefense(new double[]{50, 60})
+            .spellDefense(new double[]{0, 0})
             .spellEffectiveDistance(new double[]{})
             .characterState(CharacterState.FROZEN)
             .spellChance(0.6)
@@ -201,6 +211,34 @@ public class Spell extends AbstractSpell {
             .spellCoolDown(1)
             .build();
 
+    public static Spell avadaKedavra = Spell.builder()
+            .spellName("Avada Kedavra")
+            .spellType(SpellType.UNFORGIVABLE_CURSE)
+            .spellDescription("Kills enemies instantly.")
+            .spellSpecialAttackLine("the enemy is kinda dead")
+            .spellLevelRequirement(10)
+            .spellDamage(new double[]{100000, 100000})
+            .spellDefense(new double[]{0, 0})
+            .spellEffectiveDistance(new double[]{})
+            .characterState(CharacterState.STANDING)
+            .spellChance(1)
+            .spellCoolDown(6)
+            .build();
+
+    public static Spell crucio = Spell.builder()
+            .spellName("Crucio")
+            .spellType(SpellType.UNFORGIVABLE_CURSE)
+            .spellDescription("Curses the victim, cursed enemies take extra damage.")
+            .spellSpecialAttackLine("You've cursed the enemy!")
+            .spellLevelRequirement(8)
+            .spellDamage(new double[]{50, 70})
+            .spellDefense(new double[]{0, 0})
+            .spellEffectiveDistance(new double[]{})
+            .characterState(CharacterState.CURSED)
+            .spellChance(0.8)
+            .spellCoolDown(4)
+            .build();
+
 
     public static List<Spell> getAllSpells(){
         List<Spell> spellList = new ArrayList<>();
@@ -224,10 +262,32 @@ public class Spell extends AbstractSpell {
     public static List<String> getAllSpellsNamesList() {
         List<String> spellNameList = new ArrayList<>();
 
-        for(Spell spell:Spell.getAllSpells()) {
+        for(Spell spell: getAllSpells()) {
             spellNameList.add(spell.getSpellName());
         }
         return spellNameList;
     }
+
+
+
+    public static void printSeparator(int length) {
+        for(int i = 0; i < length; i++) {
+            System.out.print("/");
+        }
+        System.out.println();
+    }
+
+    public static void printSpell(Spell AbstractSpell) {
+        printSeparator(AbstractSpell.spellName.length());
+        System.out.println(AbstractSpell.spellName);
+        printSeparator(AbstractSpell.spellName.length());
+    }
+
+    public static void useSpell(Spell AbstractSpell) {
+        printSpell(AbstractSpell);
+
+    }
+
+
 
 }
