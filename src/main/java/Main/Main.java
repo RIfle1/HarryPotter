@@ -20,10 +20,12 @@ public class Main {
 //        checkSaves();
 //        CharacterCreation.characterInit();
 
-        List<Enemy> enemies = Enemy.generateEnemies(10, 10, 1, EnemyName.BASILISK, Difficulty.DEATH_WISH);
+        Enemy.enemies = Enemy.generateEnemies(10, 10, 1, EnemyName.BASILISK, Difficulty.DEATH_WISH);
 
         Wizard.testWizard.updateSpells();
-        Wizard.testWizard.attack(Spell.avadaKedavra, enemies.get(0));
+        Wizard.testWizard.attack(Spell.avadaKedavra, Enemy.enemies.get(0));
+
+        System.out.println(Enemy.enemies.stream().map(Enemy::getEnemyName).toList());
 
     }
 }

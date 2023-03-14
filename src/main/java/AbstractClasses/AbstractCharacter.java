@@ -10,6 +10,7 @@ import Main.ConsoleFunctions;
 import lombok.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static Enums.EnumMethods.returnFormattedEnum;
@@ -33,6 +34,10 @@ public abstract class AbstractCharacter {
     private List<Potion> activePotionsList;
     private List<Spell> spellList;
     private double level;
+
+    public void deleteCharacter() {
+        Enemy.enemies.remove();
+    }
 
     public void addItem(AbstractItem abstractItem){
         List<AbstractItem> currentItemList = this.getItemList();
@@ -146,17 +151,20 @@ public abstract class AbstractCharacter {
 
     public double takeDamage(double spellDamage) {
         double calculatedDamage;
+        final int z = 2;
 
-
-        // RETHINK THIS
-        if(spellDamage < this.defensePoints) {
-            calculatedDamage = (spellDamage / (this.defensePoints / spellDamage));
+        if(spellDamage <= this.defensePoints && spellDamage >= 0) {
+            calculatedDamage = (Math.pow(spellDamage, z)) / (this.defensePoints * z);
         }
         else {
-            calculatedDamage = (spellDamage / (spellDamage / this.defensePoints ));
+            calculatedDamage = spellDamage - (this.defensePoints / z);
         }
         System.out.println(calculatedDamage);
         this.healthPoints -= (int) calculatedDamage;
+        if(this.healthPoints <= 0) {
+            System.out.println();
+        }
+
         return calculatedDamage;
     }
 

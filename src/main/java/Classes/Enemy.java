@@ -34,7 +34,7 @@ public class Enemy extends AbstractCharacter {
     private EnemyType enemyType;
     private double experiencePoints;
     private double distanceFromPlayer;
-
+    public static List<Enemy> enemies = new ArrayList<Enemy>();
 
     public static List<AbstractItem> generateRandomPotions(int potionNumber) {
         // GENERATE 3 RANDOM POTIONS FOR EACH ENEMY
@@ -124,7 +124,7 @@ public class Enemy extends AbstractCharacter {
         return enemyList;
     }
 
-    public static List<String> getAllEnemysNamesList() {
+    public static List<String> getAllEnemiesNamesList() {
         List<String> enemyNameList = new ArrayList<>();
 
         for(Enemy enemy: getAllEnemies()) {
@@ -133,7 +133,7 @@ public class Enemy extends AbstractCharacter {
         return enemyNameList;
     }
 
-    public static List<String> getEnemysNamesList(List<Enemy> enemyList) {
+    public static List<String> getEnemiesNamesList(List<Enemy> enemyList) {
         List<String> enemyNameList = new ArrayList<>();
 
         for(Enemy enemy: enemyList) {
