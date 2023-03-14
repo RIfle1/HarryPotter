@@ -42,13 +42,13 @@ public class CharacterCreation {
         printChoices(Gender.getGenderList());
         gender = Gender.setGender(Gender.getGenderList().get(returnChoiceInt() - 1));
 
-        printHeader("Select your character");
+        printHeader("Select your pet");
         printChoices(Pet.getPetList());
         pet = Pet.setPet(Pet.getPetList().get(returnChoiceInt() - 1));
 
         wand = wandCreation();
-
         house = sortingHat();
+
         printHeader("The sorting hat thinks you should be in the house of " + EnumMethods.returnFormattedEnum(house.getHouseName())+". Do you accept?");
         printChoices(yesOrNo);
         int answer = returnChoiceInt() - 1;
@@ -67,16 +67,6 @@ public class CharacterCreation {
                         house.getHouseName()
 
         );
-
-
-
-//        Wizard wizard = new Wizard(
-//                firstName,
-//                lastName,
-//                gender,
-//                pet,
-//                wand
-//        );
     }
 
     public static Wand wandCreation() {

@@ -1,7 +1,6 @@
 package Main;
 
-import static Main.ConsoleFunctions.continuePrompt;
-import static Main.ConsoleFunctions.printHeader;
+import static Main.ConsoleFunctions.*;
 
 public class SaveChecker {
     public static void checkSaves() {
@@ -9,5 +8,6 @@ public class SaveChecker {
         String newCharacterText = "No saved characters have been found, new character creation will now proceed.";
         printHeader(newCharacterText);
         continuePrompt();
+        clearConsole();
     }
 }

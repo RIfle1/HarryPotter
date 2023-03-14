@@ -11,8 +11,8 @@ import java.util.List;
 @Setter
 public class Wizard extends AbstractCharacter {
     @Builder
-    public Wizard(String name, double healthPoints, double defensePoints, CharacterState characterState, List<AbstractItem> itemList, List<Potion> activePotionsList, List<Spell> spellList, double level, String firstName, String lastName, Gender gender, Pet pet, Wand wand, House house, double experience, double charisma, double strength, double intelligence, double luck) {
-        super(name, healthPoints, defensePoints, characterState, itemList, activePotionsList, spellList, level);
+    public Wizard(String name, double healthPoints, double defensePoints, Difficulty difficulty, CharacterState characterState, List<AbstractItem> itemList, List<Potion> activePotionsList, List<Spell> spellList, double level, String firstName, String lastName, Gender gender, Pet pet, Wand wand, House house, double experience, double charisma, double strength, double intelligence, double luck) {
+        super(name, healthPoints, defensePoints, difficulty, characterState, itemList, activePotionsList, spellList, level);
         this.firstName = firstName;
         this.lastName = lastName;
         this.gender = gender;
@@ -69,8 +69,9 @@ public class Wizard extends AbstractCharacter {
     public static Wizard testWizard = Wizard.builder()
             .healthPoints(100)
             .defensePoints(200)
+            .difficulty(Difficulty.DEATH_WISH)
             .characterState(CharacterState.STANDING)
-            .level(1)
+            .level(10)
             .firstName("Test Wizard First Name")
             .lastName("Test Wizard Last Name")
             .name("testWizard")

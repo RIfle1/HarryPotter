@@ -239,6 +239,20 @@ public class Spell {
             .spellCoolDown(4)
             .build();
 
+    public static Spell testSpell = Spell.builder()
+            .spellName("Test Spell")
+            .spellType(SpellType.UNFORGIVABLE_CURSE)
+            .spellDescription("test spell")
+            .spellSpecialAttackLine("test spell attack line")
+            .spellLevelRequirement(0)
+            .spellDamage(new double[]{100, 200})
+            .spellDefense(new double[]{0, 0})
+            .spellEffectiveDistance(new double[]{})
+            .characterState(CharacterState.STUNNED)
+            .spellChance(1)
+            .spellCoolDown(0)
+            .build();
+
 
     public static List<Spell> getAllSpells(){
         List<Spell> spellList = new ArrayList<>();

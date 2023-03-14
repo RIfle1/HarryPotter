@@ -20,8 +20,8 @@ import static java.lang.Long.sum;
 @Setter
 public class Enemy extends AbstractCharacter {
     @Builder
-    public Enemy(String name, double healthPoints, double defensePoints, CharacterState characterState, List<AbstractItem> itemList, List<Potion> activePotionsList, List<Spell> spellList, double level, EnemyName enemyName, EnemyType enemyType, double experiencePoints, double distanceFromPlayer) {
-        super(name, healthPoints, defensePoints, characterState, itemList, activePotionsList, spellList, level);
+    public Enemy(String name, double healthPoints, double defensePoints, Difficulty difficulty, CharacterState characterState, List<AbstractItem> itemList, List<Potion> activePotionsList, List<Spell> spellList, double level, EnemyName enemyName, EnemyType enemyType, double experiencePoints, double distanceFromPlayer) {
+        super(name, healthPoints, defensePoints, difficulty, characterState, itemList, activePotionsList, spellList, level);
         this.enemyName = enemyName;
         this.enemyType = enemyType;
         this.experiencePoints = experiencePoints;
@@ -82,6 +82,7 @@ public class Enemy extends AbstractCharacter {
             enemies[i] = Enemy.builder()
                     .healthPoints(enemyHp)
                     .defensePoints(enemyDefense)
+                    .difficulty(difficulty)
                     .characterState(CharacterState.STANDING)
                     .itemList(generateRandomPotions(3))
                     .activePotionsList(new ArrayList<Potion>())

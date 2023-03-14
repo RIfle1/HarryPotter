@@ -1,5 +1,6 @@
 package Main;
 
+import java.io.IOException;
 import java.util.*;
 
 public class ConsoleFunctions {
@@ -60,7 +61,6 @@ public class ConsoleFunctions {
 
     // Method to print a heading
     public static void printHeader(String title){
-        clearConsole();
         printSeparator(title.length());
         System.out.println(title);
         printSeparator(title.length());
@@ -69,7 +69,8 @@ public class ConsoleFunctions {
     // Method to continue
     public static void continuePrompt(){
         System.out.println("\nType anything and then enter to continue...");
-        System.out.println(scanner.next());
+        System.out.println(scanner.nextLine());
+
 
     }
 
@@ -77,5 +78,6 @@ public class ConsoleFunctions {
         String welcomeText = "Welcome to Harry Potter Text RPG, Made by Filips Barakats";
         printHeader(welcomeText);
         continuePrompt();
+        clearConsole();
     }
 }

@@ -4,6 +4,7 @@ import Classes.Enemy;
 import Classes.Potion;
 import Classes.Spell;
 import Enums.CharacterState;
+import Enums.Difficulty;
 import Enums.PotionType;
 import Enums.SpellType;
 import Main.ConsoleFunctions;
@@ -15,15 +16,17 @@ import java.util.Iterator;
 import java.util.List;
 
 import static Enums.EnumMethods.returnFormattedEnum;
+import static Main.ConsoleFunctions.printSeparator;
 import static Main.MechanicsFunctions.generateDoubleBetween;
 
 @Getter
 @Setter
 public abstract class AbstractCharacter {
-    public AbstractCharacter(String name, double healthPoints, double defensePoints, CharacterState characterState, List<AbstractItem> itemList, List<Potion> activePotionsList, List<Spell> spellList, double level) {
+    public AbstractCharacter(String name, double healthPoints, double defensePoints, Difficulty difficulty, CharacterState characterState, List<AbstractItem> itemList, List<Potion> activePotionsList, List<Spell> spellList, double level) {
         this.name = name;
         this.healthPoints = healthPoints;
         this.defensePoints = defensePoints;
+        this.difficulty = difficulty;
         this.characterState = characterState;
         this.itemList = itemList;
         this.activePotionsList = activePotionsList;
@@ -31,10 +34,10 @@ public abstract class AbstractCharacter {
         this.level = level;
     }
 
-
     private String name;
     private double healthPoints;
     private double defensePoints;
+    private Difficulty difficulty;
     private CharacterState characterState;
     private List<AbstractItem> itemList;
     private List<Potion> activePotionsList;
@@ -84,24 +87,24 @@ public abstract class AbstractCharacter {
                     + potion.getPotionValue()
                     + " points.";
 
-            ConsoleFunctions.printSeparator(text2.length());
+            printSeparator(text2.length());
             System.out.println(text1);
             System.out.println(text2);
-            ConsoleFunctions.printSeparator(text2.length());
+            printSeparator(text2.length());
         }
         else if (potionTypeActiveList.toArray().length >= maxPotionOfOneType){
             String text1 = returnFormattedEnum(potion.getPotionType()) + " potion is already active.";
 
-            ConsoleFunctions.printSeparator(text1.length());
+            printSeparator(text1.length());
             System.out.println(text1);
-            ConsoleFunctions.printSeparator(text1.length());
+            printSeparator(text1.length());
         }
         else if (activePotionList.toArray().length >= 3) {
             String text1 = "Cannot drink "+ returnFormattedEnum(potion.getPotionType()) +" potion, you can only have 3 potions active at once.";
 
-            ConsoleFunctions.printSeparator(text1.length());
+            printSeparator(text1.length());
             System.out.println(text1);
-            ConsoleFunctions.printSeparator(text1.length());
+            printSeparator(text1.length());
         }
     }
 
@@ -139,21 +142,25 @@ public abstract class AbstractCharacter {
 
     public double getSpellDamage(Spell spell, AbstractCharacter attackedCharacter) {
         double[] spellDamage = spell.getSpellDamage();
-        double spellCalculatedDamage;
+        double spellRandomDamage;
 
         if(spellDamage[0] != spellDamage[1]) {
-            spellCalculatedDamage = generateDoubleBetween(spellDamage[0], spellDamage[1]);
+            spellRandomDamage = generateDoubleBetween(spellDamage[0], spellDamage[1]);
         }
         else {
-            spellCalculatedDamage = spellDamage[0];
+            spellRandomDamage = spellDamage[0];
         }
 
-        double characterLevelMultiplier = this.getLevel();
-        double characterStateDamageMultiplier = attackedCharacter.getCharacterState().getDamageMultiplier();
+
+        double spellBaseDamage = (int) (this.getLevel() * 0.5 * spellRandomDamage);
+
         double potionDamagePercentIncrease = getActivePotionValueSum(PotionType.DAMAGE);
+        double characterStateDamageMultiplier = attackedCharacter.getCharacterState().getDamageMultiplier();
         attackedCharacter.setCharacterState(spell.getCharacterState());
 
-        return spellCalculatedDamage+(spellCalculatedDamage * (potionDamagePercentIncrease + characterStateDamageMultiplier));
+        return spellBaseDamage
+                * (1 + potionDamagePercentIncrease)
+                * (1 + characterStateDamageMultiplier);
 
     }
 
@@ -168,11 +175,13 @@ public abstract class AbstractCharacter {
             calculatedDamage = spellDamage - (this.defensePoints / z);
         }
         this.healthPoints -= (int) calculatedDamage;
+
         if(this.healthPoints <= 0) {
             this.deleteCharacter();
         }
 
         return calculatedDamage;
+
     }
 
     public  double getSpellDefense(Spell spell) {
@@ -216,7 +225,6 @@ public abstract class AbstractCharacter {
         SpellType spellType = spell.getSpellType();
         String spellDescription = spell.getSpellDescription();
         String spellSpecialAttackLine = spell.getSpellSpecialAttackLine();
-        CharacterState characterState = spell.getCharacterState();
 
         double spellChance = spell.getSpellChance();
         int spellCoolDown = spell.getSpellCoolDown();
@@ -228,24 +236,43 @@ public abstract class AbstractCharacter {
         double spellSuccess = Math.random();
 
         System.out.println(spellName+"!");
+        System.out.println(spellSpecialAttackLine);
         if(spellSuccess <= spellChance) {
             double damageTaken = abstractCharacter.takeDamage(spellDamage);
             double healthPoints = abstractCharacter.getHealthPoints();
 
-            System.out.println("You hit the enemy with " + (int) damageTaken + " damage!");
-            System.out.println(returnFormattedEnum(abstractCharacter.getName() + " " + abstractCharacter.getCharacterState()));
+            String text1 = "You hit the enemy with " + (int) damageTaken + " damage!";
+            String text2 = returnFormattedEnum(abstractCharacter.getName()
+                    + " "
+                    + abstractCharacter.getCharacterState()
+                    + ".");
+            String text3 = "Next attack will have "
+                    + (int) (abstractCharacter.getCharacterState().getDamageMultiplier() * 100)
+                    + "% more damage.";
+            String text4 = returnFormattedEnum(abstractCharacter.getName())
+                    + " has " + (int) healthPoints + " hp left.";
+            String text5 = "You killed " + returnFormattedEnum(abstractCharacter.getName());
+
+
+            System.out.println(text1);
+            System.out.println(text2);
+            System.out.println(text3);
 
             if(healthPoints > 0) {
-                System.out.println(returnFormattedEnum(abstractCharacter.getName()) + " has " + (int) healthPoints + " hp left.");
+
+                System.out.println(text4);
             }
             else {
-                System.out.println("You killed " + returnFormattedEnum(abstractCharacter.getName()));
+                System.out.println(text5);
             }
 
         }
         else {
-            System.out.println("You missed your spell!");
+            String text6 = "You missed your spell!";
+            System.out.println(text6);
         }
+
+        printSeparator(30);
     }
 
 //    public static double parry() {
