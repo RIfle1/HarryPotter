@@ -11,6 +11,7 @@ import lombok.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import static Enums.EnumMethods.returnFormattedEnum;
@@ -19,24 +20,29 @@ import static Main.MechanicsFunctions.generateDoubleBetween;
 @Getter
 @Setter
 public abstract class AbstractCharacter {
-    public AbstractCharacter(double healthPoints, double defensePoints, List<AbstractItem> itemList, List<Potion> activePotionsList, List<Spell> spellList, double level) {
+    public AbstractCharacter(String name, double healthPoints, double defensePoints, CharacterState characterState, List<AbstractItem> itemList, List<Potion> activePotionsList, List<Spell> spellList, double level) {
+        this.name = name;
         this.healthPoints = healthPoints;
         this.defensePoints = defensePoints;
+        this.characterState = characterState;
         this.itemList = itemList;
         this.activePotionsList = activePotionsList;
         this.spellList = spellList;
         this.level = level;
     }
 
+
+    private String name;
     private double healthPoints;
     private double defensePoints;
+    private CharacterState characterState;
     private List<AbstractItem> itemList;
     private List<Potion> activePotionsList;
     private List<Spell> spellList;
     private double level;
 
     public void deleteCharacter() {
-        Enemy.enemies.remove();
+        Enemy.enemies.removeIf(enemy1 -> enemy1.getName().equals(this.getName()));
     }
 
     public void addItem(AbstractItem abstractItem){
@@ -131,7 +137,7 @@ public abstract class AbstractCharacter {
                 .reduce((double) 0, Double::sum);
     }
 
-    public double getSpellDamage(Spell spell) {
+    public double getSpellDamage(Spell spell, AbstractCharacter attackedCharacter) {
         double[] spellDamage = spell.getSpellDamage();
         double spellCalculatedDamage;
 
@@ -142,11 +148,13 @@ public abstract class AbstractCharacter {
             spellCalculatedDamage = spellDamage[0];
         }
 
+        double characterLevelMultiplier = this.getLevel();
+        double characterStateDamageMultiplier = attackedCharacter.getCharacterState().getDamageMultiplier();
         double potionDamagePercentIncrease = getActivePotionValueSum(PotionType.DAMAGE);
-//        System.out.println(spellCalculatedDamage);
-//        System.out.println(potionDamagePercentIncrease);
+        attackedCharacter.setCharacterState(spell.getCharacterState());
 
-        return spellCalculatedDamage+(spellCalculatedDamage*potionDamagePercentIncrease);
+        return spellCalculatedDamage+(spellCalculatedDamage * (potionDamagePercentIncrease + characterStateDamageMultiplier));
+
     }
 
     public double takeDamage(double spellDamage) {
@@ -159,10 +167,9 @@ public abstract class AbstractCharacter {
         else {
             calculatedDamage = spellDamage - (this.defensePoints / z);
         }
-        System.out.println(calculatedDamage);
         this.healthPoints -= (int) calculatedDamage;
         if(this.healthPoints <= 0) {
-            System.out.println();
+            this.deleteCharacter();
         }
 
         return calculatedDamage;
@@ -203,7 +210,7 @@ public abstract class AbstractCharacter {
 
 
 
-    public void attack(Spell spell, Enemy enemy) {
+    public void attack(Spell spell, AbstractCharacter abstractCharacter) {
 
         String spellName = spell.getSpellName();
         SpellType spellType = spell.getSpellType();
@@ -214,7 +221,7 @@ public abstract class AbstractCharacter {
         double spellChance = spell.getSpellChance();
         int spellCoolDown = spell.getSpellCoolDown();
 
-        double spellDamage = getSpellDamage(spell);
+        double spellDamage = getSpellDamage(spell, abstractCharacter);
         double spellDefense = getSpellDefense(spell);
         double spellEffectiveDistance = getSpellEffectiveDistance(spell);
 
@@ -222,9 +229,18 @@ public abstract class AbstractCharacter {
 
         System.out.println(spellName+"!");
         if(spellSuccess <= spellChance) {
-            double damageTaken = enemy.takeDamage(spellDamage);
+            double damageTaken = abstractCharacter.takeDamage(spellDamage);
+            double healthPoints = abstractCharacter.getHealthPoints();
+
             System.out.println("You hit the enemy with " + (int) damageTaken + " damage!");
-            System.out.println(returnFormattedEnum(enemy.getEnemyName()) + " has " + (int) enemy.getHealthPoints() + " hp left.");
+            System.out.println(returnFormattedEnum(abstractCharacter.getName() + " " + abstractCharacter.getCharacterState()));
+
+            if(healthPoints > 0) {
+                System.out.println(returnFormattedEnum(abstractCharacter.getName()) + " has " + (int) healthPoints + " hp left.");
+            }
+            else {
+                System.out.println("You killed " + returnFormattedEnum(abstractCharacter.getName()));
+            }
 
         }
         else {

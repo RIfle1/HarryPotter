@@ -2,10 +2,7 @@ package Classes;
 
 import AbstractClasses.AbstractCharacter;
 import AbstractClasses.AbstractItem;
-import Enums.Core;
-import Enums.Gender;
-import Enums.HouseName;
-import Enums.Pet;
+import Enums.*;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -14,8 +11,8 @@ import java.util.List;
 @Setter
 public class Wizard extends AbstractCharacter {
     @Builder
-    public Wizard(double healthPoints, double defensePoints, List<AbstractItem> itemList, List<Potion> activePotionsList, List<Spell> spellList, double level, String firstName, String lastName, Gender gender, Pet pet, Wand wand, House house, double experience, double charisma, double strength, double intelligence, double luck) {
-        super(healthPoints, defensePoints, itemList, activePotionsList, spellList, level);
+    public Wizard(String name, double healthPoints, double defensePoints, CharacterState characterState, List<AbstractItem> itemList, List<Potion> activePotionsList, List<Spell> spellList, double level, String firstName, String lastName, Gender gender, Pet pet, Wand wand, House house, double experience, double charisma, double strength, double intelligence, double luck) {
+        super(name, healthPoints, defensePoints, characterState, itemList, activePotionsList, spellList, level);
         this.firstName = firstName;
         this.lastName = lastName;
         this.gender = gender;
@@ -72,9 +69,11 @@ public class Wizard extends AbstractCharacter {
     public static Wizard testWizard = Wizard.builder()
             .healthPoints(100)
             .defensePoints(200)
+            .characterState(CharacterState.STANDING)
             .level(1)
             .firstName("Test Wizard First Name")
             .lastName("Test Wizard Last Name")
+            .name("testWizard")
             .gender(Gender.MALE)
             .pet(Pet.CAT)
             .wand(new Wand(Core.PHEONIX_FEATHER, 12))
@@ -88,6 +87,5 @@ public class Wizard extends AbstractCharacter {
             .intelligence(0)
             .luck(0)
             .build();
-
 
 }

@@ -2,15 +2,13 @@ package Classes;
 
 import AbstractClasses.AbstractCharacter;
 import AbstractClasses.AbstractItem;
-import Enums.Difficulty;
-import Enums.EnemyName;
-import Enums.EnemyType;
-import Enums.EnumMethods;
+import Enums.*;
 import lombok.*;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import static Enums.EnumMethods.returnFormattedEnum;
@@ -22,8 +20,8 @@ import static java.lang.Long.sum;
 @Setter
 public class Enemy extends AbstractCharacter {
     @Builder
-    public Enemy(double healthPoints, double defensePoints, List<AbstractItem> itemList, List<Potion> activePotionsList, List<Spell> spellList, double level, EnemyName enemyName, EnemyType enemyType, double experiencePoints, double distanceFromPlayer) {
-        super(healthPoints, defensePoints, itemList, activePotionsList, spellList, level);
+    public Enemy(String name, double healthPoints, double defensePoints, CharacterState characterState, List<AbstractItem> itemList, List<Potion> activePotionsList, List<Spell> spellList, double level, EnemyName enemyName, EnemyType enemyType, double experiencePoints, double distanceFromPlayer) {
+        super(name, healthPoints, defensePoints, characterState, itemList, activePotionsList, spellList, level);
         this.enemyName = enemyName;
         this.enemyType = enemyType;
         this.experiencePoints = experiencePoints;
@@ -56,8 +54,6 @@ public class Enemy extends AbstractCharacter {
         return randomPotions;
     }
 
-
-
     public static List<Enemy> generateEnemies(double minLevel, double maxLevel, int amount, EnemyName enemyName, Difficulty difficulty) {
         // ENEMIES LIST
         List<Enemy> enemiesList = new ArrayList<Enemy>();
@@ -65,8 +61,6 @@ public class Enemy extends AbstractCharacter {
 
 
         for(int i = 0; i < amount; i++) {
-            final double enemyHpIncreasePercent = 0.6;
-            final double enemyDefenseIncreasePercent = 0.6;
             final int baseHp = 100;
             final int baseDefense = 100;
             int enemyLevel;
@@ -88,10 +82,12 @@ public class Enemy extends AbstractCharacter {
             enemies[i] = Enemy.builder()
                     .healthPoints(enemyHp)
                     .defensePoints(enemyDefense)
+                    .characterState(CharacterState.STANDING)
                     .itemList(generateRandomPotions(3))
                     .activePotionsList(new ArrayList<Potion>())
                     .spellList(new ArrayList<Spell>())
                     .level(enemyLevel)
+                    .name(returnFormattedEnum(enemyName)+"-"+(i+1))
                     .enemyName(enemyName)
                     .experiencePoints(0)
                     .distanceFromPlayer((int) generateDoubleBetween(0, 100))
@@ -128,7 +124,7 @@ public class Enemy extends AbstractCharacter {
         List<String> enemyNameList = new ArrayList<>();
 
         for(Enemy enemy: getAllEnemies()) {
-            enemyNameList.add(returnFormattedEnum(enemy.getEnemyName()));
+            enemyNameList.add(returnFormattedEnum(enemy.getName()));
         }
         return enemyNameList;
     }
@@ -137,7 +133,7 @@ public class Enemy extends AbstractCharacter {
         List<String> enemyNameList = new ArrayList<>();
 
         for(Enemy enemy: enemyList) {
-            enemyNameList.add(returnFormattedEnum(enemy.getEnemyName()));
+            enemyNameList.add(returnFormattedEnum(enemy.getName()));
         }
         return enemyNameList;
     }
