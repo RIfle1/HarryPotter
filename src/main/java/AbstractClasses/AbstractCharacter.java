@@ -1,18 +1,10 @@
 package AbstractClasses;
 
-import Classes.Enemy;
-import Classes.Potion;
-import Classes.Spell;
-import Enums.CharacterState;
-import Enums.Difficulty;
-import Enums.PotionType;
-import Enums.SpellType;
-import Main.ConsoleFunctions;
+import Classes.*;
+import Enums.*;
 import lombok.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 import static Enums.EnumMethods.returnFormattedEnum;
@@ -44,7 +36,15 @@ public abstract class AbstractCharacter {
     private List<Spell> spellList;
     private double level;
 
-    public void deleteCharacter() {
+    public final static int maxLevel = 10;
+
+    // DIFFICULTY DIFFERENCE BETWEEN PLAYER AND ENEMY
+    // =1 SAME STATS AS ENEMY
+    // >1 ENEMIES HAVE BETTER STATS THAN THE PLAYER
+    // <1 PLAYER HAS BETTER STATS THAN THE ENEMIES
+    public final static double difficultyDifference = 1.3;
+
+    public void deleteEnemy() {
         Enemy.enemies.removeIf(enemy1 -> enemy1.getName().equals(this.getName()));
     }
 
@@ -80,7 +80,7 @@ public abstract class AbstractCharacter {
         // NEEDS TO BE OPTIMIZED FOR ALL TYPES OF POTIONS
         if(potionIsInInventory && potionTypeActiveList.toArray().length < maxPotionOfOneType && activePotionList.toArray().length < maxPotionActiveAtOnce) {
             activePotionList.add(potion);
-            String text1 = "You just drank a " + potion.getItemName();
+            String text1 = "You just drank " + potion.getItemName();
             String text2 = "Your "
                     + returnFormattedEnum(potion.getPotionType())
                     + " has been improved by "
@@ -112,8 +112,7 @@ public abstract class AbstractCharacter {
         List<Spell> spellList = new ArrayList<>();
 
         for(Spell spell:Spell.getAllSpells()) {
-            if((spell.getSpellLevelRequirement() <= this.getLevel())
-                    && !(this.getClass() == Enemy.class && spell.getSpellType() == SpellType.ANCIENT)) {
+            if(spell.getSpellLevelRequirement() <= this.getLevel()) {
                 spellList.add(spell);
             }
         }
@@ -140,9 +139,14 @@ public abstract class AbstractCharacter {
                 .reduce((double) 0, Double::sum);
     }
 
-    public double getSpellDamage(Spell spell, AbstractCharacter attackedCharacter) {
+    public double getSpellDamage(Spell spell, AbstractCharacter attackCharacter) {
         double[] spellDamage = spell.getSpellDamage();
         double spellRandomDamage;
+        double spellBaseDamage = 0;
+
+        double houseDamagePercent = 0;
+        double housePotionPercent = 0;
+        double strengthPercent = 0;
 
         if(spellDamage[0] != spellDamage[1]) {
             spellRandomDamage = generateDoubleBetween(spellDamage[0], spellDamage[1]);
@@ -151,16 +155,38 @@ public abstract class AbstractCharacter {
             spellRandomDamage = spellDamage[0];
         }
 
+        // CHANGE SPELL BASE DAMAGE DEPENDING ON ENEMY OR PLAYER
+        if(this.getClass() == Wizard.class) {
+            // UPDATE WIZARD DAMAGE OR POTION EFFICIENCY BASED ON WHICH HOUSE THEY BELONG TO
+            HouseName houseName = ((Wizard) this).getHouse().getHouseName();
+            if(houseName == HouseName.SLYTHERIN) {
+                houseDamagePercent = houseName.getSpecValue();
+            }
+            else if(houseName == HouseName.HUFFLEPUFF) {
+                housePotionPercent = houseName.getSpecValue();
+            }
+            strengthPercent = ((Wizard) this).getWizardStatsPercent().get("strength");
 
-        double spellBaseDamage = (int) (this.getLevel() * 0.5 * spellRandomDamage);
+            spellBaseDamage = Math.exp(this.getLevel() * difficulty.getWizardDiffMultiplier()) * spellRandomDamage ;
+        }
+        else if(this.getClass() == Enemy.class) {
+            spellBaseDamage = (Math.exp(this.getLevel() * difficulty.getEnemyDiffMultiplier()) * spellRandomDamage) / 10;
+        }
 
-        double potionDamagePercentIncrease = getActivePotionValueSum(PotionType.DAMAGE);
-        double characterStateDamageMultiplier = attackedCharacter.getCharacterState().getDamageMultiplier();
-        attackedCharacter.setCharacterState(spell.getCharacterState());
+
+
+        System.out.println("spell base dmg: " + spellBaseDamage);
+
+        double potionDamagePercentIncrease = getActivePotionValueSum(PotionType.DAMAGE) * (1 + housePotionPercent);
+        double characterStateDamageMultiplier = attackCharacter.getCharacterState().getDamageMultiplier();
+        attackCharacter.setCharacterState(spell.getCharacterState());
 
         return spellBaseDamage
                 * (1 + potionDamagePercentIncrease)
-                * (1 + characterStateDamageMultiplier);
+                * (1 + characterStateDamageMultiplier)
+                * (1 + houseDamagePercent)
+                * (1 + strengthPercent);
+
 
     }
 
@@ -177,14 +203,14 @@ public abstract class AbstractCharacter {
         this.healthPoints -= (int) calculatedDamage;
 
         if(this.healthPoints <= 0) {
-            this.deleteCharacter();
+            this.deleteEnemy();
         }
 
         return calculatedDamage;
 
     }
 
-    public  double getSpellDefense(Spell spell) {
+    public double getSpellDefense(Spell spell) {
         double[] spellDefense = spell.getSpellDefense();
         double spellCalculatedDefense;
 
@@ -217,42 +243,61 @@ public abstract class AbstractCharacter {
         return spellCalculatedEffectiveDistance;
     }
 
+    public boolean checkSpellAvailability(Spell spell) {
+        List<Spell> abstractCharacterSpellList = this.getSpellList();
 
+        boolean spellExistsCharacterSpellList = abstractCharacterSpellList.stream().anyMatch(abstractCharacterSpell -> abstractCharacterSpell.equals(spell));
+        boolean spellIsReady = spellExistsCharacterSpellList && spell.getSpellReadyIn() == 0;
 
-    public void attack(Spell spell, AbstractCharacter abstractCharacter) {
+        System.out.println(spell.getSpellReadyIn());
 
-        String spellName = spell.getSpellName();
-        SpellType spellType = spell.getSpellType();
-        String spellDescription = spell.getSpellDescription();
-        String spellSpecialAttackLine = spell.getSpellSpecialAttackLine();
+        if(spell.getSpellReadyIn() == 0) {
+            System.out.println("yes");
+        }
 
-        double spellChance = spell.getSpellChance();
-        int spellCoolDown = spell.getSpellCoolDown();
+        return spellExistsCharacterSpellList && spellIsReady;
+    }
 
-        double spellDamage = getSpellDamage(spell, abstractCharacter);
-        double spellDefense = getSpellDefense(spell);
-        double spellEffectiveDistance = getSpellEffectiveDistance(spell);
+    public void spellUsed(Spell spell) {
+        spell.setSpellReadyIn(spell.getSpellCooldown());
+    }
 
+    public void reduceSpellsCooldown(int cooldown) {
+        List<Spell> abstractCharacterSpellList = this.getSpellList();
+        abstractCharacterSpellList
+                .forEach(abstractCharacterSpell -> abstractCharacterSpell.setSpellReadyIn(abstractCharacterSpell.getSpellReadyIn() - cooldown));
+    }
+
+    public void reduceSpellsCooldown() {
+        List<Spell> abstractCharacterSpellList = this.getSpellList();
+        abstractCharacterSpellList
+                .forEach(abstractCharacterSpell -> abstractCharacterSpell.setSpellReadyIn(0));
+    }
+
+    public void spellCast(Spell spell, AbstractCharacter attackCharacter) {
+        double luckPercent = 0;
+        if(this.getClass() == Wizard.class) {
+            luckPercent = ((Wizard) this).getWizardStatsPercent().get("luck");
+        }
         double spellSuccess = Math.random();
+        double spellChance = spell.getSpellChance() * (1 + luckPercent);
 
-        System.out.println(spellName+"!");
-        System.out.println(spellSpecialAttackLine);
         if(spellSuccess <= spellChance) {
-            double damageTaken = abstractCharacter.takeDamage(spellDamage);
-            double healthPoints = abstractCharacter.getHealthPoints();
+            double spellDamage = getSpellDamage(spell, attackCharacter);
+            double damageTaken = attackCharacter.takeDamage(spellDamage);
+            double healthPoints = attackCharacter.getHealthPoints();
 
-            String text1 = "You hit the enemy with " + (int) damageTaken + " damage!";
-            String text2 = returnFormattedEnum(abstractCharacter.getName()
+            String text1 = "You hit " + attackCharacter.getName() + " with " + (int) damageTaken + " damage!";
+            String text2 = returnFormattedEnum(attackCharacter.getName()
                     + " "
-                    + abstractCharacter.getCharacterState()
+                    + attackCharacter.getCharacterState()
                     + ".");
             String text3 = "Next attack will have "
-                    + (int) (abstractCharacter.getCharacterState().getDamageMultiplier() * 100)
+                    + (int) (attackCharacter.getCharacterState().getDamageMultiplier() * 100)
                     + "% more damage.";
-            String text4 = returnFormattedEnum(abstractCharacter.getName())
+            String text4 = returnFormattedEnum(attackCharacter.getName())
                     + " has " + (int) healthPoints + " hp left.";
-            String text5 = "You killed " + returnFormattedEnum(abstractCharacter.getName());
-
+            String text5 = "You killed " + returnFormattedEnum(attackCharacter.getName());
 
             System.out.println(text1);
             System.out.println(text2);
@@ -271,7 +316,34 @@ public abstract class AbstractCharacter {
             String text6 = "You missed your spell!";
             System.out.println(text6);
         }
+    }
 
+    public void attack(Spell spell, AbstractCharacter attackCharacter) {
+
+//        SpellType spellType = spell.getSpellType();
+//        String spellDescription = spell.getSpellDescription();
+
+        String spellName = spell.getSpellName();
+        String spellSpecialAttackLine = spell.getSpellSpecialAttackLine();
+
+        double spellDefense = getSpellDefense(spell);
+        double spellEffectiveDistance = getSpellEffectiveDistance(spell);
+
+        // IF SPELL EXISTS IN THE CHARACTER'S SPELL LIST
+        if(checkSpellAvailability(spell)) {
+            // SPELL GETS USED AND PUT ON A COOLDOWN
+            this.spellUsed(spell);
+
+            // CONSOLE STUFF
+            System.out.println(spellName+"!");
+            System.out.println(spellSpecialAttackLine);
+
+            // SPELL GETS CAST ON THE ATTACK CHARACTER
+            spellCast(spell, attackCharacter);
+        }
+        else {
+            System.out.println(spell.getSpellName() + " not available.");
+        }
         printSeparator(30);
     }
 

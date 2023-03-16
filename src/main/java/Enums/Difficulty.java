@@ -1,18 +1,29 @@
 package Enums;
 
+import AbstractClasses.AbstractCharacter;
 import lombok.Getter;
 
 @Getter
 public enum Difficulty {
-    EASY((-Math.log(6.5) + 10) / 10),
-    NORMAL((-2 * Math.log(3) + 10) / 10),
-    HARD((-Math.log(14) + 10) / 10),
-    EXTREME((-Math.log(19) + 10) / 10),
-    DEATH_WISH((-Math.log(29) + 10) / 10);
+    EASY(setEnemyMultiplier(7.5), setWizardMultiplier(7.5)),
+    NORMAL(setEnemyMultiplier(10), setWizardMultiplier(10)),
+    HARD(setEnemyMultiplier(15), setWizardMultiplier(15)),
+    EXTREME(setEnemyMultiplier(20), setWizardMultiplier(20)),
+    DEATH_WISH(setEnemyMultiplier(30), setWizardMultiplier(30));
 
-    private final double difficultyMultiplier;
+    private final double enemyDiffMultiplier;
+    private final double wizardDiffMultiplier;
 
-    Difficulty(double multiplier) {
-        this.difficultyMultiplier = multiplier;
+    Difficulty(double enemyDiffMultiplier, double wizardDiffMultiplier) {
+        this.enemyDiffMultiplier = enemyDiffMultiplier;
+        this.wizardDiffMultiplier = wizardDiffMultiplier;
+    }
+
+    private static double setEnemyMultiplier(double value) {
+        return Math.log(value) / AbstractCharacter.maxLevel;
+    }
+
+    private static double setWizardMultiplier(double value) {
+        return Math.log(value / AbstractCharacter.difficultyDifference) / AbstractCharacter.maxLevel;
     }
 }

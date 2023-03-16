@@ -27,12 +27,13 @@ public class Spell {
     private double[] spellDefense;
     private double[] spellEffectiveDistance;
     private double spellChance;
-    private int spellCoolDown;
+    private int spellCooldown;
+    private int spellReadyIn;
 
-    public static Spell ancientMagicThrow = Spell.builder()
-            .spellName("Ancient Magic Throw")
-            .spellType(SpellType.ANCIENT)
-            .spellDescription("Summons and then throws special environmental objects at the targeted enemy. Particularly useful for breaking through Shield Charms.")
+    public static Spell magicThrow = Spell.builder()
+            .spellName("Magic Throw")
+            .spellType(SpellType.DAMAGE)
+            .spellDescription("Summons and then throws special environmental objects at the targeted enemy.")
             .spellSpecialAttackLine("You've thrown an object at the enemy!")
             .spellLevelRequirement(1)
             .spellDamage(new double[]{100, 120})
@@ -40,12 +41,13 @@ public class Spell {
             .spellEffectiveDistance(new double[]{})
             .characterState(CharacterState.STUNNED)
             .spellChance(0.7)
-            .spellCoolDown(2)
+            .spellCooldown(2)
+            .spellReadyIn(0)
             .build();
 
     public static Spell basicCast = Spell.builder()
             .spellName("Basic Spell")
-            .spellType(SpellType.ESSENTIAL)
+            .spellType(SpellType.DAMAGE)
             .spellDescription("Deals minor damage to enemies and objects.")
             .spellSpecialAttackLine("Basic Attack!")
             .spellLevelRequirement(0)
@@ -54,12 +56,13 @@ public class Spell {
             .spellEffectiveDistance(new double[]{})
             .characterState(CharacterState.STANDING)
             .spellChance(0.9)
-            .spellCoolDown(1)
+            .spellCooldown(1)
+            .spellReadyIn(0)
             .build();
 
     public static Spell protego = Spell.builder()
             .spellName("Protego")
-            .spellType(SpellType.ESSENTIAL)
+            .spellType(SpellType.DEFENSE)
             .spellDescription("Protects against a variety of attacks, including spell casts, weapon strikes, and more.")
             .spellSpecialAttackLine("You've cancelled the enemy's spell!")
             .spellLevelRequirement(0)
@@ -68,12 +71,13 @@ public class Spell {
             .spellEffectiveDistance(new double[]{})
             .characterState(CharacterState.STANDING)
             .spellChance(0.8)
-            .spellCoolDown(1)
+            .spellCooldown(1)
+            .spellReadyIn(0)
             .build();
 
     public static Spell stupefy = Spell.builder()
             .spellName("Stupefy")
-            .spellType(SpellType.ESSENTIAL)
+            .spellType(SpellType.FOLLOW_UP)
             .spellDescription("Stuns enemies, making them easy targets for follow-up spells.")
             .spellSpecialAttackLine("You've cancelled the enemy's spell!")
             .spellLevelRequirement(0)
@@ -82,12 +86,13 @@ public class Spell {
             .spellEffectiveDistance(new double[]{})
             .characterState(CharacterState.STUNNED)
             .spellChance(0.8)
-            .spellCoolDown(1)
+            .spellCooldown(1)
+            .spellReadyIn(0)
             .build();
 
     public static Spell glacius = Spell.builder()
             .spellName("Glacius")
-            .spellType(SpellType.CONTROL)
+            .spellType(SpellType.DAMAGE)
             .spellDescription("Stuns enemies, making them easy targets for follow-up spells.")
             .spellSpecialAttackLine("You've cancelled the enemy's spell!")
             .spellLevelRequirement(5)
@@ -96,12 +101,13 @@ public class Spell {
             .spellEffectiveDistance(new double[]{})
             .characterState(CharacterState.FROZEN)
             .spellChance(0.6)
-            .spellCoolDown(1)
+            .spellCooldown(1)
+            .spellReadyIn(0)
             .build();
 
     public static Spell transformation = Spell.builder()
             .spellName("Transformation")
-            .spellType(SpellType.CONTROL)
+            .spellType(SpellType.DAMAGE)
             .spellDescription("Enemies struck with the Transformation spell transform into explosive objects.")
             .spellSpecialAttackLine("You've transformed the enemy into a ")
             .spellLevelRequirement(10)
@@ -110,12 +116,13 @@ public class Spell {
             .spellEffectiveDistance(new double[]{})
             .characterState(CharacterState.STANDING)
             .spellChance(0.4)
-            .spellCoolDown(2)
+            .spellCooldown(2)
+            .spellReadyIn(0)
             .build();
 
     public static Spell accio = Spell.builder()
             .spellName("Accio")
-            .spellType(SpellType.FORCE)
+            .spellType(SpellType.DAMAGE)
             .spellDescription("Summon a variety of objects and enemies to close range.")
             .spellSpecialAttackLine("The enemy has been pulled close to you!")
             .spellLevelRequirement(0)
@@ -124,12 +131,13 @@ public class Spell {
             .spellEffectiveDistance(new double[]{})
             .characterState(CharacterState.LEVITATING)
             .spellChance(0.7)
-            .spellCoolDown(1)
+            .spellCooldown(1)
+            .spellReadyIn(0)
             .build();
 
     public static Spell descendo = Spell.builder()
             .spellName("Descendo")
-            .spellType(SpellType.FORCE)
+            .spellType(SpellType.DAMAGE)
             .spellDescription("Deals no direct damage, but objects and enemies that are slammed to the ground will suffer considerable impact damage. Airborne enemies will take even greater damage upon hitting the ground.")
             .spellSpecialAttackLine("You've slammed the enemy into the ground!")
             .spellLevelRequirement(4)
@@ -138,12 +146,13 @@ public class Spell {
             .spellEffectiveDistance(new double[]{})
             .characterState(CharacterState.KNOCKED)
             .spellChance(0.7)
-            .spellCoolDown(1)
+            .spellCooldown(1)
+            .spellReadyIn(0)
             .build();
 
     public static Spell depulso = Spell.builder()
             .spellName("Depulso")
-            .spellType(SpellType.FORCE)
+            .spellType(SpellType.DAMAGE)
             .spellDescription("Repels many types of objects and enemies with considerable force.")
             .spellSpecialAttackLine("You've kicked the enemy into the wall!")
             .spellLevelRequirement(6)
@@ -152,7 +161,8 @@ public class Spell {
             .spellEffectiveDistance(new double[]{})
             .characterState(CharacterState.KNOCKED)
             .spellChance(0.6)
-            .spellCoolDown(2)
+            .spellCooldown(2)
+            .spellReadyIn(0)
             .build();
 
     public static Spell bombarda = Spell.builder()
@@ -166,7 +176,8 @@ public class Spell {
             .spellEffectiveDistance(new double[]{})
             .characterState(CharacterState.ON_FIRE)
             .spellChance(0.35)
-            .spellCoolDown(3)
+            .spellCooldown(3)
+            .spellReadyIn(0)
             .build();
 
     public static Spell confringo = Spell.builder()
@@ -180,7 +191,8 @@ public class Spell {
             .spellEffectiveDistance(new double[]{})
             .characterState(CharacterState.ON_FIRE)
             .spellChance(0.6)
-            .spellCoolDown(2)
+            .spellCooldown(2)
+            .spellReadyIn(0)
             .build();
 
     public static Spell diffindo = Spell.builder()
@@ -194,7 +206,8 @@ public class Spell {
             .spellEffectiveDistance(new double[]{})
             .characterState(CharacterState.STANDING)
             .spellChance(0.6)
-            .spellCoolDown(1)
+            .spellCooldown(1)
+            .spellReadyIn(0)
             .build();
 
     public static Spell incendio = Spell.builder()
@@ -208,12 +221,13 @@ public class Spell {
             .spellEffectiveDistance(new double[]{0, 10})
             .characterState(CharacterState.STANDING)
             .spellChance(0.6)
-            .spellCoolDown(1)
+            .spellCooldown(1)
+            .spellReadyIn(0)
             .build();
 
     public static Spell avadaKedavra = Spell.builder()
             .spellName("Avada Kedavra")
-            .spellType(SpellType.UNFORGIVABLE_CURSE)
+            .spellType(SpellType.DAMAGE)
             .spellDescription("Kills enemies instantly.")
             .spellSpecialAttackLine("the enemy is kinda dead")
             .spellLevelRequirement(10)
@@ -222,12 +236,13 @@ public class Spell {
             .spellEffectiveDistance(new double[]{})
             .characterState(CharacterState.STANDING)
             .spellChance(1)
-            .spellCoolDown(6)
+            .spellCooldown(6)
+            .spellReadyIn(0)
             .build();
 
     public static Spell crucio = Spell.builder()
             .spellName("Crucio")
-            .spellType(SpellType.UNFORGIVABLE_CURSE)
+            .spellType(SpellType.DAMAGE)
             .spellDescription("Curses the victim, cursed enemies take extra damage.")
             .spellSpecialAttackLine("You've cursed the enemy!")
             .spellLevelRequirement(8)
@@ -236,21 +251,23 @@ public class Spell {
             .spellEffectiveDistance(new double[]{})
             .characterState(CharacterState.CURSED)
             .spellChance(0.8)
-            .spellCoolDown(4)
+            .spellCooldown(4)
+            .spellReadyIn(0)
             .build();
 
     public static Spell testSpell = Spell.builder()
             .spellName("Test Spell")
-            .spellType(SpellType.UNFORGIVABLE_CURSE)
+            .spellType(SpellType.DAMAGE)
             .spellDescription("test spell")
             .spellSpecialAttackLine("test spell attack line")
             .spellLevelRequirement(0)
-            .spellDamage(new double[]{100, 200})
+            .spellDamage(new double[]{200, 200})
             .spellDefense(new double[]{0, 0})
             .spellEffectiveDistance(new double[]{})
             .characterState(CharacterState.STUNNED)
             .spellChance(1)
-            .spellCoolDown(0)
+            .spellCooldown(2)
+            .spellReadyIn(0)
             .build();
 
 

@@ -1,23 +1,12 @@
 package Main;
 
-import AbstractClasses.AbstractCharacter;
-import AbstractClasses.AbstractItem;
 import Classes.Enemy;
-import Classes.Potion;
 import Classes.Spell;
 import Classes.Wizard;
-import Enums.Difficulty;
 import Enums.EnemyName;
-import Enums.EnemyType;
-import com.sun.nio.file.SensitivityWatchEventModifier;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
-
-import static Main.ConsoleFunctions.continuePrompt;
-import static Main.ConsoleFunctions.gameCredits;
-import static Main.SaveChecker.checkSaves;
+import static Classes.Enemy.enemies;
+import static Classes.Wizard.testWizard;
 
 public class Main {
     public static void main(String[] args) {
@@ -26,10 +15,30 @@ public class Main {
 //        checkSaves();
 //        CharacterCreation.characterInit();
 
-        Enemy.enemies = Enemy.generateEnemies(10, 10, 1, EnemyName.BASILISK, Wizard.testWizard.getDifficulty());
+        enemies = Enemy.generateEnemies(10, 10, 1, EnemyName.DARK_WIZARD, testWizard.getDifficulty());
 
-        Wizard.testWizard.updateSpells();
-        Wizard.testWizard.attack(Spell.testSpell, Enemy.enemies.get(0));
-        Wizard.testWizard.attack(Spell.testSpell, Enemy.enemies.get(0));
+//        testWizard.setDefensePoints(500);
+//        testWizard.setCharisma(20);
+//        testWizard.setStrength(25);
+//        testWizard.setIntelligence(28);
+////        testWizard.setLuck(15);
+
+//        testWizard.attack(Spell.testSpell, enemies.get(0));
+//        testWizard.reduceSpellsCooldown();
+//        testWizard.attack(Spell.testSpell, enemies.get(0));
+//        System.out.println("Level " + testWizard.getLevel());
+//        System.out.println("HP: " + testWizard.getHealthPoints());
+//        System.out.println("DF: " + testWizard.getDefensePoints());
+//        System.out.println("---------------");
+        testWizard.updateStats();
+        enemies.get(0).attack(Spell.testSpell, testWizard);
+        testWizard.attack(Spell.testSpell, enemies.get(0));
+
+        System.out.println(testWizard.getSpellList().stream().map(Spell::getSpellName).toList());
+
+        System.out.println(enemies.get(0).getHealthPoints());
+        System.out.println(enemies.get(0).getDefensePoints());
+//        Wizard.testWizard.attack(Spell.testSpell, Enemy.enemies.get(0));
+//        System.out.println(testWizard.getWizardStatsPercent());
     }
 }

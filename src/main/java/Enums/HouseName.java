@@ -1,22 +1,25 @@
 package Enums;
 
+import lombok.Getter;
+
 import java.util.HashMap;
 import java.util.List;
 
 import static Enums.EnumMethods.returnFormattedEnum;
 
+@Getter
 public enum HouseName {
     HUFFLEPUFF("POTION", 0.15),
     SLYTHERIN("DAMAGE", 0.1),
     GRYFFINDOR("DEFENSE", 0.2),
     RAVENCLAW("CHARISMA", 5);
 
-    public final String houseSpec;
-    public final double value;
+    private final String specName;
+    private final double specValue;
 
     HouseName(String houseSpec, double value) {
-        this.houseSpec = houseSpec;
-        this.value = value;
+        this.specName = houseSpec;
+        this.specValue = value;
     }
 
     public static List<String> getHouseNameList() {

@@ -6,6 +6,7 @@ import Enums.*;
 import lombok.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 @Getter
 @Setter
@@ -40,13 +41,58 @@ public class Wizard extends AbstractCharacter {
     private double luck; // for more attackChance
 
     private final double baseLevelExperience = 100;
-    private final int maxLevel = 10;
     private final double levelIncrement = 0.2;
 
+    public HashMap<String, Double> getWizardStatsPercent() {
+        final int wizardStats = 4;
+        final int dungeonLevels = 7;
+        final double maxPercent = 0.25;
+        int maxPoints = wizardStats * dungeonLevels;
 
+        double strengthPercent = (this.getStrength() * maxPercent) / maxPoints;
+        double luckPercent = (this.getLuck() * maxPercent) / maxPoints;
+        double intelligencePercent = (this.getIntelligence() * maxPercent) / maxPoints;
+        double charismaPercent = (this.getCharisma() * maxPercent) / maxPoints;
+
+        HashMap<String, Double> WizardStatsPercent = new HashMap<String, Double>();
+        WizardStatsPercent.put("strength", strengthPercent);
+        WizardStatsPercent.put("luck", luckPercent);
+        WizardStatsPercent.put("intelligence", intelligencePercent);
+        WizardStatsPercent.put("charisma", charismaPercent);
+
+        return  WizardStatsPercent;
+    }
+    // UPDATE WIZARD HEALTH AND DEFENSE POINTS BASED ON THEIR LEVEL
+    public void updateWizardHpDf() {
+        int wizardBaseHp = 100;
+        int wizardBaseDp = 100;
+
+        double wizardNewHp = (int) (this.getLevel() * 150 + wizardBaseHp);
+        double wizardNewDp = (int) (this.getLevel() * 150 + wizardBaseDp);
+
+        this.setHealthPoints(wizardNewHp);
+        this.setDefensePoints(wizardNewDp);
+
+    }
+
+
+    // UPDATE WIZARD STATS BASED ON WHICH HOUSE THEY BELONG TO
+    public void updateHouseSpec() {
+        HouseName houseName = this.getHouse().getHouseName();
+        double houseSpecValue = houseName.getSpecValue();
+
+        if(houseName == HouseName.GRYFFINDOR) {
+            this.setDefensePoints(this.getDefensePoints() * (1 + houseSpecValue));
+        }
+        else if(houseName == HouseName.RAVENCLAW) {
+            this.setCharisma(this.getCharisma() + houseSpecValue);
+        }
+    }
+
+    // UPDATE WIZARD LEVEL BASED ON XP THEY HAVE
     public void updateLevel() {
         double currentExperience = this.getExperience();
-        for(double i = 0; i < this.maxLevel * this.levelIncrement; i+= this.levelIncrement) {
+        for(double i = 0; i < AbstractCharacter.maxLevel * this.levelIncrement; i+= this.levelIncrement) {
             double requiredExperience = this.baseLevelExperience + this.baseLevelExperience * i;
             if(currentExperience / (requiredExperience) >= 1) {
                 currentExperience -= requiredExperience;
@@ -60,25 +106,34 @@ public class Wizard extends AbstractCharacter {
         }
     }
 
-    public void updateWizardStats(double addExperience) {
-        this.setExperience(addExperience);
+    public void addExperience(double experience) {
+        this.setExperience(this.getExperience() + experience);
+    }
+
+    public void updateStats() {
         this.updateLevel();
         this.updateSpells();
+        this.updateWizardHpDf();
+        this.updateHouseSpec();
+    }
+
+    public static House getHouseStat(Wizard wizard) {
+        return wizard.getHouse();
     }
 
     public static Wizard testWizard = Wizard.builder()
-            .healthPoints(100)
+            .healthPoints(200)
             .defensePoints(200)
             .difficulty(Difficulty.DEATH_WISH)
             .characterState(CharacterState.STANDING)
             .level(10)
-            .firstName("Test Wizard First Name")
-            .lastName("Test Wizard Last Name")
-            .name("testWizard")
+            .firstName("Test")
+            .lastName("Wizard")
+            .name("Test Wizard")
             .gender(Gender.MALE)
             .pet(Pet.CAT)
             .wand(new Wand(Core.PHEONIX_FEATHER, 12))
-            .house(new House(HouseName.GRYFFINDOR))
+            .house(new House(HouseName.SLYTHERIN))
             .spellList(new ArrayList<Spell>())
             .itemList(new ArrayList<AbstractItem>())
             .activePotionsList(new ArrayList<Potion>())

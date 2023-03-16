@@ -7,13 +7,10 @@ import lombok.*;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 import static Enums.EnumMethods.returnFormattedEnum;
 import static Main.MechanicsFunctions.generateDoubleBetween;
-import static java.lang.Long.sum;
 
 
 @Getter
@@ -33,6 +30,9 @@ public class Enemy extends AbstractCharacter {
     private double experiencePoints;
     private double distanceFromPlayer;
     public static List<Enemy> enemies = new ArrayList<Enemy>();
+
+    static final int enemyBaseHp = 100;
+    static final int enemyBaseDp = 100;
 
     public static List<AbstractItem> generateRandomPotions(int potionNumber) {
         // GENERATE 3 RANDOM POTIONS FOR EACH ENEMY
@@ -61,8 +61,6 @@ public class Enemy extends AbstractCharacter {
 
 
         for(int i = 0; i < amount; i++) {
-            final int baseHp = 100;
-            final int baseDefense = 100;
             int enemyLevel;
                 if(minLevel == maxLevel) {
                     enemyLevel = (int) minLevel;
@@ -71,17 +69,17 @@ public class Enemy extends AbstractCharacter {
                     enemyLevel = (int) generateDoubleBetween(minLevel, maxLevel);
                 }
 
-            int enemyHp = (int) (Math.exp(enemyLevel - enemyLevel * difficulty.getDifficultyMultiplier()) * baseHp + baseHp);
-            int enemyDefense = (int) ((Math.exp(enemyLevel - enemyLevel * difficulty.getDifficultyMultiplier()) * baseDefense + baseDefense) / 2);
+            int enemyHp = (int) Math.round(Math.exp(enemyLevel * difficulty.getEnemyDiffMultiplier()) * enemyBaseHp) ;
+            int enemyDp = (int) Math.round((Math.exp(enemyLevel * difficulty.getEnemyDiffMultiplier()) * enemyBaseDp) / 3);
 
-            System.out.println("Level " + enemyLevel);
-            System.out.println("HP: " + enemyHp);
-            System.out.println("DF: " + enemyDefense);
-            System.out.println("---------------");
+//            System.out.println("Level " + enemyLevel);
+//            System.out.println("HP: " + enemyHp);
+//            System.out.println("DF: " + enemyDp);
+//            System.out.println("---------------");
 
             enemies[i] = Enemy.builder()
                     .healthPoints(enemyHp)
-                    .defensePoints(enemyDefense)
+                    .defensePoints(enemyDp)
                     .difficulty(difficulty)
                     .characterState(CharacterState.STANDING)
                     .itemList(generateRandomPotions(3))

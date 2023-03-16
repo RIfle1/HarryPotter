@@ -6,13 +6,9 @@ import java.util.List;
 import static Enums.EnumMethods.returnFormattedEnum;
 
 public enum SpellType {
-    ANCIENT,
-    ESSENTIAL,
-    CONTROL,
-    FORCE,
     DAMAGE,
-    TRANSFIGURATION,
-    UNFORGIVABLE_CURSE;
+    DEFENSE,
+    FOLLOW_UP;
 
     public static List<String> getSpellTypeList() {
         SpellType[] spellTypeValues = SpellType.values();
