@@ -5,8 +5,11 @@ import Enums.*;
 import lombok.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
+import static Classes.Color.ANSI_BLUE;
+import static Classes.Color.printColoredText;
 import static Enums.EnumMethods.returnFormattedEnum;
 import static Main.ConsoleFunctions.printSeparator;
 import static Main.MechanicsFunctions.generateDoubleBetween;
@@ -14,26 +17,30 @@ import static Main.MechanicsFunctions.generateDoubleBetween;
 @Getter
 @Setter
 public abstract class AbstractCharacter {
-    public AbstractCharacter(String name, double healthPoints, double defensePoints, Difficulty difficulty, CharacterState characterState, List<AbstractItem> itemList, List<Potion> activePotionsList, List<Spell> spellList, double level) {
+    public AbstractCharacter(String name, double healthPoints, double defensePoints, double maxHealthPoints, double maxDefensePoints, Difficulty difficulty, CharacterState characterState, List<AbstractItem> itemList, List<Potion> activePotionsList, HashMap<Spell, Spell> spellHashMap, double level) {
         this.name = name;
         this.healthPoints = healthPoints;
         this.defensePoints = defensePoints;
+        this.maxHealthPoints = maxHealthPoints;
+        this.maxDefensePoints = maxDefensePoints;
         this.difficulty = difficulty;
         this.characterState = characterState;
         this.itemList = itemList;
         this.activePotionsList = activePotionsList;
-        this.spellList = spellList;
+        this.spellHashMap = spellHashMap;
         this.level = level;
     }
 
     private String name;
     private double healthPoints;
     private double defensePoints;
+    private double maxHealthPoints;
+    private double maxDefensePoints;
     private Difficulty difficulty;
     private CharacterState characterState;
     private List<AbstractItem> itemList;
     private List<Potion> activePotionsList;
-    private List<Spell> spellList;
+    private HashMap<Spell, Spell> spellHashMap;
     private double level;
 
     public final static int maxLevel = 10;
@@ -44,8 +51,32 @@ public abstract class AbstractCharacter {
     // <1 PLAYER HAS BETTER STATS THAN THE ENEMIES
     public final static double difficultyDifference = 1.3;
 
-    public void deleteEnemy() {
-        Enemy.enemies.removeIf(enemy1 -> enemy1.getName().equals(this.getName()));
+    public void getStatBar(String statLogo, String statLogoColor, String color ,double value, double maxValue) {
+        final int statBarLength = 30;
+
+        int stat = (int) ((value / maxValue) * statBarLength);
+        int empty = statBarLength - stat;
+
+        System.out.print(printColoredText(statLogo, statLogoColor));
+        System.out.print(printColoredText("[", Color.ANSI_CYAN));
+        for(int x = 0; x < stat; x++) {
+            System.out.print(printColoredText("|", Color.ANSI_GREEN));
+        }
+        for(int y = 0; y < empty; y++) {
+            System.out.print(printColoredText("-", Color.ANSI_RED));
+        }
+        System.out.print(printColoredText("]", Color.ANSI_CYAN));
+
+    }
+
+    public void printStats() {
+        System.out.print(printColoredText(this.getName(), Color.ANSI_PURPLE));
+        System.out.print(printColoredText(" <> ", Color.ANSI_WHITE));
+        System.out.print(printColoredText("Level " + (int) this.getLevel(), Color.ANSI_YELLOW));
+        System.out.print(printColoredText(" <> ", Color.ANSI_WHITE));
+        getStatBar("❤", Color.ANSI_RED,"", this.getHealthPoints(), this.getMaxHealthPoints());
+        System.out.print(printColoredText(" <> ", Color.ANSI_WHITE));
+        System.out.print(printColoredText( (int) this.getDefensePoints() + " Defense", ANSI_BLUE));
     }
 
     public void addItem(AbstractItem abstractItem){
@@ -108,25 +139,15 @@ public abstract class AbstractCharacter {
         }
     }
 
-    public void updateSpells() {
-        List<Spell> spellList = new ArrayList<>();
+    public void updateSpells() throws CloneNotSupportedException {
+        HashMap<Spell, Spell> spellList = new HashMap<>();
 
         for(Spell spell:Spell.getAllSpells()) {
             if(spell.getSpellLevelRequirement() <= this.getLevel()) {
-                spellList.add(spell);
+                spellList.put(spell, (Spell) spell.clone());
             }
         }
-        this.setSpellList(spellList);
-    }
-
-    public List<String> getSpellNamesList() {
-        List<String> spellNamesList = new ArrayList<>();
-
-        for(Spell spell:this.getSpellList()) {
-            spellNamesList.add(spell.getSpellName());
-        }
-
-        return spellNamesList;
+        this.setSpellHashMap(spellList);
     }
 
     public double getActivePotionValueSum(PotionType potionType) {
@@ -167,15 +188,13 @@ public abstract class AbstractCharacter {
             }
             strengthPercent = ((Wizard) this).getWizardStatsPercent().get("strength");
 
-            spellBaseDamage = Math.exp(this.getLevel() * difficulty.getWizardDiffMultiplier()) * spellRandomDamage ;
+            spellBaseDamage = (Math.exp(this.getLevel() * getDifficulty().getWizardDiffMultiplier()) * spellRandomDamage) / 10 ;
         }
         else if(this.getClass() == Enemy.class) {
-            spellBaseDamage = (Math.exp(this.getLevel() * difficulty.getEnemyDiffMultiplier()) * spellRandomDamage) / 10;
+            spellBaseDamage = (Math.exp(this.getLevel() * getDifficulty().getEnemyDiffMultiplier()) * spellRandomDamage) / 15;
         }
 
-
-
-        System.out.println("spell base dmg: " + spellBaseDamage);
+//        System.out.println("spell base dmg: " + spellBaseDamage);
 
         double potionDamagePercentIncrease = getActivePotionValueSum(PotionType.DAMAGE) * (1 + housePotionPercent);
         double characterStateDamageMultiplier = attackCharacter.getCharacterState().getDamageMultiplier();
@@ -191,19 +210,17 @@ public abstract class AbstractCharacter {
     }
 
     public double takeDamage(double spellDamage) {
-        double calculatedDamage;
-        final int z = 2;
-
-        if(spellDamage <= this.defensePoints && spellDamage >= 0) {
-            calculatedDamage = (Math.pow(spellDamage, z)) / (this.defensePoints * z);
-        }
-        else {
-            calculatedDamage = spellDamage - (this.defensePoints / z);
-        }
-        this.healthPoints -= (int) calculatedDamage;
+        final double maxDefenseReductionPercent = 0.2;
+        double calculatedDamage = spellDamage * (1 - (this.maxDefensePoints / this.maxHealthPoints) *maxDefenseReductionPercent);
+        this.healthPoints -= calculatedDamage;
 
         if(this.healthPoints <= 0) {
-            this.deleteEnemy();
+            if(this.getClass() == Enemy.class) {
+                ((Enemy) this).deleteEnemy();
+            }
+//            else {
+//
+//            }
         }
 
         return calculatedDamage;
@@ -244,34 +261,48 @@ public abstract class AbstractCharacter {
     }
 
     public boolean checkSpellAvailability(Spell spell) {
-        List<Spell> abstractCharacterSpellList = this.getSpellList();
+        HashMap<Spell, Spell> characterSpellHashMap = this.getSpellHashMap();
+        List<Spell> characterSpellList = new ArrayList<>();
 
-        boolean spellExistsCharacterSpellList = abstractCharacterSpellList.stream().anyMatch(abstractCharacterSpell -> abstractCharacterSpell.equals(spell));
-        boolean spellIsReady = spellExistsCharacterSpellList && spell.getSpellReadyIn() == 0;
+        characterSpellHashMap.forEach((key, value) -> characterSpellList.add(value));
+        boolean spellInHashMap = characterSpellList.stream().anyMatch(abstractCharacterSpell -> abstractCharacterSpell.equals(spell));
 
-        System.out.println(spell.getSpellReadyIn());
+        boolean spellIsReady = spellInHashMap && spell.getSpellReadyIn() == 0;
 
-        if(spell.getSpellReadyIn() == 0) {
-            System.out.println("yes");
-        }
+//        System.out.println(spell.getSpellReadyIn());
 
-        return spellExistsCharacterSpellList && spellIsReady;
+//        if(spell.getSpellReadyIn() == 0) {
+//            System.out.println("yes");
+//        }
+
+        return spellInHashMap && spellIsReady;
     }
 
     public void spellUsed(Spell spell) {
         spell.setSpellReadyIn(spell.getSpellCooldown());
     }
 
+    public List<Spell> getAllSpells() {
+        HashMap<Spell, Spell> characterSpellHashMap = this.getSpellHashMap();
+        List<Spell> characterSpellList = new ArrayList<>();
+
+        characterSpellHashMap.forEach((key, value) -> characterSpellList.add(value));
+        return characterSpellList;
+    }
+
+    public Spell getSpell(Spell spell) {
+        HashMap<Spell, Spell> characterSpellHashMap = this.getSpellHashMap();
+        return characterSpellHashMap.get(spell);
+    }
+
     public void reduceSpellsCooldown(int cooldown) {
-        List<Spell> abstractCharacterSpellList = this.getSpellList();
-        abstractCharacterSpellList
-                .forEach(abstractCharacterSpell -> abstractCharacterSpell.setSpellReadyIn(abstractCharacterSpell.getSpellReadyIn() - cooldown));
+        HashMap<Spell, Spell> characterSpellHashMap = this.getSpellHashMap();
+        characterSpellHashMap.forEach((key, value) -> value.setSpellReadyIn(value.getSpellReadyIn() - cooldown));
     }
 
     public void reduceSpellsCooldown() {
-        List<Spell> abstractCharacterSpellList = this.getSpellList();
-        abstractCharacterSpellList
-                .forEach(abstractCharacterSpell -> abstractCharacterSpell.setSpellReadyIn(0));
+        HashMap<Spell, Spell> characterSpellHashMap = this.getSpellHashMap();
+        characterSpellHashMap.forEach((key, value) -> value.setSpellReadyIn(0));
     }
 
     public void spellCast(Spell spell, AbstractCharacter attackCharacter) {
@@ -287,24 +318,23 @@ public abstract class AbstractCharacter {
             double damageTaken = attackCharacter.takeDamage(spellDamage);
             double healthPoints = attackCharacter.getHealthPoints();
 
-            String text1 = "You hit " + attackCharacter.getName() + " with " + (int) damageTaken + " damage!";
-            String text2 = returnFormattedEnum(attackCharacter.getName()
+            String text1 = this.getName() + " hit " + attackCharacter.getName() + " with " + (int) damageTaken + " damage!";
+            String text2 = attackCharacter.getName()
                     + " "
-                    + attackCharacter.getCharacterState()
-                    + ".");
+                    + returnFormattedEnum(attackCharacter.getCharacterState())
+                    + ".";
             String text3 = "Next attack will have "
                     + (int) (attackCharacter.getCharacterState().getDamageMultiplier() * 100)
                     + "% more damage.";
-            String text4 = returnFormattedEnum(attackCharacter.getName())
+            String text4 = attackCharacter.getName()
                     + " has " + (int) healthPoints + " hp left.";
             String text5 = "You killed " + returnFormattedEnum(attackCharacter.getName());
 
             System.out.println(text1);
-            System.out.println(text2);
-            System.out.println(text3);
 
             if(healthPoints > 0) {
-
+                System.out.println(text2);
+                System.out.println(text3);
                 System.out.println(text4);
             }
             else {
@@ -331,15 +361,20 @@ public abstract class AbstractCharacter {
 
         // IF SPELL EXISTS IN THE CHARACTER'S SPELL LIST
         if(checkSpellAvailability(spell)) {
-            // SPELL GETS USED AND PUT ON A COOLDOWN
-            this.spellUsed(spell);
-
-            // CONSOLE STUFF
-            System.out.println(spellName+"!");
-            System.out.println(spellSpecialAttackLine);
 
             // SPELL GETS CAST ON THE ATTACK CHARACTER
-            spellCast(spell, attackCharacter);
+            if(attackCharacter.getHealthPoints() > 0) {
+                // SPELL GETS USED AND PUT ON A COOLDOWN
+                this.spellUsed(spell);
+                // CONSOLE STUFF
+                System.out.println(spellName+"!");
+                System.out.println(spellSpecialAttackLine);
+                spellCast(spell, attackCharacter);
+            }
+            else {
+                System.out.println(attackCharacter.getName() + " is already dead.");
+            }
+
         }
         else {
             System.out.println(spell.getSpellName() + " not available.");

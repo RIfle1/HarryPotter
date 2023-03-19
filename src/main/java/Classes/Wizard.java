@@ -8,12 +8,13 @@ import lombok.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
 @Getter
 @Setter
 public class Wizard extends AbstractCharacter {
     @Builder
-    public Wizard(String name, double healthPoints, double defensePoints, Difficulty difficulty, CharacterState characterState, List<AbstractItem> itemList, List<Potion> activePotionsList, List<Spell> spellList, double level, String firstName, String lastName, Gender gender, Pet pet, Wand wand, House house, double experience, double charisma, double strength, double intelligence, double luck) {
-        super(name, healthPoints, defensePoints, difficulty, characterState, itemList, activePotionsList, spellList, level);
+    public Wizard(String name, double healthPoints, double defensePoints, double maxHealthPoints, double maxDefensePoints, Difficulty difficulty, CharacterState characterState, List<AbstractItem> itemList, List<Potion> activePotionsList, HashMap<Spell, Spell> spellHashMap, double level, String firstName, String lastName, Gender gender, Pet pet, Wand wand, House house, double experience, double charisma, double strength, double intelligence, double luck) {
+        super(name, healthPoints, defensePoints, maxHealthPoints, maxDefensePoints, difficulty, characterState, itemList, activePotionsList, spellHashMap, level);
         this.firstName = firstName;
         this.lastName = lastName;
         this.gender = gender;
@@ -40,6 +41,8 @@ public class Wizard extends AbstractCharacter {
     private double intelligence; // for parrying
     private double luck; // for more attackChance
 
+    private static final int wizardBaseHp = 120;
+    private static final int wizardBaseDp = 40;
     private final double baseLevelExperience = 100;
     private final double levelIncrement = 0.2;
 
@@ -64,15 +67,14 @@ public class Wizard extends AbstractCharacter {
     }
     // UPDATE WIZARD HEALTH AND DEFENSE POINTS BASED ON THEIR LEVEL
     public void updateWizardHpDf() {
-        int wizardBaseHp = 100;
-        int wizardBaseDp = 100;
 
-        double wizardNewHp = (int) (this.getLevel() * 150 + wizardBaseHp);
-        double wizardNewDp = (int) (this.getLevel() * 150 + wizardBaseDp);
+        double wizardNewHp = (int) (this.getLevel() * wizardBaseHp);
+        double wizardNewDp = (int) (this.getLevel() * wizardBaseDp);
 
         this.setHealthPoints(wizardNewHp);
         this.setDefensePoints(wizardNewDp);
-
+        this.setMaxDefensePoints(wizardNewDp);
+        this.setMaxHealthPoints(wizardNewHp);
     }
 
 
@@ -110,7 +112,7 @@ public class Wizard extends AbstractCharacter {
         this.setExperience(this.getExperience() + experience);
     }
 
-    public void updateStats() {
+    public void updateStats() throws CloneNotSupportedException {
         this.updateLevel();
         this.updateSpells();
         this.updateWizardHpDf();
@@ -121,9 +123,11 @@ public class Wizard extends AbstractCharacter {
         return wizard.getHouse();
     }
 
-    public static Wizard testWizard = Wizard.builder()
-            .healthPoints(200)
-            .defensePoints(200)
+    public static Wizard wizard = Wizard.builder()
+            .healthPoints(wizardBaseHp)
+            .defensePoints(wizardBaseDp)
+            .maxDefensePoints(wizardBaseDp)
+            .maxHealthPoints(wizardBaseHp)
             .difficulty(Difficulty.DEATH_WISH)
             .characterState(CharacterState.STANDING)
             .level(10)
@@ -134,9 +138,9 @@ public class Wizard extends AbstractCharacter {
             .pet(Pet.CAT)
             .wand(new Wand(Core.PHEONIX_FEATHER, 12))
             .house(new House(HouseName.SLYTHERIN))
-            .spellList(new ArrayList<Spell>())
-            .itemList(new ArrayList<AbstractItem>())
-            .activePotionsList(new ArrayList<Potion>())
+            .spellHashMap(new HashMap<>())
+            .itemList(new ArrayList<>())
+            .activePotionsList(new ArrayList<>())
             .experience(0)
             .charisma(0)
             .strength(0)

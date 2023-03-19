@@ -15,7 +15,7 @@ import java.util.List;
 @Setter
 @Builder
 @AllArgsConstructor
-public class Spell {
+public class Spell implements Cloneable{
 
     private String spellName;
     private SpellType spellType;
@@ -320,5 +320,8 @@ public class Spell {
     }
 
 
-
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
 }

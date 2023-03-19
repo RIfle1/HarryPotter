@@ -5,8 +5,8 @@ import AbstractClasses.AbstractItem;
 import Enums.*;
 import lombok.*;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import static Enums.EnumMethods.returnFormattedEnum;
@@ -17,8 +17,8 @@ import static Main.MechanicsFunctions.generateDoubleBetween;
 @Setter
 public class Enemy extends AbstractCharacter {
     @Builder
-    public Enemy(String name, double healthPoints, double defensePoints, Difficulty difficulty, CharacterState characterState, List<AbstractItem> itemList, List<Potion> activePotionsList, List<Spell> spellList, double level, EnemyName enemyName, EnemyType enemyType, double experiencePoints, double distanceFromPlayer) {
-        super(name, healthPoints, defensePoints, difficulty, characterState, itemList, activePotionsList, spellList, level);
+    public Enemy(String name, double healthPoints, double defensePoints, double maxHealthPoints, double maxDefensePoints, Difficulty difficulty, CharacterState characterState, List<AbstractItem> itemList, List<Potion> activePotionsList, HashMap<Spell, Spell> spellHashMap, double level, EnemyName enemyName, EnemyType enemyType, double experiencePoints, double distanceFromPlayer) {
+        super(name, healthPoints, defensePoints, maxHealthPoints, maxDefensePoints, difficulty, characterState, itemList, activePotionsList, spellHashMap, level);
         this.enemyName = enemyName;
         this.enemyType = enemyType;
         this.experiencePoints = experiencePoints;
@@ -29,10 +29,19 @@ public class Enemy extends AbstractCharacter {
     private EnemyType enemyType;
     private double experiencePoints;
     private double distanceFromPlayer;
-    public static List<Enemy> enemies = new ArrayList<Enemy>();
-
+    public static HashMap<String, Enemy> enemiesHashMap = new HashMap<>();
+    public static List<String> enemiesKeyList = new ArrayList<>();
     static final int enemyBaseHp = 100;
     static final int enemyBaseDp = 100;
+
+    public static void clearEnemies() {
+        enemiesKeyList.forEach(key -> enemiesHashMap.remove(key));
+        enemiesKeyList.clear();
+    }
+
+    public void deleteEnemy() {
+        enemiesHashMap.remove(this.getName());
+    }
 
     public static List<AbstractItem> generateRandomPotions(int potionNumber) {
         // GENERATE 3 RANDOM POTIONS FOR EACH ENEMY
@@ -49,14 +58,16 @@ public class Enemy extends AbstractCharacter {
             }
 
         }
-
-
         return randomPotions;
     }
 
-    public static List<Enemy> generateEnemies(double minLevel, double maxLevel, int amount, EnemyName enemyName, Difficulty difficulty) {
+    public static void updateEnemiesKeyList(HashMap<String, Enemy> enemiesHashMap) {
+        enemiesHashMap.forEach((key, value) -> enemiesKeyList.add(key));
+    }
+
+    public static HashMap<String, Enemy> generateEnemies(double minLevel, double maxLevel, int amount, EnemyName enemyName, Difficulty difficulty) throws CloneNotSupportedException {
         // ENEMIES LIST
-        List<Enemy> enemiesList = new ArrayList<Enemy>();
+        HashMap<String, Enemy> enemiesHashMap = new HashMap<>();
         Enemy[] enemies = new Enemy[amount];
 
 
@@ -80,11 +91,13 @@ public class Enemy extends AbstractCharacter {
             enemies[i] = Enemy.builder()
                     .healthPoints(enemyHp)
                     .defensePoints(enemyDp)
+                    .maxHealthPoints(enemyHp)
+                    .maxDefensePoints(enemyDp)
                     .difficulty(difficulty)
                     .characterState(CharacterState.STANDING)
                     .itemList(generateRandomPotions(3))
-                    .activePotionsList(new ArrayList<Potion>())
-                    .spellList(new ArrayList<Spell>())
+                    .activePotionsList(new ArrayList<>())
+                    .spellHashMap(new HashMap<>())
                     .level(enemyLevel)
                     .name(returnFormattedEnum(enemyName)+"-"+(i+1))
                     .enemyName(enemyName)
@@ -93,49 +106,14 @@ public class Enemy extends AbstractCharacter {
                     .build();
 
             enemies[i].updateSpells();
-
-            enemiesList.add(enemies[i]);
+            enemiesHashMap.put(enemies[i].getName(), enemies[i]);
         }
-        return enemiesList;
+        updateEnemiesKeyList(enemiesHashMap);
+        return enemiesHashMap;
     }
 
 
-    public static List<Enemy> getAllEnemies(){
-        List<Enemy> enemyList = new ArrayList<>();
-        Field[] declaredFields = Enemy.class.getDeclaredFields();
 
-        for(Field field:declaredFields) {
-            if (java.lang.reflect.Modifier.isStatic(field.getModifiers())) {
-                if (Enemy.class.isAssignableFrom(field.getType())) {
-                    try {
-                        enemyList.add((Enemy) field.get(null));
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
-
-        return enemyList;
-    }
-
-    public static List<String> getAllEnemiesNamesList() {
-        List<String> enemyNameList = new ArrayList<>();
-
-        for(Enemy enemy: getAllEnemies()) {
-            enemyNameList.add(returnFormattedEnum(enemy.getName()));
-        }
-        return enemyNameList;
-    }
-
-    public static List<String> getEnemiesNamesList(List<Enemy> enemyList) {
-        List<String> enemyNameList = new ArrayList<>();
-
-        for(Enemy enemy: enemyList) {
-            enemyNameList.add(returnFormattedEnum(enemy.getName()));
-        }
-        return enemyNameList;
-    }
 
 
 }
