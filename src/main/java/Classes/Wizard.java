@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static Classes.Color.*;
+
 @Getter
 @Setter
 public class Wizard extends AbstractCharacter {
@@ -41,10 +43,35 @@ public class Wizard extends AbstractCharacter {
     private double intelligence; // for parrying
     private double luck; // for more attackChance
 
-    private static final int wizardBaseHp = 120;
-    private static final int wizardBaseDp = 40;
+    public static final int wizardBaseHp = 120;
+    public static final int wizardBaseDp = 40;
     private final double baseLevelExperience = 100;
     private final double levelIncrement = 0.2;
+
+    public void printStats() throws CloneNotSupportedException {
+        this.updateStats();
+        System.out.print(
+                printColoredText(this.getName(), Color.ANSI_PURPLE) +
+                printColoredText(" <> ", Color.ANSI_WHITE) +
+                printColoredText("Level " + (int) this.getLevel(), Color.ANSI_YELLOW) +
+                printColoredText(" <> ", Color.ANSI_WHITE)
+        );
+        getStatBar("❤", Color.ANSI_RED,"", this.getHealthPoints(), this.getMaxHealthPoints());
+        System.out.print(
+                printColoredText(" <> ", Color.ANSI_WHITE) +
+                printColoredText( (int) this.getDefensePoints() + " Defense", ANSI_BLUE) +
+                printColoredText(" <> ", Color.ANSI_WHITE) +
+                printColoredText((int) this.getCharisma() + " Charisma", ANSI_YELLOW) +
+                printColoredText(" <> ", Color.ANSI_WHITE) +
+                printColoredText((int) this.getStrength() + " Strength", ANSI_RED) +
+                printColoredText(" <> ", Color.ANSI_WHITE) +
+                printColoredText((int) this.getIntelligence() + " Intelligence", ANSI_BLUE) +
+                printColoredText(" <> ", Color.ANSI_WHITE) +
+                printColoredText((int) this.getLuck() + " Luck", ANSI_PURPLE)
+        );
+        System.out.println();
+
+    }
 
     public HashMap<String, Double> getWizardStatsPercent() {
         final int wizardStats = 4;
@@ -66,7 +93,7 @@ public class Wizard extends AbstractCharacter {
         return  WizardStatsPercent;
     }
     // UPDATE WIZARD HEALTH AND DEFENSE POINTS BASED ON THEIR LEVEL
-    public void updateWizardHpDf() {
+    private void updateWizardHpDf() {
 
         double wizardNewHp = (int) (this.getLevel() * wizardBaseHp);
         double wizardNewDp = (int) (this.getLevel() * wizardBaseDp);
@@ -92,7 +119,7 @@ public class Wizard extends AbstractCharacter {
     }
 
     // UPDATE WIZARD LEVEL BASED ON XP THEY HAVE
-    public void updateLevel() {
+    private void updateLevel() {
         double currentExperience = this.getExperience();
         for(double i = 0; i < AbstractCharacter.maxLevel * this.levelIncrement; i+= this.levelIncrement) {
             double requiredExperience = this.baseLevelExperience + this.baseLevelExperience * i;
@@ -116,7 +143,6 @@ public class Wizard extends AbstractCharacter {
         this.updateLevel();
         this.updateSpells();
         this.updateWizardHpDf();
-        this.updateHouseSpec();
     }
 
     public static House getHouseStat(Wizard wizard) {
@@ -124,6 +150,31 @@ public class Wizard extends AbstractCharacter {
     }
 
     public static Wizard wizard = Wizard.builder()
+            .healthPoints(wizardBaseHp)
+            .defensePoints(wizardBaseDp)
+            .maxDefensePoints(wizardBaseDp)
+            .maxHealthPoints(wizardBaseHp)
+            .difficulty(null)
+            .characterState(CharacterState.STANDING)
+            .level(1)
+            .firstName("null")
+            .lastName("null")
+            .name("null null")
+            .gender(null)
+            .pet(null)
+            .wand(null)
+            .house(null)
+            .spellHashMap(new HashMap<>())
+            .itemList(new ArrayList<>())
+            .activePotionsList(new ArrayList<>())
+            .experience(0)
+            .charisma(0)
+            .strength(0)
+            .intelligence(0)
+            .luck(0)
+            .build();
+
+    public static Wizard testWizard = Wizard.builder()
             .healthPoints(wizardBaseHp)
             .defensePoints(wizardBaseDp)
             .maxDefensePoints(wizardBaseDp)

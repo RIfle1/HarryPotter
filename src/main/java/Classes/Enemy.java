@@ -8,7 +8,9 @@ import lombok.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import static Classes.Color.*;
 import static Enums.EnumMethods.returnFormattedEnum;
 import static Main.MechanicsFunctions.generateDoubleBetween;
 
@@ -112,7 +114,29 @@ public class Enemy extends AbstractCharacter {
         return enemiesHashMap;
     }
 
+    public void printStats() {
+        System.out.print(
+                printColoredText(this.getName(), Color.ANSI_PURPLE) +
+                        printColoredText(" <> ", Color.ANSI_WHITE) +
+                        printColoredText("Level " + (int) this.getLevel(), Color.ANSI_YELLOW) +
+                        printColoredText(" <> ", Color.ANSI_WHITE)
+        );
+        getStatBar("❤", Color.ANSI_RED,"", this.getHealthPoints(), this.getMaxHealthPoints());
+        System.out.print(
+                printColoredText(" <> ", Color.ANSI_WHITE) +
+                        printColoredText( (int) this.getDefensePoints() + " Defense", ANSI_BLUE)
+        );
+        System.out.println();
+    }
 
+    public static void printEnemies() {
+        int index = 1;
+        for(Map.Entry<String, Enemy> set : enemiesHashMap.entrySet()) {
+            System.out.print("(" + index + ") ");
+            set.getValue().printStats();
+            index++;
+        }
+    }
 
 
 

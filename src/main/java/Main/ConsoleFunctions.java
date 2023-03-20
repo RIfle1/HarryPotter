@@ -3,6 +3,8 @@ package Main;
 import java.io.IOException;
 import java.util.*;
 
+import static Classes.BattleArena.battleArena;
+
 public class ConsoleFunctions {
     static Scanner scanner = new Scanner(System.in);
     public static final String[] yesOrNo = {"Yes", "No"};
@@ -91,8 +93,6 @@ public class ConsoleFunctions {
     public static void continuePrompt(){
         System.out.println("\nType anything and then enter to continue...");
         System.out.println(scanner.nextLine());
-
-
     }
 
     public static void gameCredits() {
@@ -100,5 +100,25 @@ public class ConsoleFunctions {
         printHeader(welcomeText);
         continuePrompt();
         clearConsole();
+    }
+
+    public static void chooseLevel() throws CloneNotSupportedException {
+        String[] optionsList = {
+                "The Philosopher's Stone",
+                "The Chamber of Secrets",
+                "The Prisoner of Azkaban",
+                "The Goblet of Fire",
+                "The Order of the Phoenix",
+                "The Half-Blooded Prince",
+                "The Deathly Hallows",
+                "Battle Arena",
+        };
+
+        printHeader("Choose your level: ");
+        printChoices(optionsList);
+
+        switch (returnChoiceInt()) {
+            case 1, 2, 3, 4, 5, 6, 7, 8 -> battleArena();
+        }
     }
 }

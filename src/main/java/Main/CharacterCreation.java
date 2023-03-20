@@ -1,19 +1,17 @@
 package Main;
-import Classes.House;
-import Classes.Potion;
-import Classes.Spell;
-import Classes.Wand;
+import Classes.*;
 import Enums.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static Classes.Wizard.*;
 import static Main.ConsoleFunctions.*;
 
 public class CharacterCreation {
 
-    public static void characterInit() {
+    public static void characterInit() throws CloneNotSupportedException {
         String firstName;
         String lastName;
 
@@ -22,11 +20,7 @@ public class CharacterCreation {
 
         Wand wand;
         House house;
-
-        List<Spell> knownSpells;
-        List<Potion> potions;
-
-        double experience;
+        Difficulty difficulty;
 
         double charisma; // for dodging
         double strength; // for more attack damage
@@ -57,6 +51,11 @@ public class CharacterCreation {
         }
         printHeader("Congratulations!, You are now part of the " + EnumMethods.returnFormattedEnum(house.getHouseName()) + " House.");
 
+        printHeader("Choose the difficulty of your game: ");
+        printChoices(Difficulty.getDifficultyList());
+        difficulty = Difficulty.setDifficulty(Difficulty.getDifficultyList().get(returnChoiceInt() - 1));
+
+
         System.out.println(
                 firstName +
                         lastName +
@@ -67,6 +66,34 @@ public class CharacterCreation {
                         house.getHouseName()
 
         );
+
+        Wizard.wizard = Wizard.builder()
+                .healthPoints(wizardBaseHp)
+                .defensePoints(wizardBaseDp)
+                .maxDefensePoints(wizardBaseDp)
+                .maxHealthPoints(wizardBaseHp)
+                .difficulty(difficulty)
+                .characterState(CharacterState.STANDING)
+                .level(1)
+                .firstName(firstName)
+                .lastName(lastName)
+                .name(firstName + " " + lastName)
+                .gender(gender)
+                .pet(pet)
+                .wand(wand)
+                .house(house)
+                .spellHashMap(new HashMap<>())
+                .itemList(new ArrayList<>())
+                .activePotionsList(new ArrayList<>())
+                .experience(0)
+                .charisma(0)
+                .strength(0)
+                .intelligence(0)
+                .luck(0)
+                .build();
+
+        wizard.updateHouseSpec();
+        wizard.updateStats();
     }
 
     public static Wand wandCreation() {
@@ -77,8 +104,8 @@ public class CharacterCreation {
         printChoices(Core.getCoreList());
         core = Core.setCore(Core.getCoreList().get(returnChoiceInt() - 1));
 
-        printHeader("Select your wand's Size:");
-        size = returnChoiceInt();
+        printHeader("Select your wand's Size (10-27):");
+        size = returnChoiceInt(10, 27);
 
         return new Wand(core, size);
     }
@@ -120,7 +147,6 @@ public class CharacterCreation {
 
         printChoices(questionList2);
         houseName = questionMap2.get(questionList2.get(returnChoiceInt() - 1));
-        System.out.println(houseName);
 
         return new House(houseName);
     }

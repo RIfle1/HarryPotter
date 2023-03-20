@@ -69,16 +69,6 @@ public abstract class AbstractCharacter {
 
     }
 
-    public void printStats() {
-        System.out.print(printColoredText(this.getName(), Color.ANSI_PURPLE));
-        System.out.print(printColoredText(" <> ", Color.ANSI_WHITE));
-        System.out.print(printColoredText("Level " + (int) this.getLevel(), Color.ANSI_YELLOW));
-        System.out.print(printColoredText(" <> ", Color.ANSI_WHITE));
-        getStatBar("❤", Color.ANSI_RED,"", this.getHealthPoints(), this.getMaxHealthPoints());
-        System.out.print(printColoredText(" <> ", Color.ANSI_WHITE));
-        System.out.print(printColoredText( (int) this.getDefensePoints() + " Defense", ANSI_BLUE));
-    }
-
     public void addItem(AbstractItem abstractItem){
         List<AbstractItem> currentItemList = this.getItemList();
         currentItemList.add(abstractItem);
