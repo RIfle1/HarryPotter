@@ -31,6 +31,27 @@ public class ConsoleFunctions {
         return input;
     }
 
+    public static int returnChoiceInt(int min, int max) {
+        int input;
+
+        do{
+            System.out.println("-> ");
+            try{
+                input = Integer.parseInt(scanner.next());
+            }
+            catch(Exception e) {
+                input = -1;
+                System.out.println("Input must be an integer");
+            }
+            if(input < min || input > max) {
+                input = -1;
+                System.out.println("Input must be between " + min + " and " + max);
+            }
+        }
+        while(input < 1);
+        return input;
+    }
+
 
     public static void printChoices(List<String> choicesList) {
         for(int i = 0; i < choicesList.toArray().length; i++) {
