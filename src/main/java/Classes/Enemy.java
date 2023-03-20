@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import static Classes.Color.*;
+import static Classes.Wizard.wizard;
 import static Enums.EnumMethods.returnFormattedEnum;
 import static Main.MechanicsFunctions.generateDoubleBetween;
 
@@ -19,22 +20,20 @@ import static Main.MechanicsFunctions.generateDoubleBetween;
 @Setter
 public class Enemy extends AbstractCharacter {
     @Builder
-    public Enemy(String name, double healthPoints, double defensePoints, double maxHealthPoints, double maxDefensePoints, Difficulty difficulty, CharacterState characterState, List<AbstractItem> itemList, List<Potion> activePotionsList, HashMap<Spell, Spell> spellHashMap, double level, EnemyName enemyName, EnemyType enemyType, double experiencePoints, double distanceFromPlayer) {
+    public Enemy(String name, double healthPoints, double defensePoints, double maxHealthPoints, double maxDefensePoints, Difficulty difficulty, CharacterState characterState, List<AbstractItem> itemList, List<Potion> activePotionsList, HashMap<Spell, Spell> spellHashMap, double level, EnemyName enemyName, EnemyCombat enemyCombat, double experiencePoints, double distanceFromPlayer) {
         super(name, healthPoints, defensePoints, maxHealthPoints, maxDefensePoints, difficulty, characterState, itemList, activePotionsList, spellHashMap, level);
         this.enemyName = enemyName;
-        this.enemyType = enemyType;
+        this.enemyCombat = enemyCombat;
         this.experiencePoints = experiencePoints;
         this.distanceFromPlayer = distanceFromPlayer;
     }
 
     private EnemyName enemyName;
-    private EnemyType enemyType;
+    private EnemyCombat enemyCombat;
     private double experiencePoints;
     private double distanceFromPlayer;
     public static HashMap<String, Enemy> enemiesHashMap = new HashMap<>();
     public static List<String> enemiesKeyList = new ArrayList<>();
-    static final int enemyBaseHp = 100;
-    static final int enemyBaseDp = 100;
 
     public static void clearEnemies() {
         enemiesKeyList.forEach(key -> enemiesHashMap.remove(key));
@@ -43,6 +42,14 @@ public class Enemy extends AbstractCharacter {
 
     public void deleteEnemy() {
         enemiesHashMap.remove(this.getName());
+    }
+
+    public static EnemyName generateRandomBasicEnemy() {
+        List<EnemyName> allEnemyNames;
+        allEnemyNames = EnemyName.getAllBasicEnemyNames();
+        int randomInt = (int) generateDoubleBetween(0, allEnemyNames.toArray().length - 1);
+
+        return allEnemyNames.get(randomInt);
     }
 
     public static List<AbstractItem> generateRandomPotions(int potionNumber) {
@@ -67,73 +74,70 @@ public class Enemy extends AbstractCharacter {
         enemiesHashMap.forEach((key, value) -> enemiesKeyList.add(key));
     }
 
-    public static HashMap<String, Enemy> generateEnemies(double minLevel, double maxLevel, int amount, EnemyName enemyName, Difficulty difficulty) throws CloneNotSupportedException {
+    public static void generateEnemiesSub(double minLevel, double maxLevel, EnemyName enemyName, HashMap<String, Enemy> enemiesHashMap, Enemy[] enemies, int i) throws CloneNotSupportedException {
+        int enemyLevel;
+        if(minLevel == maxLevel) {
+            enemyLevel = (int) minLevel;
+        }
+        else {
+            enemyLevel = (int) generateDoubleBetween(minLevel, maxLevel);
+        }
+
+        int enemyHp = (int) Math.round(Math.exp(enemyLevel * wizard.getDifficulty().getEnemyDiffMultiplier()) * enemyName.getEnemyBaseHp()) ;
+        int enemyDp = (int) Math.round((Math.exp(enemyLevel * wizard.getDifficulty().getEnemyDiffMultiplier()) * enemyName.getEnemyBaseDp()) / 3);
+
+        enemies[i] = Enemy.builder()
+                .healthPoints(enemyHp)
+                .defensePoints(enemyDp)
+                .maxHealthPoints(enemyHp)
+                .maxDefensePoints(enemyDp)
+                .difficulty(wizard.getDifficulty())
+                .characterState(CharacterState.STANDING)
+                .itemList(generateRandomPotions(3))
+                .activePotionsList(new ArrayList<>())
+                .spellHashMap(new HashMap<>())
+                .level(enemyLevel)
+                .name(returnFormattedEnum(enemyName)+"-"+(i+1))
+                .enemyName(enemyName)
+                .experiencePoints(0)
+                .distanceFromPlayer((int) generateDoubleBetween(0, 100))
+                .build();
+
+        enemies[i].updateSpells();
+        enemiesHashMap.put(enemies[i].getName(), enemies[i]);
+    }
+
+    public static HashMap<String, Enemy> generateEnemies(double minLevel, double maxLevel, int amount) throws CloneNotSupportedException {
         // ENEMIES LIST
         HashMap<String, Enemy> enemiesHashMap = new HashMap<>();
         Enemy[] enemies = new Enemy[amount];
 
-
         for(int i = 0; i < amount; i++) {
-            int enemyLevel;
-                if(minLevel == maxLevel) {
-                    enemyLevel = (int) minLevel;
-                }
-                else {
-                    enemyLevel = (int) generateDoubleBetween(minLevel, maxLevel);
-                }
-
-            int enemyHp = (int) Math.round(Math.exp(enemyLevel * difficulty.getEnemyDiffMultiplier()) * enemyBaseHp) ;
-            int enemyDp = (int) Math.round((Math.exp(enemyLevel * difficulty.getEnemyDiffMultiplier()) * enemyBaseDp) / 3);
-
-//            System.out.println("Level " + enemyLevel);
-//            System.out.println("HP: " + enemyHp);
-//            System.out.println("DF: " + enemyDp);
-//            System.out.println("---------------");
-
-            enemies[i] = Enemy.builder()
-                    .healthPoints(enemyHp)
-                    .defensePoints(enemyDp)
-                    .maxHealthPoints(enemyHp)
-                    .maxDefensePoints(enemyDp)
-                    .difficulty(difficulty)
-                    .characterState(CharacterState.STANDING)
-                    .itemList(generateRandomPotions(3))
-                    .activePotionsList(new ArrayList<>())
-                    .spellHashMap(new HashMap<>())
-                    .level(enemyLevel)
-                    .name(returnFormattedEnum(enemyName)+"-"+(i+1))
-                    .enemyName(enemyName)
-                    .experiencePoints(0)
-                    .distanceFromPlayer((int) generateDoubleBetween(0, 100))
-                    .build();
-
-            enemies[i].updateSpells();
-            enemiesHashMap.put(enemies[i].getName(), enemies[i]);
+            EnemyName enemyName = generateRandomBasicEnemy();
+            generateEnemiesSub(minLevel, maxLevel, enemyName, enemiesHashMap, enemies, i);
         }
+
         updateEnemiesKeyList(enemiesHashMap);
         return enemiesHashMap;
     }
 
-    public void printStats() {
-        System.out.print(
-                printColoredText(this.getName(), Color.ANSI_PURPLE) +
-                        printColoredText(" <> ", Color.ANSI_WHITE) +
-                        printColoredText("Level " + (int) this.getLevel(), Color.ANSI_YELLOW) +
-                        printColoredText(" <> ", Color.ANSI_WHITE)
-        );
-        getStatBar("❤", Color.ANSI_RED,"", this.getHealthPoints(), this.getMaxHealthPoints());
-        System.out.print(
-                printColoredText(" <> ", Color.ANSI_WHITE) +
-                        printColoredText( (int) this.getDefensePoints() + " Defense", ANSI_BLUE)
-        );
-        System.out.println();
+    public static HashMap<String, Enemy> generateEnemies(double minLevel, double maxLevel, int amount, EnemyName enemyName) throws CloneNotSupportedException {
+        // ENEMIES LIST
+        HashMap<String, Enemy> enemiesHashMap = new HashMap<>();
+        Enemy[] enemies = new Enemy[amount];
+
+        for(int i = 0; i < amount; i++) {
+            generateEnemiesSub(minLevel, maxLevel, enemyName, enemiesHashMap, enemies, i);
+        }
+        updateEnemiesKeyList(enemiesHashMap);
+        return enemiesHashMap;
     }
 
     public static void printEnemies() {
         int index = 1;
         for(Map.Entry<String, Enemy> set : enemiesHashMap.entrySet()) {
             System.out.print("(" + index + ") ");
-            set.getValue().printStats();
+            System.out.println(set.getValue().printStats());
             index++;
         }
     }

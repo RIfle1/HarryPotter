@@ -1,9 +1,10 @@
 package Main;
 
-import java.io.IOException;
 import java.util.*;
 
 import static Classes.BattleArena.battleArena;
+import static Classes.Color.*;
+import static Classes.Color.printColoredText;
 
 public class ConsoleFunctions {
     static Scanner scanner = new Scanner(System.in);
@@ -12,7 +13,7 @@ public class ConsoleFunctions {
     // Read the user's choice
 
     public static String returnChoiceString() {
-        System.out.println("-> ");
+        System.out.println(printColoredText("-> ", ANSI_YELLOW));
         return scanner.next();
     }
 
@@ -20,13 +21,13 @@ public class ConsoleFunctions {
         int input;
 
         do{
-            System.out.println("-> ");
+            System.out.println(printColoredText("-> ", ANSI_YELLOW));
             try{
                 input = Integer.parseInt(scanner.next());
             }
             catch(Exception e) {
                 input = -1;
-                System.out.println("Input must be an integer");
+                System.out.println(printColoredText("Input must be an integer", ANSI_RED));
             }
         }
         while(input < 1);
@@ -37,17 +38,17 @@ public class ConsoleFunctions {
         int input;
 
         do{
-            System.out.println("-> ");
+            System.out.println(printColoredText("-> ", ANSI_YELLOW));
             try{
                 input = Integer.parseInt(scanner.next());
             }
             catch(Exception e) {
                 input = -1;
-                System.out.println("Input must be an integer");
+                System.out.println(printColoredText("Input must be an integer", ANSI_RED));
             }
             if(input < min || input > max) {
                 input = -1;
-                System.out.println("Input must be between " + min + " and " + max);
+                System.out.println(printColoredText("Input must be between " + min + " and " + max, ANSI_RED));
             }
         }
         while(input < 1);
@@ -57,13 +58,13 @@ public class ConsoleFunctions {
 
     public static void printChoices(List<String> choicesList) {
         for(int i = 0; i < choicesList.toArray().length; i++) {
-            System.out.printf("(%d) %s\n", i + 1, choicesList.get(i));
+            System.out.printf("(%s) %s\n", printColoredText(String.valueOf(i + 1), ANSI_YELLOW), printColoredText(choicesList.get(i), ANSI_PURPLE));
         }
     }
 
     public static void printChoices(String[] choicesList) {
         for(int i = 0; i < choicesList.length; i++) {
-            System.out.printf("(%d) %s\n", i + 1, choicesList[i]);
+            System.out.printf("(%s) %s\n", printColoredText(String.valueOf(i + 1), ANSI_YELLOW), printColoredText(choicesList[i], ANSI_PURPLE));
         }
     }
 
@@ -83,7 +84,21 @@ public class ConsoleFunctions {
     }
 
     // Method to print a heading
-    public static void printHeader(String title){
+    public static void printColoredHeader(String header){
+        clearConsole();
+        printSeparator(header.length());
+        System.out.println(printColoredText(header, ANSI_GREEN));
+        printSeparator(header.length());
+    }
+
+    public static void printHeader(String header) {
+        clearConsole();
+        printSeparator(header.length());
+        System.out.println(header);
+        printSeparator(header.length());
+    }
+
+    public static void printTitle(String title) {
         printSeparator(title.length());
         System.out.println(title);
         printSeparator(title.length());
@@ -91,15 +106,14 @@ public class ConsoleFunctions {
 
     // Method to continue
     public static void continuePrompt(){
-        System.out.println("\nType anything and then enter to continue...");
+        System.out.println(printColoredText("Press 'Enter' to continue...", ANSI_BLUE));
         System.out.println(scanner.nextLine());
     }
 
     public static void gameCredits() {
         String welcomeText = "Welcome to Harry Potter Text RPG, Made by Filips Barakats";
-        printHeader(welcomeText);
+        printColoredHeader(welcomeText);
         continuePrompt();
-        clearConsole();
     }
 
     public static void chooseLevel() throws CloneNotSupportedException {
@@ -114,7 +128,7 @@ public class ConsoleFunctions {
                 "Battle Arena",
         };
 
-        printHeader("Choose your level: ");
+        printColoredHeader("Choose your level: ");
         printChoices(optionsList);
 
         switch (returnChoiceInt()) {

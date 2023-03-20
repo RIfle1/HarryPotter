@@ -1,22 +1,42 @@
 package Enums;
 
+import lombok.Getter;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
 import static Enums.EnumMethods.returnFormattedEnum;
 
+@Getter
 public enum EnemyName {
-    GOBLIN(EnemyType.MELEE_ENEMY),
-    DARK_WIZARD(EnemyType.MAGIC_ENEMY),
-    TROLL(EnemyType.MELEE_ENEMY),
-    BASILISK(EnemyType.MELEE_ENEMY),
-    DEMENTOR(EnemyType.MAGIC_ENEMY),
-    DEATH_EATER(EnemyType.MAGIC_ENEMY);
+    GOBLIN(EnemyCombat.MELEE, EnemyType.BASIC, 50, 30),
+    DARK_WIZARD(EnemyCombat.MAGIC, EnemyType.BASIC, 70, 60),
+    TROLL(EnemyCombat.MELEE, EnemyType.BOSS, 200, 60),
+    BASILISK(EnemyCombat.MELEE, EnemyType.BOSS, 140, 100),
+    DEMENTOR(EnemyCombat.MAGIC, EnemyType.BASIC, 30, 110),
+    DEATH_EATER(EnemyCombat.MAGIC, EnemyType.BASIC, 90, 120);
 
-    public final EnemyType enemyType;
+    private final EnemyCombat enemyCombat;
+    private final EnemyType enemyType;
+    private final int enemyBaseHp;
+    private final int enemyBaseDp;
 
-    EnemyName(EnemyType enemyType) {
+    EnemyName(EnemyCombat enemyCombat, EnemyType enemyType, int enemyBaseHp, int enemyBaseDp) {
+        this.enemyCombat = enemyCombat;
         this.enemyType = enemyType;
+        this.enemyBaseHp = enemyBaseHp;
+        this.enemyBaseDp = enemyBaseDp;
+    }
+
+    public static List<EnemyName> getAllEnemyNames() {
+        EnemyName[] enemyNameValues = EnemyName.values();
+        return new ArrayList<>(Arrays.asList(enemyNameValues));
+    }
+
+    public static List<EnemyName> getAllBasicEnemyNames() {
+        return Arrays.stream(EnemyName.values()).filter(enemyName -> enemyName.enemyType.equals(EnemyType.BASIC)).toList();
     }
 
     public static List<String> getEnemyNameList() {

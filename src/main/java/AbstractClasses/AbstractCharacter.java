@@ -8,8 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static Classes.Color.ANSI_BLUE;
-import static Classes.Color.printColoredText;
+import static Classes.Color.*;
 import static Enums.EnumMethods.returnFormattedEnum;
 import static Main.ConsoleFunctions.printSeparator;
 import static Main.MechanicsFunctions.generateDoubleBetween;
@@ -51,22 +50,37 @@ public abstract class AbstractCharacter {
     // <1 PLAYER HAS BETTER STATS THAN THE ENEMIES
     public final static double difficultyDifference = 1.3;
 
-    public void getStatBar(String statLogo, String statLogoColor, String color ,double value, double maxValue) {
+    public String getStatBar(String statLogo, String statLogoColor, String color ,double value, double maxValue) {
         final int statBarLength = 30;
 
         int stat = (int) ((value / maxValue) * statBarLength);
         int empty = statBarLength - stat;
 
-        System.out.print(printColoredText(statLogo, statLogoColor));
-        System.out.print(printColoredText("[", Color.ANSI_CYAN));
-        for(int x = 0; x < stat; x++) {
-            System.out.print(printColoredText("|", Color.ANSI_GREEN));
-        }
-        for(int y = 0; y < empty; y++) {
-            System.out.print(printColoredText("-", Color.ANSI_RED));
-        }
-        System.out.print(printColoredText("]", Color.ANSI_CYAN));
+        return printColoredText(statLogo, statLogoColor) +
+                printColoredText("[", Color.ANSI_CYAN) + printColoredText("|", Color.ANSI_GREEN).repeat(Math.max(0, stat)) +
+                printColoredText("-", Color.ANSI_RED).repeat(Math.max(0, empty)) +
+            printColoredText("]", Color.ANSI_CYAN);
+    }
 
+    public String printStats() {
+        String name;
+
+        if(this.getClass() == Wizard.class) {
+            name = this.getName();
+        }
+        else {
+            name = returnFormattedEnum(((Enemy) this).getEnemyName());
+        }
+
+        return
+                printColoredText(name, Color.ANSI_PURPLE) +
+                        printColoredText(" <> ", Color.ANSI_WHITE) +
+                        printColoredText("Level " + (int) this.getLevel(), Color.ANSI_YELLOW) +
+                        printColoredText(" <> ", Color.ANSI_WHITE) +
+                        getStatBar("❤", Color.ANSI_RED,"", this.getHealthPoints(), this.getMaxHealthPoints()) +
+                        printColoredText( " "+ (int) this.getHealthPoints () + "/" + (int) this.getMaxHealthPoints(), ANSI_RED) +
+                        printColoredText(" <> ", Color.ANSI_WHITE) +
+                        printColoredText( (int) this.getDefensePoints() + " Defense", ANSI_BLUE);
     }
 
     public void addItem(AbstractItem abstractItem){

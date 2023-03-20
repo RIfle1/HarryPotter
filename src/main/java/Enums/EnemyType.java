@@ -6,8 +6,8 @@ import java.util.List;
 import static Enums.EnumMethods.returnFormattedEnum;
 
 public enum EnemyType {
-    MELEE_ENEMY,
-    MAGIC_ENEMY;
+    BASIC,
+    BOSS;
 
     public static List<String> getEnemyTypeList() {
         EnemyType[] enemyTypeValues = EnemyType.values();

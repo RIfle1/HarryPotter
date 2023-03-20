@@ -1,8 +1,10 @@
 package Main;
 
 import static Classes.BattleArena.battleArena;
+import static Classes.Enemy.generateRandomBasicEnemy;
 import static Classes.Wizard.testWizard;
 import static Main.ConsoleFunctions.*;
+import static Main.SaveChecker.checkSaves;
 
 public class Main {
     public static void main(String[] args) throws CloneNotSupportedException {
@@ -10,7 +12,7 @@ public class Main {
 //        checkSaves();
 //        CharacterCreation.characterInit();
         chooseLevel();
-
+//        System.out.println(generateRandomBasicEnemy());
 //        enemiesHashMap = generateEnemies(10, 10, 1, EnemyName.DARK_WIZARD, wizard.getDifficulty());
 //
 //        System.out.println(enemiesHashMap);

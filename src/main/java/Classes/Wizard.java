@@ -48,18 +48,8 @@ public class Wizard extends AbstractCharacter {
     private final double baseLevelExperience = 100;
     private final double levelIncrement = 0.2;
 
-    public void printStats() throws CloneNotSupportedException {
-        this.updateStats();
-        System.out.print(
-                printColoredText(this.getName(), Color.ANSI_PURPLE) +
-                printColoredText(" <> ", Color.ANSI_WHITE) +
-                printColoredText("Level " + (int) this.getLevel(), Color.ANSI_YELLOW) +
-                printColoredText(" <> ", Color.ANSI_WHITE)
-        );
-        getStatBar("❤", Color.ANSI_RED,"", this.getHealthPoints(), this.getMaxHealthPoints());
-        System.out.print(
-                printColoredText(" <> ", Color.ANSI_WHITE) +
-                printColoredText( (int) this.getDefensePoints() + " Defense", ANSI_BLUE) +
+    public String printSpecs() {
+        return
                 printColoredText(" <> ", Color.ANSI_WHITE) +
                 printColoredText((int) this.getCharisma() + " Charisma", ANSI_YELLOW) +
                 printColoredText(" <> ", Color.ANSI_WHITE) +
@@ -67,10 +57,12 @@ public class Wizard extends AbstractCharacter {
                 printColoredText(" <> ", Color.ANSI_WHITE) +
                 printColoredText((int) this.getIntelligence() + " Intelligence", ANSI_BLUE) +
                 printColoredText(" <> ", Color.ANSI_WHITE) +
-                printColoredText((int) this.getLuck() + " Luck", ANSI_PURPLE)
-        );
-        System.out.println();
+                printColoredText((int) this.getLuck() + " Luck", ANSI_PURPLE);
+    }
 
+    public String printAllStats() throws CloneNotSupportedException {
+        this.updateStats();
+        return this.printStats() + this.printSpecs();
     }
 
     public HashMap<String, Double> getWizardStatsPercent() {
@@ -154,7 +146,7 @@ public class Wizard extends AbstractCharacter {
             .defensePoints(wizardBaseDp)
             .maxDefensePoints(wizardBaseDp)
             .maxHealthPoints(wizardBaseHp)
-            .difficulty(null)
+            .difficulty(Difficulty.EASY)
             .characterState(CharacterState.STANDING)
             .level(1)
             .firstName("null")
