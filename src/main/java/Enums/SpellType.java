@@ -6,8 +6,8 @@ import java.util.List;
 import static Enums.EnumMethods.returnFormattedEnum;
 
 public enum SpellType {
-    DAMAGE,
-    DEFENSE,
+    ATTACK,
+    PARRY,
     FOLLOW_UP;
 
     public static List<String> getSpellTypeList() {

@@ -191,5 +191,4 @@ public class Wizard extends AbstractCharacter {
             .intelligence(0)
             .luck(0)
             .build();
-
 }
