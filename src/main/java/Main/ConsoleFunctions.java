@@ -5,6 +5,7 @@ import java.util.*;
 import static Classes.BattleArena.battleArena;
 import static Classes.Color.*;
 import static Classes.Color.printColoredText;
+import static Classes.Wizard.wizard;
 
 public class ConsoleFunctions {
     static Scanner scanner = new Scanner(System.in);

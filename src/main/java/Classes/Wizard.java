@@ -15,8 +15,8 @@ import static Classes.Color.*;
 @Setter
 public class Wizard extends AbstractCharacter {
     @Builder
-    public Wizard(String name, double healthPoints, double defensePoints, double maxHealthPoints, double maxDefensePoints, Difficulty difficulty, CharacterState characterState, List<AbstractItem> itemList, List<Potion> activePotionsList, HashMap<Spell, Spell> spellHashMap, double level, String firstName, String lastName, Gender gender, Pet pet, Wand wand, House house, double experience, double charisma, double strength, double intelligence, double luck) {
-        super(name, healthPoints, defensePoints, maxHealthPoints, maxDefensePoints, difficulty, characterState, itemList, activePotionsList, spellHashMap, level);
+    public Wizard(String name, double healthPoints, double defensePoints, double maxHealthPoints, double maxDefensePoints, Difficulty difficulty, CharacterState characterState, List<AbstractItem> itemList, List<Potion> activePotionsList, HashMap<String, Spell> spellsHashMap, List<String> spellsKeyList, double level, String firstName, String lastName, Gender gender, Pet pet, Wand wand, House house, double experience, double charisma, double strength, double intelligence, double luck) {
+        super(name, healthPoints, defensePoints, maxHealthPoints, maxDefensePoints, difficulty, characterState, itemList, activePotionsList, spellsHashMap, spellsKeyList, level);
         this.firstName = firstName;
         this.lastName = lastName;
         this.gender = gender;
@@ -133,7 +133,7 @@ public class Wizard extends AbstractCharacter {
 
     public void updateStats() throws CloneNotSupportedException {
         this.updateLevel();
-        this.updateSpells();
+        this.updateSpellsHashMap();
         this.updateWizardHpDf();
     }
 
@@ -155,8 +155,9 @@ public class Wizard extends AbstractCharacter {
             .gender(null)
             .pet(null)
             .wand(null)
-            .house(null)
-            .spellHashMap(new HashMap<>())
+            .house(new House(HouseName.SLYTHERIN))
+            .spellsHashMap(new HashMap<>())
+            .spellsKeyList(new ArrayList<>())
             .itemList(new ArrayList<>())
             .activePotionsList(new ArrayList<>())
             .experience(0)
@@ -181,7 +182,8 @@ public class Wizard extends AbstractCharacter {
             .pet(Pet.CAT)
             .wand(new Wand(Core.PHEONIX_FEATHER, 12))
             .house(new House(HouseName.SLYTHERIN))
-            .spellHashMap(new HashMap<>())
+            .spellsHashMap(new HashMap<>())
+            .spellsKeyList(new ArrayList<>())
             .itemList(new ArrayList<>())
             .activePotionsList(new ArrayList<>())
             .experience(0)

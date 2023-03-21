@@ -16,7 +16,7 @@ import static Main.MechanicsFunctions.generateDoubleBetween;
 @Getter
 @Setter
 public abstract class AbstractCharacter {
-    public AbstractCharacter(String name, double healthPoints, double defensePoints, double maxHealthPoints, double maxDefensePoints, Difficulty difficulty, CharacterState characterState, List<AbstractItem> itemList, List<Potion> activePotionsList, HashMap<Spell, Spell> spellHashMap, double level) {
+    public AbstractCharacter(String name, double healthPoints, double defensePoints, double maxHealthPoints, double maxDefensePoints, Difficulty difficulty, CharacterState characterState, List<AbstractItem> itemList, List<Potion> activePotionsList, HashMap<String, Spell> spellsHashMap, List<String> spellsKeyList, double level) {
         this.name = name;
         this.healthPoints = healthPoints;
         this.defensePoints = defensePoints;
@@ -26,7 +26,8 @@ public abstract class AbstractCharacter {
         this.characterState = characterState;
         this.itemList = itemList;
         this.activePotionsList = activePotionsList;
-        this.spellHashMap = spellHashMap;
+        this.spellsHashMap = spellsHashMap;
+        this.spellsKeyList = spellsKeyList;
         this.level = level;
     }
 
@@ -39,7 +40,8 @@ public abstract class AbstractCharacter {
     private CharacterState characterState;
     private List<AbstractItem> itemList;
     private List<Potion> activePotionsList;
-    private HashMap<Spell, Spell> spellHashMap;
+    private HashMap<String, Spell> spellsHashMap;
+    private List<String> spellsKeyList;
     private double level;
 
     public final static int maxLevel = 10;
@@ -143,15 +145,25 @@ public abstract class AbstractCharacter {
         }
     }
 
-    public void updateSpells() throws CloneNotSupportedException {
-        HashMap<Spell, Spell> spellList = new HashMap<>();
+    public Spell getSpellFromInt(int number) {
+        return this.getSpellsHashMap().get(this.getSpellsKeyList().get(number));
+    }
+
+    public void updateSpellsKeyList(HashMap<String, Spell> spellsHashMap) {
+        spellsKeyList.clear();
+        spellsHashMap.forEach((key, value) -> spellsKeyList.add(key));
+    }
+
+    public void updateSpellsHashMap() throws CloneNotSupportedException {
+        HashMap<String, Spell> spellList = new HashMap<>();
 
         for(Spell spell:Spell.getAllSpells()) {
             if(spell.getSpellLevelRequirement() <= this.getLevel()) {
-                spellList.put(spell, (Spell) spell.clone());
+                spellList.put(spell.getSpellName(), (Spell) spell.clone());
             }
         }
-        this.setSpellHashMap(spellList);
+        this.setSpellsHashMap(spellList);
+        updateSpellsKeyList(this.getSpellsHashMap());
     }
 
     public double getActivePotionValueSum(PotionType potionType) {
@@ -265,19 +277,19 @@ public abstract class AbstractCharacter {
     }
 
     public boolean checkSpellAvailability(Spell spell) {
-        HashMap<Spell, Spell> characterSpellHashMap = this.getSpellHashMap();
+        HashMap<String, Spell> characterSpellHashMap = this.getSpellsHashMap();
         List<Spell> characterSpellList = new ArrayList<>();
 
         characterSpellHashMap.forEach((key, value) -> characterSpellList.add(value));
         boolean spellInHashMap = characterSpellList.stream().anyMatch(abstractCharacterSpell -> abstractCharacterSpell.equals(spell));
-
         boolean spellIsReady = spellInHashMap && spell.getSpellReadyIn() == 0;
 
-//        System.out.println(spell.getSpellReadyIn());
-
-//        if(spell.getSpellReadyIn() == 0) {
-//            System.out.println("yes");
-//        }
+        if(!spellInHashMap) {
+            System.out.println("Spell not available.");
+        }
+        else if(!spellIsReady) {
+            System.out.println("Spell on cooldown.");
+        }
 
         return spellInHashMap && spellIsReady;
     }
@@ -287,25 +299,28 @@ public abstract class AbstractCharacter {
     }
 
     public List<Spell> getAllSpells() {
-        HashMap<Spell, Spell> characterSpellHashMap = this.getSpellHashMap();
+        HashMap<String, Spell> characterSpellHashMap = this.getSpellsHashMap();
         List<Spell> characterSpellList = new ArrayList<>();
 
         characterSpellHashMap.forEach((key, value) -> characterSpellList.add(value));
         return characterSpellList;
     }
 
-    public Spell getSpell(Spell spell) {
-        HashMap<Spell, Spell> characterSpellHashMap = this.getSpellHashMap();
-        return characterSpellHashMap.get(spell);
+    public List<String> getAllCharacterSpells() {
+        HashMap<String, Spell> characterSpellHashMap = this.getSpellsHashMap();
+        List<String> allSpellNames = new ArrayList<>();
+        characterSpellHashMap.forEach((key, value) -> allSpellNames.add(value.getSpellName()));
+
+        return allSpellNames;
     }
 
     public void reduceSpellsCooldown(int cooldown) {
-        HashMap<Spell, Spell> characterSpellHashMap = this.getSpellHashMap();
+        HashMap<String, Spell> characterSpellHashMap = this.getSpellsHashMap();
         characterSpellHashMap.forEach((key, value) -> value.setSpellReadyIn(value.getSpellReadyIn() - cooldown));
     }
 
     public void reduceSpellsCooldown() {
-        HashMap<Spell, Spell> characterSpellHashMap = this.getSpellHashMap();
+        HashMap<String, Spell> characterSpellHashMap = this.getSpellsHashMap();
         characterSpellHashMap.forEach((key, value) -> value.setSpellReadyIn(0));
     }
 
@@ -380,10 +395,6 @@ public abstract class AbstractCharacter {
             }
 
         }
-        else {
-            System.out.println(spell.getSpellName() + " not available.");
-        }
-        printSeparator(30);
     }
 
 //    public static double parry() {

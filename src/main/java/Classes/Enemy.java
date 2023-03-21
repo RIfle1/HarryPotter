@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static Classes.Color.*;
 import static Classes.Wizard.wizard;
 import static Enums.EnumMethods.returnFormattedEnum;
 import static Main.MechanicsFunctions.generateDoubleBetween;
@@ -20,8 +19,8 @@ import static Main.MechanicsFunctions.generateDoubleBetween;
 @Setter
 public class Enemy extends AbstractCharacter {
     @Builder
-    public Enemy(String name, double healthPoints, double defensePoints, double maxHealthPoints, double maxDefensePoints, Difficulty difficulty, CharacterState characterState, List<AbstractItem> itemList, List<Potion> activePotionsList, HashMap<Spell, Spell> spellHashMap, double level, EnemyName enemyName, EnemyCombat enemyCombat, double experiencePoints, double distanceFromPlayer) {
-        super(name, healthPoints, defensePoints, maxHealthPoints, maxDefensePoints, difficulty, characterState, itemList, activePotionsList, spellHashMap, level);
+    public Enemy(String name, double healthPoints, double defensePoints, double maxHealthPoints, double maxDefensePoints, Difficulty difficulty, CharacterState characterState, List<AbstractItem> itemList, List<Potion> activePotionsList, HashMap<String, Spell> spellsHashMap, List<String> spellsKeyList, double level, EnemyName enemyName, EnemyCombat enemyCombat, double experiencePoints, double distanceFromPlayer) {
+        super(name, healthPoints, defensePoints, maxHealthPoints, maxDefensePoints, difficulty, characterState, itemList, activePotionsList, spellsHashMap, spellsKeyList, level);
         this.enemyName = enemyName;
         this.enemyCombat = enemyCombat;
         this.experiencePoints = experiencePoints;
@@ -42,6 +41,7 @@ public class Enemy extends AbstractCharacter {
 
     public void deleteEnemy() {
         enemiesHashMap.remove(this.getName());
+        enemiesKeyList.remove(this.getName());
     }
 
     public static EnemyName generateRandomBasicEnemy() {
@@ -95,7 +95,8 @@ public class Enemy extends AbstractCharacter {
                 .characterState(CharacterState.STANDING)
                 .itemList(generateRandomPotions(3))
                 .activePotionsList(new ArrayList<>())
-                .spellHashMap(new HashMap<>())
+                .spellsHashMap(new HashMap<>())
+                .spellsKeyList(new ArrayList<>())
                 .level(enemyLevel)
                 .name(returnFormattedEnum(enemyName)+"-"+(i+1))
                 .enemyName(enemyName)
@@ -103,7 +104,7 @@ public class Enemy extends AbstractCharacter {
                 .distanceFromPlayer((int) generateDoubleBetween(0, 100))
                 .build();
 
-        enemies[i].updateSpells();
+        enemies[i].updateSpellsHashMap();
         enemiesHashMap.put(enemies[i].getName(), enemies[i]);
     }
 
