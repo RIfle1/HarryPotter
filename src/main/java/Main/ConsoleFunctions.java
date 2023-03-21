@@ -18,7 +18,7 @@ public class ConsoleFunctions {
         return scanner.next();
     }
 
-    public static int returnChoiceInt() {
+    public static int returnChoiceInt(int max) {
         int input;
 
         do{
@@ -29,6 +29,10 @@ public class ConsoleFunctions {
             catch(Exception e) {
                 input = -1;
                 System.out.println(printColoredText("Input must be an integer", ANSI_RED));
+            }
+            if(input > max) {
+                input = -1;
+                System.out.println(printColoredText("Input must be between 1 and " + max, ANSI_RED));
             }
         }
         while(input < 1);
@@ -132,7 +136,7 @@ public class ConsoleFunctions {
         printColoredHeader("Choose your level: ");
         printChoices(optionsList);
 
-        switch (returnChoiceInt()) {
+        switch (returnChoiceInt(optionsList.length)) {
             case 1, 2, 3, 4, 5, 6, 7, 8 -> battleArena();
         }
     }

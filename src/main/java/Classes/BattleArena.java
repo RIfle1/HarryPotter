@@ -2,8 +2,6 @@ package Classes;
 
 import AbstractClasses.AbstractCharacter;
 
-import java.util.List;
-
 import static Classes.Wizard.wizard;
 import static Main.ConsoleFunctions.*;
 import static Classes.Enemy.*;
@@ -33,8 +31,8 @@ public class BattleArena {
     public static void fight() throws CloneNotSupportedException {
         Enemy enemyVictim;
         Enemy enemyAttacker;
-        Spell wizardSpellChosen;
-        Spell enemySpellChosen;
+        Spell wizardChosenSpell;
+        Spell enemyChosenSpell;
         int randomEnemyIndex;
         int randomEnemySpellIndex;
 
@@ -42,29 +40,34 @@ public class BattleArena {
 
         printTitle("Choose the enemy you want to attack.");
         printEnemies();
-        enemyVictim = enemiesHashMap.get(enemiesKeyList.get(returnChoiceInt() - 1));
+        enemyVictim = enemiesHashMap.get(enemiesKeyList.get(returnChoiceInt(enemiesKeyList.size()) - 1));
 
         printTitle("Choose the spell you want to use.");
-        printChoices(wizard.getAllCharacterSpells());
-        wizardSpellChosen = wizard.getSpellFromInt(returnChoiceInt() - 1);
+        wizard.printAllCharacterSpells();
+        wizardChosenSpell = wizard.getSpellFromInt(returnChoiceInt(wizard.getSpellsKeyList().size()) - 1);
 
-        wizard.attack(wizardSpellChosen, enemyVictim);
+        while(!wizard.checkSpellReady(wizardChosenSpell)) {
+            System.out.println(wizardChosenSpell.getSpellName() + " is on cooldown.");
+            wizardChosenSpell = wizard.getSpellFromInt(returnChoiceInt(wizard.getSpellsKeyList().size()) - 1);
+        }
+
+        wizard.attack(wizardChosenSpell, enemyVictim);
+
 
         randomEnemyIndex = (int) generateDoubleBetween(0, enemiesKeyList.toArray().length - 1);
 
         enemyAttacker = enemiesHashMap.get(enemiesKeyList.get(randomEnemyIndex));
         randomEnemySpellIndex = (int) generateDoubleBetween(0, enemyAttacker.getSpellsKeyList().toArray().length - 1);
-        enemySpellChosen = enemyAttacker.getSpellFromInt(randomEnemySpellIndex);
+        enemyChosenSpell = enemyAttacker.getSpellFromInt(randomEnemySpellIndex);
 
         printTitle(enemyAttacker.getName() + " will attack you.");
-        enemyAttacker.attack(enemySpellChosen, wizard);
+        enemyAttacker.attack(enemyChosenSpell, wizard);
     }
 
     public static void battleArena() throws CloneNotSupportedException {
         chooseEnemies();
         while(!enemiesHashMap.isEmpty() && wizard.getHealthPoints() > 0) {
             fight();
-            continuePrompt();
         }
         if(enemiesHashMap.isEmpty()) {
             printTitle("Congrats, you defeated all the enemies.");
@@ -72,6 +75,7 @@ public class BattleArena {
         else if(wizard.getHealthPoints() <= 0) {
             printTitle("You died.");
         }
+        wizard.updateWizardHpDf();
 
     }
 

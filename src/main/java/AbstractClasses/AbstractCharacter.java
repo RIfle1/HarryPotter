@@ -7,8 +7,10 @@ import lombok.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static Classes.Color.*;
+import static Classes.Wizard.wizard;
 import static Enums.EnumMethods.returnFormattedEnum;
 import static Main.ConsoleFunctions.printSeparator;
 import static Main.MechanicsFunctions.generateDoubleBetween;
@@ -149,20 +151,21 @@ public abstract class AbstractCharacter {
         return this.getSpellsHashMap().get(this.getSpellsKeyList().get(number));
     }
 
+    public void putSpellsHashMap(Spell spell) {
+        this.spellsHashMap.put(spell.getSpellName(), spell);
+    }
+
     public void updateSpellsKeyList(HashMap<String, Spell> spellsHashMap) {
         spellsKeyList.clear();
         spellsHashMap.forEach((key, value) -> spellsKeyList.add(key));
     }
 
     public void updateSpellsHashMap() throws CloneNotSupportedException {
-        HashMap<String, Spell> spellList = new HashMap<>();
-
         for(Spell spell:Spell.getAllSpells()) {
-            if(spell.getSpellLevelRequirement() <= this.getLevel()) {
-                spellList.put(spell.getSpellName(), (Spell) spell.clone());
+            if(spell.getSpellLevelRequirement() <= this.getLevel() && !this.getSpellsHashMap().containsKey(spell.getSpellName())) {
+                this.putSpellsHashMap((Spell) spell.clone());
             }
         }
-        this.setSpellsHashMap(spellList);
         updateSpellsKeyList(this.getSpellsHashMap());
     }
 
@@ -276,22 +279,15 @@ public abstract class AbstractCharacter {
         return spellCalculatedEffectiveDistance;
     }
 
-    public boolean checkSpellAvailability(Spell spell) {
+    public boolean checkSpellReady(Spell spell) {
+        return spell.getSpellReadyIn() == 0;
+    }
+
+    public boolean checkSpellAvailable(Spell spell) {
         HashMap<String, Spell> characterSpellHashMap = this.getSpellsHashMap();
         List<Spell> characterSpellList = new ArrayList<>();
-
         characterSpellHashMap.forEach((key, value) -> characterSpellList.add(value));
-        boolean spellInHashMap = characterSpellList.stream().anyMatch(abstractCharacterSpell -> abstractCharacterSpell.equals(spell));
-        boolean spellIsReady = spellInHashMap && spell.getSpellReadyIn() == 0;
-
-        if(!spellInHashMap) {
-            System.out.println("Spell not available.");
-        }
-        else if(!spellIsReady) {
-            System.out.println("Spell on cooldown.");
-        }
-
-        return spellInHashMap && spellIsReady;
+        return characterSpellList.stream().anyMatch(abstractCharacterSpell -> abstractCharacterSpell.equals(spell));
     }
 
     public void spellUsed(Spell spell) {
@@ -314,14 +310,31 @@ public abstract class AbstractCharacter {
         return allSpellNames;
     }
 
+    public void printAllCharacterSpells() {
+        int index = 1;
+        for(Map.Entry<String, Spell> spell : this.getSpellsHashMap().entrySet()) {
+            System.out.print("(" + index + ") ");
+            System.out.println(spell.getValue().printStats());
+            index++;
+        }
+
+    }
+
     public void reduceSpellsCooldown(int cooldown) {
-        HashMap<String, Spell> characterSpellHashMap = this.getSpellsHashMap();
-        characterSpellHashMap.forEach((key, value) -> value.setSpellReadyIn(value.getSpellReadyIn() - cooldown));
+        HashMap<String, Spell> spellsHashMap = this.getSpellsHashMap();
+
+        spellsHashMap.forEach((key, value) -> {
+            int newValue = value.getSpellReadyIn() - cooldown;
+            if(newValue < 0) {
+                newValue = 0;
+            }
+            value.setSpellReadyIn(newValue);
+        });
     }
 
     public void reduceSpellsCooldown() {
         HashMap<String, Spell> characterSpellHashMap = this.getSpellsHashMap();
-        characterSpellHashMap.forEach((key, value) -> value.setSpellReadyIn(0));
+        characterSpellHashMap.forEach((key, value) -> {value.setSpellReadyIn(0);});
     }
 
     public void spellCast(Spell spell, AbstractCharacter attackCharacter) {
@@ -379,11 +392,11 @@ public abstract class AbstractCharacter {
         double spellEffectiveDistance = getSpellEffectiveDistance(spell);
 
         // IF SPELL EXISTS IN THE CHARACTER'S SPELL LIST
-        if(checkSpellAvailability(spell)) {
-
+        if(checkSpellAvailable(spell)) {
             // SPELL GETS CAST ON THE ATTACK CHARACTER
             if(attackCharacter.getHealthPoints() > 0) {
                 // SPELL GETS USED AND PUT ON A COOLDOWN
+                this.reduceSpellsCooldown(1);
                 this.spellUsed(spell);
                 // CONSOLE STUFF
                 System.out.println(spellName+"!");
@@ -393,7 +406,6 @@ public abstract class AbstractCharacter {
             else {
                 System.out.println(attackCharacter.getName() + " is already dead.");
             }
-
         }
     }
 

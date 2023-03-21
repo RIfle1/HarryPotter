@@ -9,7 +9,13 @@ import lombok.Setter;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+
+import static Classes.Color.*;
+import static Classes.Color.printColoredText;
+import static Enums.EnumMethods.returnFormattedEnum;
+import static Main.MechanicsFunctions.generateDoubleBetween;
 
 @Getter
 @Setter
@@ -312,6 +318,25 @@ public class Spell implements Cloneable{
         printSeparator(AbstractSpell.spellName.length());
         System.out.println(AbstractSpell.spellName);
         printSeparator(AbstractSpell.spellName.length());
+    }
+
+    public String printStats() {
+        String spellState = "(Ready)";
+        if(this.spellReadyIn > 0) {
+            spellState = "(Ready in " + this.spellReadyIn + " turns)";
+        }
+
+        int spellChance = (int) (this.spellChance * 100);
+
+        return
+                printColoredText(this.getSpellName() + "\t", ANSI_PURPLE)
+                + printColoredText(spellState + "\t", ANSI_YELLOW)
+                + printColoredText((int) generateDoubleBetween(this.spellDamage[0], this.spellDamage[1]) + " Approx Base Damage\t", ANSI_RED)
+                + printColoredText((int) generateDoubleBetween(this.spellDefense[0], this.spellDefense[1]) + " Approx Base Defense\t", ANSI_BLUE)
+//                + printColoredText(generateDoubleBetween(this.spellEffectiveDistance[0], this.spellEffectiveDistance[1]) + " Approx Effective Distance", ANSI_CYAN)
+                + printColoredText(spellChance + "% Chance Success\t", ANSI_YELLOW)
+                + printColoredText(this.spellCooldown + " Turn(s) Cooldown\t", ANSI_BLUE)
+                + returnFormattedEnum(this.spellType);
     }
 
     public static void useSpell(Spell AbstractSpell) {

@@ -85,7 +85,7 @@ public class Wizard extends AbstractCharacter {
         return  WizardStatsPercent;
     }
     // UPDATE WIZARD HEALTH AND DEFENSE POINTS BASED ON THEIR LEVEL
-    private void updateWizardHpDf() {
+    public void updateWizardHpDf() {
 
         double wizardNewHp = (int) (this.getLevel() * wizardBaseHp);
         double wizardNewDp = (int) (this.getLevel() * wizardBaseDp);
@@ -134,7 +134,6 @@ public class Wizard extends AbstractCharacter {
     public void updateStats() throws CloneNotSupportedException {
         this.updateLevel();
         this.updateSpellsHashMap();
-        this.updateWizardHpDf();
     }
 
     public static House getHouseStat(Wizard wizard) {

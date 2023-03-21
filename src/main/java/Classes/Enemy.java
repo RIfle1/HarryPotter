@@ -136,9 +136,9 @@ public class Enemy extends AbstractCharacter {
 
     public static void printEnemies() {
         int index = 1;
-        for(Map.Entry<String, Enemy> set : enemiesHashMap.entrySet()) {
+        for(Map.Entry<String, Enemy> enemy : enemiesHashMap.entrySet()) {
             System.out.print("(" + index + ") ");
-            System.out.println(set.getValue().printStats());
+            System.out.println(enemy.getValue().printStats());
             index++;
         }
     }
