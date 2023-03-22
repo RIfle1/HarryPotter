@@ -85,6 +85,8 @@ public class Enemy extends AbstractCharacter {
 
         int enemyHp = (int) Math.round(Math.exp(enemyLevel * wizard.getDifficulty().getEnemyDiffMultiplier()) * enemyName.getEnemyBaseHp()) ;
         int enemyDp = (int) Math.round((Math.exp(enemyLevel * wizard.getDifficulty().getEnemyDiffMultiplier()) * enemyName.getEnemyBaseDp()) / 3);
+        // TODO - SET XP OF EACH ENEMY DEPENDING ON THEIR LEVEL
+        // TODO - PROBABLY REWORK THE PLAYER LEVELING SYSTEM 
 
         enemies[i] = Enemy.builder()
                 .healthPoints(enemyHp)

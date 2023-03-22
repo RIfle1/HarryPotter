@@ -59,10 +59,10 @@ public abstract class AbstractCharacter {
         int stat = (int) ((value / maxValue) * statBarLength);
         int empty = statBarLength - stat;
 
-        return printColoredText(statLogo, statLogoColor) +
-                printColoredText("[", Color.ANSI_CYAN) + printColoredText("|", Color.ANSI_GREEN).repeat(Math.max(0, stat)) +
-                printColoredText("-", Color.ANSI_RED).repeat(Math.max(0, empty)) +
-                printColoredText("]", Color.ANSI_CYAN);
+        return returnColoredText(statLogo, statLogoColor) +
+                returnColoredText("[", Color.ANSI_CYAN) + returnColoredText("|", Color.ANSI_GREEN).repeat(Math.max(0, stat)) +
+                returnColoredText("-", Color.ANSI_RED).repeat(Math.max(0, empty)) +
+                returnColoredText("]", Color.ANSI_CYAN);
     }
 
     public String printStats() {
@@ -75,14 +75,14 @@ public abstract class AbstractCharacter {
         }
 
         return
-                printColoredText(name, Color.ANSI_PURPLE) +
-                        printColoredText(" <> ", Color.ANSI_WHITE) +
-                        printColoredText("Level " + (int) this.getLevel(), Color.ANSI_YELLOW) +
-                        printColoredText(" <> ", Color.ANSI_WHITE) +
+                returnColoredText(name, Color.ANSI_PURPLE) +
+                        returnColoredText(" <> ", Color.ANSI_WHITE) +
+                        returnColoredText("Level " + (int) this.getLevel(), Color.ANSI_YELLOW) +
+                        returnColoredText(" <> ", Color.ANSI_WHITE) +
                         getStatBar("❤", Color.ANSI_RED, "", this.getHealthPoints(), this.getMaxHealthPoints()) +
-                        printColoredText(" " + (int) this.getHealthPoints() + "/" + (int) this.getMaxHealthPoints(), ANSI_RED) +
-                        printColoredText(" <> ", Color.ANSI_WHITE) +
-                        printColoredText((int) this.getDefensePoints() + " Defense", ANSI_BLUE);
+                        returnColoredText(" " + (int) this.getHealthPoints() + "/" + (int) this.getMaxHealthPoints(), ANSI_RED) +
+                        returnColoredText(" <> ", Color.ANSI_WHITE) +
+                        returnColoredText((int) this.getDefensePoints() + " Defense", ANSI_BLUE);
     }
 
     public void addItem(AbstractItem abstractItem) {
@@ -147,7 +147,7 @@ public abstract class AbstractCharacter {
         return this.getSpellsHashMap().get(this.getSpellsKeyList().get(number));
     }
 
-    public Spell getTypedSpellsFromInt(SpellType spellType, int number) {
+    public Spell getTypedSpellsFromInt(MoveType spellType, int number) {
         return this.getAllSpells().stream().filter(spell -> spell.getSpellType().equals(spellType)).toList().get(number);
     }
 
@@ -284,7 +284,7 @@ public abstract class AbstractCharacter {
         return characterSpellList.stream().anyMatch(abstractCharacterSpell -> abstractCharacterSpell.equals(spell));
     }
 
-    public void spellUsed(Spell spell) {
+    public void setSpellReadyIn(Spell spell) {
         spell.setSpellReadyIn(spell.getSpellCooldown());
     }
 
@@ -315,11 +315,16 @@ public abstract class AbstractCharacter {
     }
 
 
-    public void printTypedSpells(SpellType spellType) {
-        int index = 1;
-        List<Spell> typedCharacterSpells = this.getAllSpells().stream().filter(spell -> spell.getSpellType().equals(spellType)).toList();
+    public List<Spell> getTypedSpellsList(MoveType spellType) {
+        return this.getAllSpells().stream().filter(spell -> spell.getSpellType().equals(spellType)).toList();
+    }
 
-        for (Spell spell : typedCharacterSpells) {
+
+    public void printTypedSpells(MoveType spellType) {
+        int index = 1;
+        List<Spell> typedSpellsList = getTypedSpellsList(spellType);
+
+        for (Spell spell : typedSpellsList) {
             System.out.print("(" + index + ") ");
             System.out.println(spell.printStats());
             index++;
@@ -345,7 +350,7 @@ public abstract class AbstractCharacter {
         });
     }
 
-    public void spellCast(Spell spell, AbstractCharacter attackCharacter) {
+    public void spellCast(Spell spell, AbstractCharacter attackedCharacter) {
         double luckPercent = 0;
         if (this.getClass() == Wizard.class) {
             luckPercent = ((Wizard) this).getWizardStatsPercent().get("luck");
@@ -353,74 +358,73 @@ public abstract class AbstractCharacter {
         double spellSuccess = Math.random();
         double spellChance = spell.getSpellChance() * (1 + luckPercent);
 
+        String attackedCharacterName;
+        String attackingCharacterName;
+
+        if(this.getClass() == Enemy.class) {
+            attackingCharacterName = returnFormattedEnum(((Enemy) this).getEnemyName());
+            attackedCharacterName = attackedCharacter.getName();
+        }
+        else {
+            attackingCharacterName = this.getName();
+            attackedCharacterName = returnFormattedEnum(((Enemy) attackedCharacter).getEnemyName());
+        }
+
         if (spellSuccess <= spellChance) {
-            double spellDamage = getSpellDamage(spell, attackCharacter);
-            double damageTaken = attackCharacter.takeDamage(spellDamage);
-            double healthPoints = attackCharacter.getHealthPoints();
-
-            String text1 = this.getName() + " hit " + attackCharacter.getName() + " with " + (int) damageTaken + " damage!";
-            String text2 = attackCharacter.getName()
-                    + " "
-                    + returnFormattedEnum(attackCharacter.getCharacterState())
-                    + ".";
-            String text3 = "Next attack will have "
-                    + (int) (attackCharacter.getCharacterState().getDamageMultiplier() * 100)
-                    + "% more damage.";
-            String text4 = attackCharacter.getName()
-                    + " has " + (int) healthPoints + " hp left.";
-            String text5 = "You killed " + returnFormattedEnum(attackCharacter.getName());
-
-            System.out.println(text1);
-
-            if (healthPoints > 0) {
-                System.out.println(text2);
-                System.out.println(text3);
-                System.out.println(text4);
-            } else {
-                System.out.println(text5);
-            }
+            double spellDamage = getSpellDamage(spell, attackedCharacter);
+            double damageTaken = attackedCharacter.takeDamage(spellDamage);
+            // TODO - GIVE EXPERIENCE TO PLAYER WHEN HE KILLS AN ENEMY
+            double healthPoints = attackedCharacter.getHealthPoints();
+            double maxHealthPoints = attackedCharacter.getMaxHealthPoints();
+            spellAfterCast(attackedCharacter, attackedCharacterName, attackingCharacterName, (int) damageTaken, healthPoints, maxHealthPoints);
 
         } else {
-            String text6 = "You missed your spell!";
+            String text6 = attackingCharacterName + returnColoredText( " missed ", ANSI_YELLOW) + "their spell!";
             System.out.println(text6);
+        }
+    }
+
+    private static void spellAfterCast(AbstractCharacter attackedCharacter, String attackedCharacterName, String attackingCharacterName, int damageTaken, double healthPoints, double maxHealthPoints) {
+        String text1 = attackingCharacterName + " hit " + attackedCharacterName + " with " + returnColoredText(damageTaken + " damage", ANSI_RED) + "!";
+        String text2 = attackedCharacterName + " is now " + returnColoredText(returnFormattedEnum(attackedCharacter.getCharacterState()), ANSI_BLUE) + ".";
+        String text4 = attackedCharacterName + " has " + returnColoredText((int) healthPoints + "/" + (int) maxHealthPoints + " hp", ANSI_GREEN)  + " left.";
+        String text5 = "You killed " + attackedCharacterName;
+
+        System.out.println(text1);
+        if (healthPoints > 0) {
+            System.out.println(text2);
+            System.out.println(text4);
+        } else {
+            System.out.println(text5);
         }
     }
 
     public void attack(Spell spell, AbstractCharacter attackCharacter) {
 
-//        SpellType spellType = spell.getSpellType();
-//        String spellDescription = spell.getSpellDescription();
-
         String spellName = spell.getSpellName();
-        String spellSpecialAttackLine = spell.getSpellSpecialAttackLine();
 
-        double spellDefense = getSpellDefense(spell);
+        // TODO - USE SPELL EFFECTIVE DISTANCE
         double spellEffectiveDistance = getSpellEffectiveDistance(spell);
 
-        // IF SPELL EXISTS IN THE CHARACTER'S SPELL LIST
-        if (checkSpellAvailable(spell)) {
-            // SPELL GETS CAST ON THE ATTACK CHARACTER
-            if (attackCharacter.getHealthPoints() > 0) {
-                // SPELL GETS USED AND PUT ON A COOLDOWN
-                this.reduceSpellsCooldown(1);
-                this.spellUsed(spell);
-                // CONSOLE STUFF
-                System.out.println(spellName + "!");
-                System.out.println(spellSpecialAttackLine);
-                spellCast(spell, attackCharacter);
-            } else {
-                System.out.println(attackCharacter.getName() + " is already dead.");
-            }
-        }
+        // SPELL GETS USED AND PUT ON A COOLDOWN
+        this.reduceSpellsCooldown(1);
+        this.setSpellReadyIn(spell);
+
+        // CONSOLE STUFF
+        printSeparator(50);
+        System.out.println(returnColoredText(spellName + "!", spell.getSpellColor()));
+        spellCast(spell, attackCharacter);
+        printSeparator(50);
+
     }
 
     public void parry(Spell spell, AbstractCharacter abstractCharacter) {
-
+        // TODO - USE SPELL DEFENSE DISTANCE
     }
-//
-//    public static boolean dodge() {
-//
-//    }
+
+    public void  dodge() {
+        // TODO - CAN DODGE DEPENDING ON THE SUCCESS RATE OF THE SPELL
+    }
 
 
 }

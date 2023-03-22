@@ -5,21 +5,21 @@ import java.util.List;
 
 import static Enums.EnumMethods.returnFormattedEnum;
 
-public enum SpellType {
+public enum MoveType {
     ATTACK,
     PARRY,
     FOLLOW_UP;
 
     public static List<String> getSpellTypeList() {
-        SpellType[] spellTypeValues = SpellType.values();
+        MoveType[] spellTypeValues = MoveType.values();
         return EnumMethods.getEnumList(spellTypeValues);
     }
 
-    public static SpellType setSpellType(String spellType) {
-        HashMap<String, SpellType> spellTypeHashMap = new HashMap<>();
-        SpellType[] spellTypeValues = SpellType.values();
+    public static MoveType setSpellType(String spellType) {
+        HashMap<String, MoveType> spellTypeHashMap = new HashMap<>();
+        MoveType[] spellTypeValues = MoveType.values();
 
-        for(SpellType spellTypeValue:spellTypeValues) {
+        for(MoveType spellTypeValue:spellTypeValues) {
             spellTypeHashMap.put(returnFormattedEnum(spellTypeValue), spellTypeValue);
         }
         return spellTypeHashMap.get(spellType);

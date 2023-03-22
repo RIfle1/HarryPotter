@@ -50,14 +50,14 @@ public class Wizard extends AbstractCharacter {
 
     public String printSpecs() {
         return
-                printColoredText(" <> ", Color.ANSI_WHITE) +
-                printColoredText((int) this.getCharisma() + " Charisma", ANSI_YELLOW) +
-                printColoredText(" <> ", Color.ANSI_WHITE) +
-                printColoredText((int) this.getStrength() + " Strength", ANSI_RED) +
-                printColoredText(" <> ", Color.ANSI_WHITE) +
-                printColoredText((int) this.getIntelligence() + " Intelligence", ANSI_BLUE) +
-                printColoredText(" <> ", Color.ANSI_WHITE) +
-                printColoredText((int) this.getLuck() + " Luck", ANSI_PURPLE);
+                returnColoredText(" <> ", Color.ANSI_WHITE) +
+                returnColoredText((int) this.getCharisma() + " Charisma", ANSI_YELLOW) +
+                returnColoredText(" <> ", Color.ANSI_WHITE) +
+                returnColoredText((int) this.getStrength() + " Strength", ANSI_RED) +
+                returnColoredText(" <> ", Color.ANSI_WHITE) +
+                returnColoredText((int) this.getIntelligence() + " Intelligence", ANSI_BLUE) +
+                returnColoredText(" <> ", Color.ANSI_WHITE) +
+                returnColoredText((int) this.getLuck() + " Luck", ANSI_PURPLE);
     }
 
     public String printAllStats() throws CloneNotSupportedException {

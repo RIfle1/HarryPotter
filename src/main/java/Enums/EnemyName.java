@@ -23,6 +23,8 @@ public enum EnemyName {
     private final int enemyBaseHp;
     private final int enemyBaseDp;
 
+    // TODO - ADD BASE EXPERIENCE POINTS TO EACH ENEMY NAME
+
     EnemyName(EnemyCombat enemyCombat, EnemyType enemyType, int enemyBaseHp, int enemyBaseDp) {
         this.enemyCombat = enemyCombat;
         this.enemyType = enemyType;

@@ -8,8 +8,8 @@ import static Main.SaveChecker.checkSaves;
 
 public class Main {
     public static void main(String[] args) throws CloneNotSupportedException {
-//        gameCredits();
-//        checkSaves();
+        gameCredits();
+        checkSaves();
 //        CharacterCreation.characterInit();
         chooseLevel();
 //        System.out.println(generateRandomBasicEnemy());

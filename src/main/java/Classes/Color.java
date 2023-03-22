@@ -20,11 +20,11 @@ public class Color {
     public static final String ANSI_BACKGROUND_CYAN = "\u001B[46m";
     public static final String ANSI_BACKGROUND_WHITE = "\u001B[47m";
 
-    public static String printColoredText(String text, String textColor) {
+    public static String returnColoredText(String text, String textColor) {
         return textColor + "" + text + "" + ANSI_RESET;
     }
 
-    public static String printColoredText(String text, String textColor, String backgroundColor) {
+    public static String returnColoredText(String text, String textColor, String backgroundColor) {
         return textColor + "" + backgroundColor + text + "" + ANSI_RESET;
     }
 

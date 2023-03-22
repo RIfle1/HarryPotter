@@ -1,10 +1,11 @@
 package Classes;
 
 import AbstractClasses.AbstractCharacter;
-import Enums.SpellType;
+import Enums.MoveType;
 
 import java.util.List;
 
+import static Classes.Color.*;
 import static Classes.Wizard.wizard;
 import static Enums.EnumMethods.returnFormattedEnum;
 import static Main.ConsoleFunctions.*;
@@ -37,7 +38,7 @@ public class BattleArena {
         Enemy enemyAttacker;
         Spell wizardChosenSpell;
         Spell enemyChosenSpell;
-        SpellType wizardChosenSpellType = SpellType.ATTACK;
+        MoveType wizardChosenSpellType = MoveType.ATTACK;
         int randomEnemyIndex;
         int randomEnemySpellIndex;
 
@@ -48,37 +49,42 @@ public class BattleArena {
         enemyVictim = enemiesHashMap.get(enemiesKeyList.get(returnChoiceInt(enemiesKeyList.size()) - 1));
 
         if (!firstMove) {
-            List<String> spellTypeList = SpellType.getSpellTypeList();
-            spellTypeList.remove(returnFormattedEnum(SpellType.FOLLOW_UP));
+            List<String> spellTypeList = MoveType.getSpellTypeList();
+            spellTypeList.remove(returnFormattedEnum(MoveType.FOLLOW_UP));
             printTitle("What is your move?");
             printChoices(spellTypeList);
-            wizardChosenSpellType = SpellType.setSpellType(spellTypeList.get(returnChoiceInt(spellTypeList.size()) - 1));
+            wizardChosenSpellType = MoveType.setSpellType(spellTypeList.get(returnChoiceInt(spellTypeList.size()) - 1));
         }
 
         printTitle("Choose the spell you want to use.");
         wizard.printTypedSpells(wizardChosenSpellType);
-        wizardChosenSpell = wizard.getTypedSpellsFromInt(wizardChosenSpellType, returnChoiceInt(wizard..size()) - 1);
+        wizardChosenSpell = wizard.getTypedSpellsFromInt(wizardChosenSpellType, returnChoiceInt(wizard.getTypedSpellsList(wizardChosenSpellType).size()) - 1);
 
         while (!wizard.checkSpellReady(wizardChosenSpell)) {
-            System.out.println(wizardChosenSpell.getSpellName() + " is on cooldown.");
-            wizardChosenSpell = wizard.getTypedSpellsFromInt(wizardChosenSpellType, returnChoiceInt(wizard.getSpellsKeyList().size()) - 1);
+            System.out.println(returnColoredText(wizardChosenSpell.getSpellName() + " will be ready in " + wizardChosenSpell.getSpellReadyIn() + " turns.", ANSI_RED));
+            System.out.println(returnColoredText("Choose another spell.", ANSI_BLUE));
+            wizardChosenSpell = wizard.getTypedSpellsFromInt(wizardChosenSpellType, returnChoiceInt(wizard.getTypedSpellsList(wizardChosenSpellType).size()) - 1);
         }
 
-        if (wizardChosenSpellType == SpellType.ATTACK) {
+        if (wizardChosenSpellType == MoveType.ATTACK) {
             wizard.attack(wizardChosenSpell, enemyVictim);
-        } else if (wizardChosenSpellType == SpellType.PARRY) {
+        } else if (wizardChosenSpellType == MoveType.PARRY) {
             wizard.parry(wizardChosenSpell, enemyVictim);
         }
+        continuePromptExtra();
 
+        // IF ENEMY LIST ISN'T EMPTY
+        if(!enemiesHashMap.isEmpty()) {
+            randomEnemyIndex = (int) generateDoubleBetween(0, enemiesKeyList.toArray().length - 1);
 
-        randomEnemyIndex = (int) generateDoubleBetween(0, enemiesKeyList.toArray().length - 1);
+            enemyAttacker = enemiesHashMap.get(enemiesKeyList.get(randomEnemyIndex));
+            randomEnemySpellIndex = (int) generateDoubleBetween(0, enemyAttacker.getSpellsKeyList().toArray().length - 1);
+            enemyChosenSpell = enemyAttacker.getSpellFromInt(randomEnemySpellIndex);
 
-        enemyAttacker = enemiesHashMap.get(enemiesKeyList.get(randomEnemyIndex));
-        randomEnemySpellIndex = (int) generateDoubleBetween(0, enemyAttacker.getSpellsKeyList().toArray().length - 1);
-        enemyChosenSpell = enemyAttacker.getSpellFromInt(randomEnemySpellIndex);
-
-        printTitle(enemyAttacker.getName() + " will attack you.");
-        enemyAttacker.attack(enemyChosenSpell, wizard);
+            printTitle(returnFormattedEnum(enemyAttacker.getEnemyName()) + " will attack you.");
+            enemyAttacker.attack(enemyChosenSpell, wizard);
+            continuePromptExtra();
+        }
     }
 
     public static void battleArena() throws CloneNotSupportedException {
@@ -87,6 +93,7 @@ public class BattleArena {
         while (!enemiesHashMap.isEmpty() && wizard.getHealthPoints() > 0) {
             fight(firstMove);
             firstMove = false;
+            clearConsole();
         }
         if (enemiesHashMap.isEmpty()) {
             printTitle("Congrats, you defeated all the enemies.");

@@ -1,11 +1,12 @@
 package Main;
 
+import Classes.Color;
+
 import java.util.*;
 
 import static Classes.BattleArena.battleArena;
 import static Classes.Color.*;
-import static Classes.Color.printColoredText;
-import static Classes.Wizard.wizard;
+import static Classes.Color.returnColoredText;
 
 public class ConsoleFunctions {
     static Scanner scanner = new Scanner(System.in);
@@ -14,7 +15,7 @@ public class ConsoleFunctions {
     // Read the user's choice
 
     public static String returnChoiceString() {
-        System.out.println(printColoredText("-> ", ANSI_YELLOW));
+        System.out.println(Color.returnColoredText("-> ", ANSI_YELLOW));
         return scanner.next();
     }
 
@@ -22,17 +23,17 @@ public class ConsoleFunctions {
         int input;
 
         do{
-            System.out.println(printColoredText("-> ", ANSI_YELLOW));
+            System.out.println(Color.returnColoredText("-> ", ANSI_YELLOW));
             try{
                 input = Integer.parseInt(scanner.next());
             }
             catch(Exception e) {
                 input = -1;
-                System.out.println(printColoredText("Input must be an integer", ANSI_RED));
+                System.out.println(Color.returnColoredText("Input must be an integer", ANSI_RED));
             }
             if(input > max) {
                 input = -1;
-                System.out.println(printColoredText("Input must be between 1 and " + max, ANSI_RED));
+                System.out.println(Color.returnColoredText("Input must be between 1 and " + max, ANSI_RED));
             }
         }
         while(input < 1);
@@ -43,17 +44,17 @@ public class ConsoleFunctions {
         int input;
 
         do{
-            System.out.println(printColoredText("-> ", ANSI_YELLOW));
+            System.out.println(Color.returnColoredText("-> ", ANSI_YELLOW));
             try{
                 input = Integer.parseInt(scanner.next());
             }
             catch(Exception e) {
                 input = -1;
-                System.out.println(printColoredText("Input must be an integer", ANSI_RED));
+                System.out.println(Color.returnColoredText("Input must be an integer", ANSI_RED));
             }
             if(input < min || input > max) {
                 input = -1;
-                System.out.println(printColoredText("Input must be between " + min + " and " + max, ANSI_RED));
+                System.out.println(Color.returnColoredText("Input must be between " + min + " and " + max, ANSI_RED));
             }
         }
         while(input < 1);
@@ -63,13 +64,13 @@ public class ConsoleFunctions {
 
     public static void printChoices(List<String> choicesList) {
         for(int i = 0; i < choicesList.toArray().length; i++) {
-            System.out.printf("(%s) %s\n", printColoredText(String.valueOf(i + 1), ANSI_YELLOW), printColoredText(choicesList.get(i), ANSI_PURPLE));
+            System.out.printf("(%s) %s\n", Color.returnColoredText(String.valueOf(i + 1), ANSI_YELLOW), Color.returnColoredText(choicesList.get(i), ANSI_PURPLE));
         }
     }
 
     public static void printChoices(String[] choicesList) {
         for(int i = 0; i < choicesList.length; i++) {
-            System.out.printf("(%s) %s\n", printColoredText(String.valueOf(i + 1), ANSI_YELLOW), printColoredText(choicesList[i], ANSI_PURPLE));
+            System.out.printf("(%s) %s\n", Color.returnColoredText(String.valueOf(i + 1), ANSI_YELLOW), Color.returnColoredText(choicesList[i], ANSI_PURPLE));
         }
     }
 
@@ -92,7 +93,7 @@ public class ConsoleFunctions {
     public static void printColoredHeader(String header){
         clearConsole();
         printSeparator(header.length());
-        System.out.println(printColoredText(header, ANSI_GREEN));
+        System.out.println(Color.returnColoredText(header, ANSI_GREEN));
         printSeparator(header.length());
     }
 
@@ -111,8 +112,26 @@ public class ConsoleFunctions {
 
     // Method to continue
     public static void continuePrompt(){
-        System.out.println(printColoredText("Press 'Enter' to continue...", ANSI_BLUE));
-        System.out.println(scanner.nextLine());
+        String continuePromptText = "Press 'Enter' to continue...";
+
+        printSeparator(continuePromptText.length());
+        System.out.println(returnColoredText(continuePromptText, ANSI_BLUE));
+        printSeparator(continuePromptText.length());
+        System.out.println(returnColoredText("->", ANSI_YELLOW));
+
+        System.out.print(scanner.nextLine());
+    }
+
+    public static void continuePromptExtra(){
+        String continuePromptText = "Press 'Enter' to continue...";
+
+        printSeparator(continuePromptText.length());
+        System.out.println(returnColoredText(continuePromptText, ANSI_BLUE));
+        printSeparator(continuePromptText.length());
+        System.out.println(returnColoredText("->", ANSI_YELLOW));
+
+        System.out.print(scanner.nextLine());
+        System.out.print(scanner.nextLine());
     }
 
     public static void gameCredits() {
