@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static Classes.Color.ANSI_YELLOW;
+import static Classes.Color.returnColoredText;
 import static Classes.Wizard.wizard;
 import static Enums.EnumMethods.returnFormattedEnum;
 import static Main.MechanicsFunctions.generateDoubleBetween;
@@ -40,7 +42,14 @@ public class Enemy extends AbstractCharacter {
         enemiesKeyList.clear();
     }
 
-    public void deleteEnemy() {
+    public void giveItems(Wizard wizard) {
+        List<AbstractItem> enemyItemList =  this.getItemList();
+        for(AbstractItem item:enemyItemList) {
+            wizard.getItemList().add(item);
+        }
+    }
+
+    public void killEnemy() {
         enemiesHashMap.remove(this.getName());
         enemiesKeyList.remove(this.getName());
     }
@@ -55,8 +64,9 @@ public class Enemy extends AbstractCharacter {
 
     public void checkHealth(Wizard wizard) {
         if (this.getHealthPoints() <= 0) {
-            this.deleteEnemy();
+            this.killEnemy();
             wizard.addExperience(this.getExperiencePoints());
+            this.giveItems(wizard);
         }
     }
 
@@ -148,7 +158,7 @@ public class Enemy extends AbstractCharacter {
     public static void printEnemies() {
         int index = 1;
         for(Map.Entry<String, Enemy> enemy : enemiesHashMap.entrySet()) {
-            System.out.printf("%-6s", "("+index+")");
+            System.out.printf("%-15s", "("+returnColoredText(index+"", ANSI_YELLOW)+")");
             System.out.println(enemy.getValue().printStats());
             index++;
         }

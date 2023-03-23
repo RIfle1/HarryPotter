@@ -16,8 +16,8 @@ import java.util.List;
 @Setter
 public class Potion extends AbstractItem {
     @Builder
-    public Potion(String itemName, String itemDescription, ItemType itemType, double itemDropChance, PotionType potionType, double potionDuration, double potionValue) {
-        super(itemName, itemDescription, itemType, itemDropChance);
+    public Potion(String itemName, String itemDescription, ItemType itemType, double itemDropChance, String itemColor, PotionType potionType, double potionDuration, double potionValue) {
+        super(itemName, itemDescription, itemType, itemDropChance, itemColor);
         this.potionType = potionType;
         this.potionDuration = potionDuration;
         this.potionValue = potionValue;
@@ -32,6 +32,7 @@ public class Potion extends AbstractItem {
             .itemDescription("A minor healing potion which heals 40hp.")
             .itemType(ItemType.CONSUMABLE)
             .itemDropChance(0.8)
+            .itemColor(Color.ANSI_BLUE)
             .potionType(PotionType.HEALTH)
             .potionDuration(0)
             .potionValue(40)
@@ -42,6 +43,7 @@ public class Potion extends AbstractItem {
             .itemDescription("A medium healing potion which heals 70hp.")
             .itemType(ItemType.CONSUMABLE)
             .itemDropChance(0.5)
+            .itemColor(Color.ANSI_YELLOW)
             .potionType(PotionType.HEALTH)
             .potionDuration(0)
             .potionValue(70)
@@ -52,6 +54,7 @@ public class Potion extends AbstractItem {
             .itemDescription("A high healing potion which heals 100hp.")
             .itemType(ItemType.CONSUMABLE)
             .itemDropChance(0.2)
+            .itemColor(Color.ANSI_RED)
             .potionType(PotionType.HEALTH)
             .potionDuration(0)
             .potionValue(100)
@@ -62,8 +65,9 @@ public class Potion extends AbstractItem {
             .itemDescription("A minor defense potion which adds 40 defense.")
             .itemType(ItemType.CONSUMABLE)
             .itemDropChance(0.8)
+            .itemColor(Color.ANSI_BLUE)
             .potionType(PotionType.DEFENSE)
-            .potionDuration(0)
+            .potionDuration(3)
             .potionValue(40)
             .build();
 
@@ -72,8 +76,9 @@ public class Potion extends AbstractItem {
             .itemDescription("A medium defense potion which adds 70 defense.")
             .itemType(ItemType.CONSUMABLE)
             .itemDropChance(0.5)
+            .itemColor(Color.ANSI_YELLOW)
             .potionType(PotionType.DEFENSE)
-            .potionDuration(0)
+            .potionDuration(5)
             .potionValue(70)
             .build();
 
@@ -82,8 +87,9 @@ public class Potion extends AbstractItem {
             .itemDescription("A high defense potion which adds 100 defense.")
             .itemType(ItemType.CONSUMABLE)
             .itemDropChance(0.2)
+            .itemColor(Color.ANSI_RED)
             .potionType(PotionType.DEFENSE)
-            .potionDuration(0)
+            .potionDuration(6)
             .potionValue(100)
             .build();
 
@@ -92,6 +98,7 @@ public class Potion extends AbstractItem {
             .itemDescription("A minor regeneration potion which regenerates 10 hp per turn.")
             .itemType(ItemType.CONSUMABLE)
             .itemDropChance(0.8)
+            .itemColor(Color.ANSI_BLUE)
             .potionType(PotionType.REGENERATION)
             .potionDuration(3)
             .potionValue(10)
@@ -102,6 +109,7 @@ public class Potion extends AbstractItem {
             .itemDescription("A minor regeneration potion which regenerates 15 hp per turn.")
             .itemType(ItemType.CONSUMABLE)
             .itemDropChance(0.5)
+            .itemColor(Color.ANSI_YELLOW)
             .potionType(PotionType.REGENERATION)
             .potionDuration(5)
             .potionValue(15)
@@ -112,6 +120,7 @@ public class Potion extends AbstractItem {
             .itemDescription("A minor regeneration potion which regenerates 25 hp per turn.")
             .itemType(ItemType.CONSUMABLE)
             .itemDropChance(0.2)
+            .itemColor(Color.ANSI_RED)
             .potionType(PotionType.REGENERATION)
             .potionDuration(7)
             .potionValue(0.2)
@@ -122,6 +131,7 @@ public class Potion extends AbstractItem {
             .itemDescription("A minor damage potion which increases damage by 10%.")
             .itemType(ItemType.CONSUMABLE)
             .itemDropChance(0.8)
+            .itemColor(Color.ANSI_BLUE)
             .potionType(PotionType.DAMAGE)
             .potionDuration(2)
             .potionValue(0.1)
@@ -132,6 +142,7 @@ public class Potion extends AbstractItem {
             .itemDescription("A minor damage potion which increases damage by 15%.")
             .itemType(ItemType.CONSUMABLE)
             .itemDropChance(0.5)
+            .itemColor(Color.ANSI_YELLOW)
             .potionType(PotionType.DAMAGE)
             .potionDuration(4)
             .potionValue(0.15)
@@ -142,6 +153,7 @@ public class Potion extends AbstractItem {
             .itemDescription("A minor damage potion which increases damage by 25%.")
             .itemType(ItemType.CONSUMABLE)
             .itemDropChance(0.2)
+            .itemColor(Color.ANSI_RED)
             .potionType(PotionType.DAMAGE)
             .potionDuration(6)
             .potionValue(0.25)
@@ -152,6 +164,7 @@ public class Potion extends AbstractItem {
             .itemDescription("A minor cooldown potion which reduces all spells cooldown by 2 turns.")
             .itemType(ItemType.CONSUMABLE)
             .itemDropChance(0.8)
+            .itemColor(Color.ANSI_BLUE)
             .potionType(PotionType.COOLDOWN)
             .potionDuration(0)
             .potionValue(2)
@@ -162,6 +175,7 @@ public class Potion extends AbstractItem {
             .itemDescription("A minor cooldown potion which reduces all spells cooldown by 4 turns.")
             .itemType(ItemType.CONSUMABLE)
             .itemDropChance(0.5)
+            .itemColor(Color.ANSI_YELLOW)
             .potionType(PotionType.COOLDOWN)
             .potionDuration(0)
             .potionValue(4)
@@ -172,6 +186,7 @@ public class Potion extends AbstractItem {
             .itemDescription("A minor cooldown potion which reduces all spells cooldown by 6 turns.")
             .itemType(ItemType.CONSUMABLE)
             .itemDropChance(0.2)
+            .itemColor(Color.ANSI_RED)
             .potionType(PotionType.COOLDOWN)
             .potionDuration(0)
             .potionValue(6)
@@ -182,6 +197,7 @@ public class Potion extends AbstractItem {
             .itemDescription("An invincibility potion which makes you invincible to all attacks.")
             .itemType(ItemType.CONSUMABLE)
             .itemDropChance(0.1)
+            .itemColor(Color.ANSI_PURPLE)
             .potionType(PotionType.INVINCIBILITY)
             .potionDuration(0)
             .potionValue(-1)

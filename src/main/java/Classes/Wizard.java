@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static Classes.Color.*;
-import static Main.ConsoleFunctions.printColumnSeparator;
+import static Main.ConsoleFunctions.*;
 
 @Getter
 @Setter
@@ -149,8 +149,24 @@ public class Wizard extends AbstractCharacter {
         this.updateSpellsHashMap();
     }
 
-    public static House getHouseStat(Wizard wizard) {
-        return wizard.getHouse();
+    public void checkStats() {
+
+    }
+
+    public void usePotion() {
+        List<String> potionNamesList = this.getPotionNamesList();
+
+
+        if(potionNamesList.size() > 0) {
+            printTitle("Choose a potion you want to use.");
+            printChoices(potionNamesList);
+        }
+        else {
+            printTitle("You don't have any potions in your inventory.");
+        }
+
+        Potion chosenPotion = getPotion(potionNamesList.get(returnChoiceInt(0, potionNamesList.size()) - 1));
+        this.drinkPotion(chosenPotion);
     }
 
     public static Wizard wizard = Wizard.builder()

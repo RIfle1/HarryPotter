@@ -35,7 +35,7 @@ public class BattleArena {
         enemiesHashMap = generateEnemies(minLevel, maxLevel, enemyAmount);
     }
 
-    public static void fight(boolean firstMove) throws CloneNotSupportedException {
+    public static void fight() throws CloneNotSupportedException {
         Enemy enemyVictim;
         Enemy enemyAttacker;
         Spell wizardChosenSpell;
@@ -84,7 +84,7 @@ public class BattleArena {
 
         // IF DODGE OR PARRY FAILED, THE WIZARD WILL ATTACK
         if(!enemyDodgeOrParrySuccess) {
-            wizard.attack(wizardChosenSpell, enemyVictim, wizardCalculatedDamage);
+            wizard.attack(wizardChosenSpell, enemyVictim, wizardCalculatedDamage, true);
         }
         continuePromptExtra();
 
@@ -123,7 +123,7 @@ public class BattleArena {
 
             // IF DODGE OR PARRY FAILED, THE ENEMY WILL ATTACK
             if(!wizardDodgeOrParrySuccess) {
-                enemyAttacker.attack(enemyChosenSpell, wizard, enemyCalculatedDamage);
+                enemyAttacker.attack(enemyChosenSpell, wizard, enemyCalculatedDamage, true);
             }
 
             continuePromptExtra();
@@ -134,16 +134,24 @@ public class BattleArena {
         chooseEnemies();
         wizard.updateStats();
         wizard.restoreWizardHpDf();
-        boolean firstMove = true;
         while (!enemiesHashMap.isEmpty() && wizard.getHealthPoints() > 0) {
-            fight(firstMove);
-            firstMove = false;
+            List<String> choiceList = new ArrayList<>(Arrays.asList("Check Stats", "Use Potion", "Fight!"));
+            printColoredHeader("What would you like to do?");
+            printChoices(choiceList);
+            int choice = returnChoiceInt(1, choiceList.size());
+
+            switch (choice) {
+                case 1 -> wizard.checkStats();
+                case 2 -> wizard.usePotion();
+                case 3 -> fight();
+            }
+
             clearConsole();
         }
         if (enemiesHashMap.isEmpty()) {
-            printTitle("Congrats, you defeated all the enemies.");
+            printTitle(returnColoredText("Congrats, you defeated all the enemies.", ANSI_YELLOW));
         } else if (wizard.getHealthPoints() <= 0) {
-            printTitle("You died.");
+            printTitle(returnColoredText("You died.", ANSI_RED));
         }
     }
 

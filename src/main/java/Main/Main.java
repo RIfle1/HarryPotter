@@ -1,5 +1,11 @@
 package Main;
 
+import AbstractClasses.AbstractItem;
+import Classes.Potion;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import static Classes.BattleArena.battleArena;
 import static Classes.Enemy.generateRandomBasicEnemy;
 import static Classes.Wizard.testWizard;
@@ -12,6 +18,7 @@ public class Main {
 //        gameCredits();
 //        checkSaves();
 //        CharacterCreation.characterInit();
+        wizard.setItemList(new ArrayList<>(Arrays.asList(Potion.highDefensePotion, Potion.highHealthPotion)));
         chooseLevel();
 
 //        System.out.println(generateRandomBasicEnemy());

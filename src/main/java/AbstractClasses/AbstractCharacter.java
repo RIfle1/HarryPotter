@@ -4,14 +4,10 @@ import Classes.*;
 import Enums.*;
 import lombok.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static Classes.Color.*;
 import static Classes.Spell.*;
-import static Classes.Wizard.wizard;
 import static Enums.EnumMethods.returnFormattedEnum;
 import static Main.ConsoleFunctions.*;
 import static Main.MechanicsFunctions.generateDoubleBetween;
@@ -84,22 +80,25 @@ public abstract class AbstractCharacter {
         String column2Format = "%-" + 10 + "s";
         String column3Format = "%-" + 20 + "s";
         String column4Format = "%-" + 12 + "s";
+        String column5Format = "%-" + 12 + "s";
 
 
         String column1 = returnColoredText(String.format(column1Format, name), Color.ANSI_PURPLE);
         String column2 = returnColoredText(String.format(column2Format, "Level " + (int) this.getLevel()), Color.ANSI_YELLOW);
-        String column3 = String.format(column3Format ,getStatBar("❤", Color.ANSI_RED, this.getHealthPoints(), this.getMaxHealthPoints()));
+        String column3 = String.format(column3Format, getStatBar("❤", Color.ANSI_RED, this.getHealthPoints(), this.getMaxHealthPoints()));
         String column4 = returnColoredText(String.format(column4Format, (int) this.getDefensePoints() + " Defense"), ANSI_BLUE);
+        String column5 = "";
+
+        if(this.getCharacterState() != CharacterState.STANDING) {
+            column5 = printColumnSeparator("<>") +
+                    returnColoredText(String.format(column5Format, (int) (this.getCharacterState().getDamageMultiplier() * 100) + "% More Damage."), ANSI_RED);
+        }
 
         return column1 + printColumnSeparator("<>") +
                 column2 + printColumnSeparator("<>") +
                 column3 + printColumnSeparator("<>") +
-                column4;
-    }
-
-    public void addItem(AbstractItem abstractItem) {
-        List<AbstractItem> currentItemList = this.getItemList();
-        currentItemList.add(abstractItem);
+                column4 +
+                column5;
     }
 
     public List<String> getItemNameList() {
@@ -112,9 +111,33 @@ public abstract class AbstractCharacter {
         return currentItemNameList;
     }
 
+    public Potion getPotion(String potionName) {
+        return (Potion) getPotionsList().stream()
+                .filter(AbstractItem -> AbstractItem.getItemName().equals(potionName))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public List<AbstractItem> getPotionsList() {
+            return this.getItemList().stream().filter(AbstractItem -> AbstractItem.getClass() == Potion.class).toList();
+    }
+
+    public List<String> getPotionNamesList() {
+        List<String> potionNamesList = new ArrayList<>();
+        this.getPotionsList().forEach(AbstractItem -> potionNamesList.add(AbstractItem.getItemName()));
+        return potionNamesList;
+    }
+
+    public List<String> getActivePotionNamesList() {
+        List<String> activePotionNamesList = new ArrayList<>();
+        this.getActivePotionsList().forEach(AbstractItem -> activePotionNamesList.add(AbstractItem.getItemName()));
+        return activePotionNamesList;
+    }
+
     public void drinkPotion(Potion potion) {
         final int maxPotionActiveAtOnce = 3;
         final int maxPotionOfOneType = 1;
+        String text ="";
 
         List<AbstractItem> currentItemList = this.getItemList();
         boolean potionIsInInventory = currentItemList.stream().anyMatch(currentItem -> currentItem.equals(potion));
@@ -128,31 +151,26 @@ public abstract class AbstractCharacter {
 
         // NEEDS TO BE OPTIMIZED FOR ALL TYPES OF POTIONS
         if (potionIsInInventory && potionTypeActiveList.toArray().length < maxPotionOfOneType && activePotionList.toArray().length < maxPotionActiveAtOnce) {
+            // TODO - THE POTIONS ADDED IN ACTIVE POTION LIST MUST BE ACTUALLY APPLIED -> LIKE HEALTH AND DEFENSE -- USE POTION DURATION
             activePotionList.add(potion);
-            String text1 = "You just drank " + potion.getItemName();
-            String text2 = "Your "
-                    + returnFormattedEnum(potion.getPotionType())
-                    + " has been improved by "
-                    + potion.getPotionValue()
-                    + " points.";
+            text = returnColoredText("You just drank " + potion.getItemName(), potion.getItemColor()) +
+                    "\nYour " +
+                    returnColoredText(returnFormattedEnum(potion.getPotionType()), potion.getItemColor()) +
+                    " has been improved by " +
+                    returnColoredText(String.valueOf((int) potion.getPotionValue()), potion.getItemColor()) +
+                    " points.";
 
-            printLineSeparator(text2.length());
-            System.out.println(text1);
-            System.out.println(text2);
-            printLineSeparator(text2.length());
         } else if (potionTypeActiveList.toArray().length >= maxPotionOfOneType) {
-            String text1 = returnFormattedEnum(potion.getPotionType()) + " potion is already active.";
-
-            printLineSeparator(text1.length());
-            System.out.println(text1);
-            printLineSeparator(text1.length());
+            text = returnColoredText(returnFormattedEnum(potion.getPotionType()), potion.getItemColor()) +
+                    returnColoredText(" potion is already active.", ANSI_YELLOW);
         } else if (activePotionList.toArray().length >= 3) {
-            String text1 = "Cannot drink " + returnFormattedEnum(potion.getPotionType()) + " potion, you can only have 3 potions active at once.";
-
-            printLineSeparator(text1.length());
-            System.out.println(text1);
-            printLineSeparator(text1.length());
+            text = returnColoredText("Cannot drink ", ANSI_RED) +
+                    returnColoredText(returnFormattedEnum(potion.getPotionType()), potion.getItemColor()) +
+                    returnColoredText(" potion, you can only have 3 potions active at once.", ANSI_RED);
         }
+
+        printTitle(text);
+        continuePromptExtra();
     }
 
     public Spell getSpellFromInt(int number) {
@@ -282,7 +300,7 @@ public abstract class AbstractCharacter {
     public void printAllCharacterSpells() {
         int index = 1;
         for (Map.Entry<String, Spell> spell : this.getSpellsHashMap().entrySet()) {
-            System.out.printf("%-6s", "("+index+")");
+            System.out.printf("%-6s", "(" + index + ")");
             System.out.println(spell.getValue().printStats());
             index++;
         }
@@ -299,7 +317,7 @@ public abstract class AbstractCharacter {
         List<Spell> typedSpellsList = getTypedSpellsList(spellType);
 
         for (Spell spell : typedSpellsList) {
-            System.out.printf("%-6s", "("+index+")");
+            System.out.printf("%-15s", "("+returnColoredText(String.valueOf(index), ANSI_YELLOW)+")");
             System.out.println(spell.printStats());
             index++;
         }
@@ -338,16 +356,15 @@ public abstract class AbstractCharacter {
         return spell.getSpellChance() * (1 + luckPercent);
     }
 
-    public void spellCast(Spell spell, AbstractCharacter attackedCharacter, double calculatedDamage) {
+    public void spellCast(Spell spell, AbstractCharacter attackedCharacter, double calculatedDamage, boolean spellAfterCast) {
 
         String attackedCharacterName = "";
         String attackingCharacterName = "";
 
-        if(this.getClass() == Enemy.class) {
+        if (this.getClass() == Enemy.class) {
             attackingCharacterName = returnFormattedEnum(((Enemy) this).getEnemyName());
             attackedCharacterName = attackedCharacter.getName();
-        }
-        else if (this.getClass() == Wizard.class){
+        } else if (this.getClass() == Wizard.class) {
             attackingCharacterName = this.getName();
             attackedCharacterName = returnFormattedEnum(((Enemy) attackedCharacter).getEnemyName());
         }
@@ -356,38 +373,51 @@ public abstract class AbstractCharacter {
         if (spellSuccess <= getSpellChance(spell)) {
             // TAKE DAMAGE
             double damageTaken = attackedCharacter.takeDamage(calculatedDamage);
-            // ADD EXPERIENCE
-            if(attackedCharacter.getClass() == Enemy.class) {
+
+            // PRINT AFTER CAST STUFF INTO CONSOLE
+            double healthPoints = attackedCharacter.getHealthPoints();
+            double maxHealthPoints = attackedCharacter.getMaxHealthPoints();
+            if(spellAfterCast) {
+                spellAfterCast(attackedCharacter, attackedCharacterName, attackingCharacterName, (int) damageTaken, healthPoints, maxHealthPoints);
+            }
+
+            // CHECK ENEMY'S CHARACTER AND ACT ACCORDINGLY (ADD XP AND ITEM DROPS)
+            if (attackedCharacter.getClass() == Enemy.class) {
                 assert this instanceof Wizard;
                 ((Enemy) attackedCharacter).checkHealth((Wizard) this);
             }
 
-            double healthPoints = attackedCharacter.getHealthPoints();
-            double maxHealthPoints = attackedCharacter.getMaxHealthPoints();
-            spellAfterCast(attackedCharacter, attackedCharacterName, attackingCharacterName, (int) damageTaken, healthPoints, maxHealthPoints);
-
         } else {
-            String text6 = attackingCharacterName + returnColoredText( " missed ", ANSI_YELLOW) + "their spell!";
-            System.out.println(text6);
+            System.out.println(attackingCharacterName + returnColoredText(" missed ", ANSI_YELLOW) + "their spell!");
         }
     }
 
     private static void spellAfterCast(AbstractCharacter attackedCharacter, String attackedCharacterName, String attackingCharacterName, int damageTaken, double healthPoints, double maxHealthPoints) {
         String text1 = attackingCharacterName + " hit " + attackedCharacterName + " with " + returnColoredText(damageTaken + " damage", ANSI_RED) + "!";
         String text2 = attackedCharacterName + " is now " + returnColoredText(returnFormattedEnum(attackedCharacter.getCharacterState()), ANSI_BLUE) + ".";
-        String text4 = attackedCharacterName + " has " + returnColoredText((int) healthPoints + "/" + (int) maxHealthPoints + " hp", ANSI_GREEN)  + " left.";
-        String text5 = "";
+        String text4 = attackedCharacterName + " has " + returnColoredText((int) healthPoints + "/" + (int) maxHealthPoints + " hp", ANSI_GREEN) + " left.";
+        StringBuilder text5 = new StringBuilder();
 
-        if(attackedCharacter.getClass() == Wizard.class) {
-            text5 = attackingCharacterName + " killed you.";
-        }
-        else if(attackedCharacter.getClass() == Enemy.class) {
-            text5 = "You killed " + attackedCharacterName + ".";
+        if (attackedCharacter.getClass() == Wizard.class) {
+            text5.append(attackingCharacterName).append(" killed you.");
+        } else if (attackedCharacter.getClass() == Enemy.class) {
+            text5.append("You killed ")
+                    .append(returnColoredText(attackedCharacterName, ANSI_PURPLE))
+                    .append(".\nYou received ")
+                    .append(returnColoredText((int) ((Enemy) attackedCharacter).getExperiencePoints() + " XP.", ANSI_BLUE))
+                    .append("\n");
+
+            List<AbstractItem> enemyItemList = attackedCharacter.getItemList();
+
+            if(enemyItemList.size() > 0) {
+                text5.append("You found:\n");
+                enemyItemList.forEach(Item -> text5.append("- ").append(returnColoredText(Item.getItemName(), Item.getItemColor())).append("\n"));
+            }
         }
 
         System.out.println(text1);
         if (healthPoints > 0) {
-            if(attackedCharacter.getCharacterState() != CharacterState.STANDING) {
+            if (attackedCharacter.getCharacterState() != CharacterState.STANDING) {
                 System.out.println(text2);
             }
             System.out.println(text4);
@@ -396,7 +426,7 @@ public abstract class AbstractCharacter {
         }
     }
 
-    public void attack(Spell spell, AbstractCharacter attackCharacter, double calculatedDamage) {
+    public void attack(Spell spell, AbstractCharacter attackCharacter, double calculatedDamage, boolean spellAfterCast) {
         String spellName = spell.getSpellName();
 
         // TODO - USE SPELL EFFECTIVE DISTANCE
@@ -407,11 +437,8 @@ public abstract class AbstractCharacter {
         this.setSpellReadyIn(spell);
 
         // CONSOLE STUFF
-        printLineSeparator(50);
         System.out.println(returnColoredText(spellName + "!", spell.getSpellColor()));
-        spellCast(spell, attackCharacter, calculatedDamage);
-        printLineSeparator(50);
-
+        spellCast(spell, attackCharacter, calculatedDamage, spellAfterCast);
     }
 
     public boolean dodge(Spell spell, AbstractCharacter attackingCharacter) {
@@ -420,21 +447,19 @@ public abstract class AbstractCharacter {
         String text1 = "";
         String text2 = "";
 
-        if(this.getClass() == Wizard.class) {
+        if (this.getClass() == Wizard.class) {
             text1 = returnColoredText("You dodged " + returnFormattedEnum(((Enemy) attackingCharacter).getEnemyName()) + "'s attack.", ANSI_YELLOW);
             text2 = returnColoredText("You were unable to dodge " + returnFormattedEnum(((Enemy) attackingCharacter).getEnemyName()) + "'s attack.", ANSI_RED);
-        }
-        else if(this.getClass() == Enemy.class) {
-            text1 = returnColoredText(returnFormattedEnum(((Enemy)this).getEnemyName())  + " dodged your attack.", ANSI_YELLOW);
-            text2 = returnColoredText(returnFormattedEnum(((Enemy)this).getEnemyName()) + " was unable to dodge your attack.", ANSI_RED);
+        } else if (this.getClass() == Enemy.class) {
+            text1 = returnColoredText(returnFormattedEnum(((Enemy) this).getEnemyName()) + " dodged your attack.", ANSI_YELLOW);
+            text2 = returnColoredText(returnFormattedEnum(((Enemy) this).getEnemyName()) + " was unable to dodge your attack.", ANSI_RED);
             spellChance = spellChance / 5;
         }
 
         if (spellSuccess <= spellChance) {
             printTitle(text1);
             return true;
-        }
-        else {
+        } else {
             printTitle(text2);
             return false;
         }
@@ -447,25 +472,23 @@ public abstract class AbstractCharacter {
         double newDamage = calculatedDamage * (1 + parryMultiplier);
         double defensePoints = this.getDefensePoints();
 
-        if(this.getClass() == Wizard.class) {
+        if (this.getClass() == Wizard.class) {
             text1 = returnColoredText("You parried " + parrySpell.getSpellName() + " and returned ", ANSI_YELLOW)
                     + returnColoredText((int) newDamage + " Damage.", ANSI_RED);
             text2 = returnColoredText("You were unable to parry " + returnFormattedEnum(((Enemy) enemyAttacker).getEnemyName()) + "'s attack.", ANSI_RED);
-        }
-        else if(this.getClass() == Enemy.class) {
-            text1 = returnColoredText(returnFormattedEnum(((Enemy)this).getEnemyName()) + " parried your attack and returned", ANSI_YELLOW)
+        } else if (this.getClass() == Enemy.class) {
+            text1 = returnColoredText(returnFormattedEnum(((Enemy) this).getEnemyName()) + " parried your attack and returned", ANSI_YELLOW)
                     + returnColoredText((int) newDamage + " Damage.", ANSI_RED);
-            text2 = returnColoredText(returnFormattedEnum(((Enemy)this).getEnemyName()) + " was unable to parry your attack.", ANSI_RED);
+            text2 = returnColoredText(returnFormattedEnum(((Enemy) this).getEnemyName()) + " was unable to parry your attack.", ANSI_RED);
             defensePoints = defensePoints / 3;
         }
 
         // THE ATTACK CAN BE PARRIED ONLY IF THE ATTACKED CHARACTER'S DEFENSE IS HIGHER THAN THE ATTACKING CHARACTER'S CALCULATED SPELL DAMAGE
-        if(defensePoints > calculatedDamage) {
+        if (defensePoints > calculatedDamage) {
+            this.attack(stupefy, enemyAttacker, newDamage, false);
             printTitle(text1);
-            this.attack(stupefy, enemyAttacker, newDamage);
             return true;
-        }
-        else {
+        } else {
             printTitle(text2);
             return false;
         }
