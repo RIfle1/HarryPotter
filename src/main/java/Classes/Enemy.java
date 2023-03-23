@@ -33,6 +33,7 @@ public class Enemy extends AbstractCharacter {
     private double distanceFromPlayer;
     public static HashMap<String, Enemy> enemiesHashMap = new HashMap<>();
     public static List<String> enemiesKeyList = new ArrayList<>();
+    private static final double enemyXpIncrement = 0.2;
 
     public static void clearEnemies() {
         enemiesKeyList.forEach(key -> enemiesHashMap.remove(key));
@@ -50,6 +51,13 @@ public class Enemy extends AbstractCharacter {
         int randomInt = (int) generateDoubleBetween(0, allEnemyNames.toArray().length - 1);
 
         return allEnemyNames.get(randomInt);
+    }
+
+    public void checkHealth(Wizard wizard) {
+        if (this.getHealthPoints() <= 0) {
+            this.deleteEnemy();
+            wizard.addExperience(this.getExperiencePoints());
+        }
     }
 
     public static List<AbstractItem> generateRandomPotions(int potionNumber) {
@@ -85,8 +93,7 @@ public class Enemy extends AbstractCharacter {
 
         int enemyHp = (int) Math.round(Math.exp(enemyLevel * wizard.getDifficulty().getEnemyDiffMultiplier()) * enemyName.getEnemyBaseHp()) ;
         int enemyDp = (int) Math.round((Math.exp(enemyLevel * wizard.getDifficulty().getEnemyDiffMultiplier()) * enemyName.getEnemyBaseDp()) / 3);
-        // TODO - SET XP OF EACH ENEMY DEPENDING ON THEIR LEVEL
-        // TODO - PROBABLY REWORK THE PLAYER LEVELING SYSTEM 
+        int enemyXp = (int) Math.round(enemyName.getEnemyXp() * enemyXpIncrement * enemyLevel + enemyName.getEnemyXp());
 
         enemies[i] = Enemy.builder()
                 .healthPoints(enemyHp)
@@ -102,9 +109,11 @@ public class Enemy extends AbstractCharacter {
                 .level(enemyLevel)
                 .name(returnFormattedEnum(enemyName)+"-"+(i+1))
                 .enemyName(enemyName)
-                .experiencePoints(0)
+                .experiencePoints(enemyXp)
                 .distanceFromPlayer((int) generateDoubleBetween(0, 100))
                 .build();
+
+//        System.out.println(enemyName + " " + enemyLevel + " " + enemyXp);
 
         enemies[i].updateSpellsHashMap();
         enemiesHashMap.put(enemies[i].getName(), enemies[i]);
@@ -139,7 +148,7 @@ public class Enemy extends AbstractCharacter {
     public static void printEnemies() {
         int index = 1;
         for(Map.Entry<String, Enemy> enemy : enemiesHashMap.entrySet()) {
-            System.out.print("(" + index + ") ");
+            System.out.printf("%-6s", "("+index+")");
             System.out.println(enemy.getValue().printStats());
             index++;
         }

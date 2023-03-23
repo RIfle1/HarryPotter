@@ -3,6 +3,8 @@ package Classes;
 import AbstractClasses.AbstractCharacter;
 import Enums.MoveType;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static Classes.Color.*;
@@ -38,57 +40,100 @@ public class BattleArena {
         Enemy enemyAttacker;
         Spell wizardChosenSpell;
         Spell enemyChosenSpell;
-        MoveType wizardChosenSpellType = MoveType.ATTACK;
+        MoveType wizardMoveType;
+        MoveType enemyMoveType;
+        MoveType attackMoveType = MoveType.ATTACK;
         int randomEnemyIndex;
         int randomEnemySpellIndex;
+        double wizardCalculatedDamage;
+        double enemyCalculatedDamage;
+
+        boolean enemyDodgeOrParrySuccess = false;
+        List<String> moveTypeList = MoveType.getMoveTypeList(new ArrayList<>(Arrays.asList(MoveType.ATTACK, MoveType.FOLLOW_UP)));
 
         printTitle(wizard.printAllStats());
-
-        printTitle("Choose the enemy you want to attack.");
+        // CHOOSE THE ENEMY
+        printTitle("Choose an enemy.");
         printEnemies();
         enemyVictim = enemiesHashMap.get(enemiesKeyList.get(returnChoiceInt(enemiesKeyList.size()) - 1));
 
-        if (!firstMove) {
-            List<String> spellTypeList = MoveType.getSpellTypeList();
-            spellTypeList.remove(returnFormattedEnum(MoveType.FOLLOW_UP));
-            printTitle("What is your move?");
-            printChoices(spellTypeList);
-            wizardChosenSpellType = MoveType.setSpellType(spellTypeList.get(returnChoiceInt(spellTypeList.size()) - 1));
-        }
-
+        // CHOOSE THE SPELL
         printTitle("Choose the spell you want to use.");
-        wizard.printTypedSpells(wizardChosenSpellType);
-        wizardChosenSpell = wizard.getTypedSpellsFromInt(wizardChosenSpellType, returnChoiceInt(wizard.getTypedSpellsList(wizardChosenSpellType).size()) - 1);
+        wizard.printTypedSpells(attackMoveType);
+        wizardChosenSpell = wizard.getTypedSpellsFromInt(attackMoveType, returnChoiceInt(wizard.getTypedSpellsList(attackMoveType).size()) - 1);
 
+        // IF THE SPELL IS READY IT WILL BE USED, OTHERWISE IT WILL PROMPT FOR ANOTHER SPELL
         while (!wizard.checkSpellReady(wizardChosenSpell)) {
             System.out.println(returnColoredText(wizardChosenSpell.getSpellName() + " will be ready in " + wizardChosenSpell.getSpellReadyIn() + " turns.", ANSI_RED));
             System.out.println(returnColoredText("Choose another spell.", ANSI_BLUE));
-            wizardChosenSpell = wizard.getTypedSpellsFromInt(wizardChosenSpellType, returnChoiceInt(wizard.getTypedSpellsList(wizardChosenSpellType).size()) - 1);
+            wizardChosenSpell = wizard.getTypedSpellsFromInt(attackMoveType, returnChoiceInt(wizard.getTypedSpellsList(attackMoveType).size()) - 1);
         }
 
-        if (wizardChosenSpellType == MoveType.ATTACK) {
-            wizard.attack(wizardChosenSpell, enemyVictim);
-        } else if (wizardChosenSpellType == MoveType.PARRY) {
-            wizard.parry(wizardChosenSpell, enemyVictim);
+        // CALCULATE THE SPELL DAMAGE BASED ON OTHER BUFFS AND THEN ATTACK THE CHOSEN ENEMY
+        wizardCalculatedDamage = wizard.getCalculatedDamage(wizardChosenSpell, enemyVictim);
+
+        int generateRandomMoveType = (int) generateDoubleBetween(0, moveTypeList.size() - 1);
+        enemyMoveType = MoveType.setMoveType(moveTypeList.get(generateRandomMoveType));
+
+        // EXECUTE ACTION BASED ON RANDOM CHOICE
+        if (enemyMoveType == MoveType.DODGE) {
+            enemyDodgeOrParrySuccess = enemyVictim.dodge(wizardChosenSpell, wizard);
+        } else if (enemyMoveType == MoveType.PARRY) {
+            enemyDodgeOrParrySuccess = enemyVictim.parry(wizardChosenSpell, wizard, wizardCalculatedDamage);
+        }
+
+        // IF DODGE OR PARRY FAILED, THE WIZARD WILL ATTACK
+        if(!enemyDodgeOrParrySuccess) {
+            wizard.attack(wizardChosenSpell, enemyVictim, wizardCalculatedDamage);
         }
         continuePromptExtra();
 
         // IF ENEMY LIST ISN'T EMPTY
         if(!enemiesHashMap.isEmpty()) {
+            boolean wizardDodgeOrParrySuccess = false;
+
+            // CHOOSE A RANDOM ENEMY FROM THE ENEMY LIST TO ATTACK BACK
             randomEnemyIndex = (int) generateDoubleBetween(0, enemiesKeyList.toArray().length - 1);
-
             enemyAttacker = enemiesHashMap.get(enemiesKeyList.get(randomEnemyIndex));
-            randomEnemySpellIndex = (int) generateDoubleBetween(0, enemyAttacker.getSpellsKeyList().toArray().length - 1);
-            enemyChosenSpell = enemyAttacker.getSpellFromInt(randomEnemySpellIndex);
 
-            printTitle(returnFormattedEnum(enemyAttacker.getEnemyName()) + " will attack you.");
-            enemyAttacker.attack(enemyChosenSpell, wizard);
+            // CHOOSE A RANDOM SPELL FROM THE ENEMY'S SPELL LIST
+            System.out.println(enemyAttacker.getTypedSpellsList(attackMoveType).size());
+            randomEnemySpellIndex = (int) generateDoubleBetween(0, enemyAttacker.getTypedSpellsList(attackMoveType).size() - 1);
+            enemyChosenSpell = enemyAttacker.getTypedSpellsFromInt(attackMoveType, randomEnemySpellIndex);
+
+            // CALCULATE THE ENEMY'S SPELL DAMAGE
+            enemyCalculatedDamage = enemyAttacker.getCalculatedDamage(enemyChosenSpell, wizard);
+
+            // NOTIFY THE PLAYER WHAT SPELL THE ENEMY WILL CHOOSE
+            printTitle(returnColoredText(returnFormattedEnum(enemyAttacker.getEnemyName()), ANSI_PURPLE) +
+                    returnColoredText(" Level " + (int) enemyAttacker.getLevel(), ANSI_YELLOW) + " will attack you with " +
+                    returnColoredText(enemyChosenSpell.getSpellName(), enemyChosenSpell.getSpellColor()));
+
+            // ASK THE PLAYER HIS ACTION
+            printTitle("What will you do?");
+            printChoices(moveTypeList);
+            wizardMoveType = MoveType.setMoveType(moveTypeList.get(returnChoiceInt(moveTypeList.size()) - 1));
+
+            // EXECUTE ACTION BASED ON PLAYER'S CHOICE
+            if (wizardMoveType == MoveType.DODGE) {
+                wizardDodgeOrParrySuccess = wizard.dodge(enemyChosenSpell, enemyAttacker);
+            } else if (wizardMoveType == MoveType.PARRY) {
+                wizardDodgeOrParrySuccess = wizard.parry(enemyChosenSpell, enemyAttacker, enemyCalculatedDamage);
+            }
+
+            // IF DODGE OR PARRY FAILED, THE ENEMY WILL ATTACK
+            if(!wizardDodgeOrParrySuccess) {
+                enemyAttacker.attack(enemyChosenSpell, wizard, enemyCalculatedDamage);
+            }
+
             continuePromptExtra();
         }
     }
 
     public static void battleArena() throws CloneNotSupportedException {
         chooseEnemies();
+        wizard.updateStats();
+        wizard.restoreWizardHpDf();
         boolean firstMove = true;
         while (!enemiesHashMap.isEmpty() && wizard.getHealthPoints() > 0) {
             fight(firstMove);
@@ -100,8 +145,6 @@ public class BattleArena {
         } else if (wizard.getHealthPoints() <= 0) {
             printTitle("You died.");
         }
-        wizard.updateWizardHpDf();
-
     }
 
 }

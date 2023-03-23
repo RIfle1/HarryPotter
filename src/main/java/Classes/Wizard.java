@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static Classes.Color.*;
+import static Main.ConsoleFunctions.printColumnSeparator;
 
 @Getter
 @Setter
@@ -46,18 +47,24 @@ public class Wizard extends AbstractCharacter {
     public static final int wizardBaseHp = 120;
     public static final int wizardBaseDp = 40;
     private final double baseLevelExperience = 100;
-    private final double levelIncrement = 0.2;
+    private final double levelIncrement = 20;
 
     public String printSpecs() {
-        return
-                returnColoredText(" <> ", Color.ANSI_WHITE) +
-                returnColoredText((int) this.getCharisma() + " Charisma", ANSI_YELLOW) +
-                returnColoredText(" <> ", Color.ANSI_WHITE) +
-                returnColoredText((int) this.getStrength() + " Strength", ANSI_RED) +
-                returnColoredText(" <> ", Color.ANSI_WHITE) +
-                returnColoredText((int) this.getIntelligence() + " Intelligence", ANSI_BLUE) +
-                returnColoredText(" <> ", Color.ANSI_WHITE) +
-                returnColoredText((int) this.getLuck() + " Luck", ANSI_PURPLE);
+
+        String column1Format = "%-" + 14 + "s";
+        String column2Format = "%-" + 14 + "s";
+        String column3Format = "%-" + 14 + "s";
+        String column4Format = "%-" + 14 + "s";
+
+        String column1 = returnColoredText(String.format(column1Format ,(int) this.getCharisma() + " Charisma"), ANSI_YELLOW);
+        String column2 = returnColoredText(String.format(column2Format ,(int) this.getStrength() + " Strength"), ANSI_RED);
+        String column3 = returnColoredText(String.format(column3Format ,(int) this.getIntelligence() + " Intelligence"), ANSI_BLUE);
+        String column4 = returnColoredText(String.format(column4Format ,(int) this.getLuck() + " Luck"), ANSI_PURPLE);
+
+        return printColumnSeparator("||") + column1 +
+                printColumnSeparator("||") + column2 +
+                printColumnSeparator("||") + column3 +
+                printColumnSeparator("||") + column4;
     }
 
     public String printAllStats() throws CloneNotSupportedException {
@@ -82,18 +89,21 @@ public class Wizard extends AbstractCharacter {
         WizardStatsPercent.put("intelligence", intelligencePercent);
         WizardStatsPercent.put("charisma", charismaPercent);
 
-        return  WizardStatsPercent;
+        return WizardStatsPercent;
     }
+
     // UPDATE WIZARD HEALTH AND DEFENSE POINTS BASED ON THEIR LEVEL
     public void updateWizardHpDf() {
-
         double wizardNewHp = (int) (this.getLevel() * wizardBaseHp);
         double wizardNewDp = (int) (this.getLevel() * wizardBaseDp);
 
-        this.setHealthPoints(wizardNewHp);
-        this.setDefensePoints(wizardNewDp);
         this.setMaxDefensePoints(wizardNewDp);
         this.setMaxHealthPoints(wizardNewHp);
+    }
+
+    public void restoreWizardHpDf() {
+        this.setHealthPoints(this.getMaxHealthPoints());
+        this.setDefensePoints(this.getMaxDefensePoints());
     }
 
 
@@ -102,10 +112,9 @@ public class Wizard extends AbstractCharacter {
         HouseName houseName = this.getHouse().getHouseName();
         double houseSpecValue = houseName.getSpecValue();
 
-        if(houseName == HouseName.GRYFFINDOR) {
+        if (houseName == HouseName.GRYFFINDOR) {
             this.setDefensePoints(this.getDefensePoints() * (1 + houseSpecValue));
-        }
-        else if(houseName == HouseName.RAVENCLAW) {
+        } else if (houseName == HouseName.RAVENCLAW) {
             this.setCharisma(this.getCharisma() + houseSpecValue);
         }
     }
@@ -113,15 +122,18 @@ public class Wizard extends AbstractCharacter {
     // UPDATE WIZARD LEVEL BASED ON XP THEY HAVE
     private void updateLevel() {
         double currentExperience = this.getExperience();
-        for(double i = 0; i < AbstractCharacter.maxLevel * this.levelIncrement; i+= this.levelIncrement) {
-            double requiredExperience = this.baseLevelExperience + this.baseLevelExperience * i;
-            if(currentExperience / (requiredExperience) >= 1) {
-                currentExperience -= requiredExperience;
-                double previousLevel = this.getLevel();
-                this.setLevel(previousLevel + 1);
+        double xpFx;
+        double xpCumulativeFunction = 0;
 
-            }
-            else {
+        for (int x = 1; x <= AbstractCharacter.maxLevel; x++) {
+            xpFx = levelIncrement * Math.pow(x, 2) + baseLevelExperience;
+            xpCumulativeFunction = xpCumulativeFunction + xpFx;
+
+            double experienceRatio = currentExperience / xpCumulativeFunction;
+            if (experienceRatio >= 1 && experienceRatio < 2) {
+                this.setLevel(x);
+            } else if (currentExperience == 0) {
+                this.setLevel(0);
                 break;
             }
         }
@@ -133,6 +145,7 @@ public class Wizard extends AbstractCharacter {
 
     public void updateStats() throws CloneNotSupportedException {
         this.updateLevel();
+        this.updateWizardHpDf();
         this.updateSpellsHashMap();
     }
 
@@ -147,7 +160,7 @@ public class Wizard extends AbstractCharacter {
             .maxHealthPoints(wizardBaseHp)
             .difficulty(Difficulty.EASY)
             .characterState(CharacterState.STANDING)
-            .level(1)
+            .level(0)
             .firstName("null")
             .lastName("null")
             .name("null null")
@@ -159,7 +172,7 @@ public class Wizard extends AbstractCharacter {
             .spellsKeyList(new ArrayList<>())
             .itemList(new ArrayList<>())
             .activePotionsList(new ArrayList<>())
-            .experience(0)
+            .experience(10000)
             .charisma(0)
             .strength(0)
             .intelligence(0)
@@ -173,7 +186,7 @@ public class Wizard extends AbstractCharacter {
             .maxHealthPoints(wizardBaseHp)
             .difficulty(Difficulty.DEATH_WISH)
             .characterState(CharacterState.STANDING)
-            .level(10)
+            .level(0)
             .firstName("Test")
             .lastName("Wizard")
             .name("Test Wizard")
@@ -185,7 +198,7 @@ public class Wizard extends AbstractCharacter {
             .spellsKeyList(new ArrayList<>())
             .itemList(new ArrayList<>())
             .activePotionsList(new ArrayList<>())
-            .experience(0)
+            .experience(580)
             .charisma(0)
             .strength(0)
             .intelligence(0)

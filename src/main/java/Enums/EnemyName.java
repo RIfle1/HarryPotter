@@ -11,25 +11,29 @@ import static Enums.EnumMethods.returnFormattedEnum;
 
 @Getter
 public enum EnemyName {
-    GOBLIN(EnemyCombat.MELEE, EnemyType.BASIC, 50, 30),
-    DARK_WIZARD(EnemyCombat.MAGIC, EnemyType.BASIC, 70, 60),
-    TROLL(EnemyCombat.MELEE, EnemyType.BOSS, 200, 60),
-    BASILISK(EnemyCombat.MELEE, EnemyType.BOSS, 140, 100),
-    DEMENTOR(EnemyCombat.MAGIC, EnemyType.BASIC, 30, 110),
-    DEATH_EATER(EnemyCombat.MAGIC, EnemyType.BASIC, 90, 120);
+    GOBLIN(EnemyCombat.MELEE, EnemyType.BASIC, 50, 30, 20),
+    DARK_WIZARD(EnemyCombat.MAGIC, EnemyType.BASIC, 70, 60, 30),
+    TROLL(EnemyCombat.MELEE, EnemyType.BOSS, 200, 60, 60),
+    BASILISK(EnemyCombat.MELEE, EnemyType.BOSS, 140, 100, 70),
+    DEMENTOR(EnemyCombat.MAGIC, EnemyType.BASIC, 30, 110, 20),
+    DEATH_EATER(EnemyCombat.MAGIC, EnemyType.BASIC, 90, 120, 25);
 
     private final EnemyCombat enemyCombat;
     private final EnemyType enemyType;
     private final int enemyBaseHp;
     private final int enemyBaseDp;
+    private final int enemyXp;
 
-    // TODO - ADD BASE EXPERIENCE POINTS TO EACH ENEMY NAME
-
-    EnemyName(EnemyCombat enemyCombat, EnemyType enemyType, int enemyBaseHp, int enemyBaseDp) {
+    EnemyName(EnemyCombat enemyCombat, EnemyType enemyType, int enemyBaseHp, int enemyBaseDp, int enemyXp) {
         this.enemyCombat = enemyCombat;
         this.enemyType = enemyType;
         this.enemyBaseHp = enemyBaseHp;
         this.enemyBaseDp = enemyBaseDp;
+        this.enemyXp = enemyXp;
+    }
+
+    public static int getEnemyNameMaxLength() {
+        return getEnemyNameList().stream().map(String::length).toList().stream().reduce(0, Integer::max);
     }
 
     public static List<EnemyName> getAllEnemyNames() {
