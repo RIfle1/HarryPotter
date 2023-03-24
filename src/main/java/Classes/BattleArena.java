@@ -69,6 +69,9 @@ public class BattleArena {
             wizardChosenSpell = wizard.getTypedSpellsFromInt(attackMoveType, returnChoiceInt(wizard.getTypedSpellsList(attackMoveType).size()) - 1);
         }
 
+        // ACTIVATE POTIONS
+        wizard.applyPotionEffect();
+
         // CALCULATE THE SPELL DAMAGE BASED ON OTHER BUFFS AND THEN ATTACK THE CHOSEN ENEMY
         wizardCalculatedDamage = wizard.getCalculatedDamage(wizardChosenSpell, enemyVictim);
 

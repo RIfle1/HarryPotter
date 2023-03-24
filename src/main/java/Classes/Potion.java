@@ -14,7 +14,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class Potion extends AbstractItem {
+public class Potion extends AbstractItem implements Cloneable {
     @Builder
     public Potion(String itemName, String itemDescription, ItemType itemType, double itemDropChance, String itemColor, PotionType potionType, double potionDuration, double potionValue) {
         super(itemName, itemDescription, itemType, itemDropChance, itemColor);
@@ -34,7 +34,7 @@ public class Potion extends AbstractItem {
             .itemDropChance(0.8)
             .itemColor(Color.ANSI_BLUE)
             .potionType(PotionType.HEALTH)
-            .potionDuration(0)
+            .potionDuration(1)
             .potionValue(40)
             .build();
 
@@ -45,7 +45,7 @@ public class Potion extends AbstractItem {
             .itemDropChance(0.5)
             .itemColor(Color.ANSI_YELLOW)
             .potionType(PotionType.HEALTH)
-            .potionDuration(0)
+            .potionDuration(1)
             .potionValue(70)
             .build();
 
@@ -56,7 +56,7 @@ public class Potion extends AbstractItem {
             .itemDropChance(0.2)
             .itemColor(Color.ANSI_RED)
             .potionType(PotionType.HEALTH)
-            .potionDuration(0)
+            .potionDuration(1)
             .potionValue(100)
             .build();
 
@@ -166,7 +166,7 @@ public class Potion extends AbstractItem {
             .itemDropChance(0.8)
             .itemColor(Color.ANSI_BLUE)
             .potionType(PotionType.COOLDOWN)
-            .potionDuration(0)
+            .potionDuration(1)
             .potionValue(2)
             .build();
 
@@ -177,7 +177,7 @@ public class Potion extends AbstractItem {
             .itemDropChance(0.5)
             .itemColor(Color.ANSI_YELLOW)
             .potionType(PotionType.COOLDOWN)
-            .potionDuration(0)
+            .potionDuration(1)
             .potionValue(4)
             .build();
 
@@ -188,7 +188,7 @@ public class Potion extends AbstractItem {
             .itemDropChance(0.2)
             .itemColor(Color.ANSI_RED)
             .potionType(PotionType.COOLDOWN)
-            .potionDuration(0)
+            .potionDuration(1)
             .potionValue(6)
             .build();
 
@@ -199,7 +199,7 @@ public class Potion extends AbstractItem {
             .itemDropChance(0.1)
             .itemColor(Color.ANSI_PURPLE)
             .potionType(PotionType.INVINCIBILITY)
-            .potionDuration(0)
+            .potionDuration(1)
             .potionValue(-1)
             .build();
 
@@ -238,5 +238,10 @@ public class Potion extends AbstractItem {
             potionNameList.add(potion.getItemName());
         }
         return potionNameList;
+    }
+
+    @Override
+    public Potion clone() throws CloneNotSupportedException {
+        return (Potion) super.clone();
     }
 }

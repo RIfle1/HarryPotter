@@ -358,7 +358,7 @@ public class Spell implements Cloneable{
     }
 
     @Override
-    public Object clone() throws CloneNotSupportedException {
-        return super.clone();
+    public Spell clone() throws CloneNotSupportedException {
+        return (Spell) super.clone();
     }
 }

@@ -70,7 +70,7 @@ public class Enemy extends AbstractCharacter {
         }
     }
 
-    public static List<AbstractItem> generateRandomPotions(int potionNumber) {
+    public static List<AbstractItem> generateRandomPotions(int potionNumber) throws CloneNotSupportedException {
         // GENERATE 3 RANDOM POTIONS FOR EACH ENEMY
         List<Potion> allPotionsList = Potion.getAllPotions();
         List<AbstractItem> randomPotions = new ArrayList<>();
@@ -81,7 +81,7 @@ public class Enemy extends AbstractCharacter {
             Potion chosenPotion = allPotionsList.get(potionIndex - 1);
 
             if(potionChance <= chosenPotion.getItemDropChance()) {
-                randomPotions.add(chosenPotion);
+                randomPotions.add(chosenPotion.clone());
             }
 
         }

@@ -134,6 +134,51 @@ public abstract class AbstractCharacter {
         return activePotionNamesList;
     }
 
+    public void applyPotion(Potion potion) {
+        List<Potion> activePotionsList = this.getActivePotionsList();
+
+        // TODO - DO SOMETHING ABOUT INVINCIBILITY POTION
+
+        if(potion.getPotionType() == PotionType.DEFENSE) {
+            this.setDefensePoints(this.getDefensePoints() + potion.getPotionValue());
+            activePotionsList.add(potion);
+        }
+        else if(potion.getPotionType() == PotionType.REGENERATION) {
+            activePotionsList.add(potion);
+        }
+        else if(potion.getPotionType() == PotionType.HEALTH) {
+            double newHealth = this.getHealthPoints() + potion.getPotionValue();
+            this.setHealthPoints(Math.min(newHealth, this.getMaxHealthPoints()));
+        }
+        else if(potion.getPotionType() == PotionType.COOLDOWN) {
+            this.reduceSpellsCooldown((int) potion.getPotionValue());
+        }
+
+        this.getItemList().remove(potion);
+    }
+
+    public void applyPotionEffect() {
+        List<Potion> activePotionsList = this.getActivePotionsList();
+
+        for(Potion potion:activePotionsList) {
+            if(potion.getPotionType() == PotionType.DEFENSE && potion.getPotionDuration() == 0) {
+                this.setDefensePoints(this.getDefensePoints() - potion.getPotionValue());
+                activePotionsList.remove(potion);
+            }
+            else if(potion.getPotionType() == PotionType.REGENERATION) {
+                double newHealth = this.getHealthPoints() + potion.getPotionValue();
+                this.setHealthPoints(Math.min(newHealth, this.getMaxHealthPoints()));
+                if(potion.getPotionDuration() == 0) {
+                    activePotionsList.remove(potion);
+                }
+            }
+            potion.setPotionDuration(potion.getPotionDuration() - 1);
+
+        }
+    }
+
+
+
     public void drinkPotion(Potion potion) {
         final int maxPotionActiveAtOnce = 3;
         final int maxPotionOfOneType = 1;
@@ -151,8 +196,9 @@ public abstract class AbstractCharacter {
 
         // NEEDS TO BE OPTIMIZED FOR ALL TYPES OF POTIONS
         if (potionIsInInventory && potionTypeActiveList.toArray().length < maxPotionOfOneType && activePotionList.toArray().length < maxPotionActiveAtOnce) {
-            // TODO - THE POTIONS ADDED IN ACTIVE POTION LIST MUST BE ACTUALLY APPLIED -> LIKE HEALTH AND DEFENSE -- USE POTION DURATION
-            activePotionList.add(potion);
+            // APPLY THE POTION'S VALUE IF IT'S HEALTH, REGENERATION OR DEFENSE
+            this.applyPotion(potion);
+
             text = returnColoredText("You just drank " + potion.getItemName(), potion.getItemColor()) +
                     "\nYour " +
                     returnColoredText(returnFormattedEnum(potion.getPotionType()), potion.getItemColor()) +
@@ -193,7 +239,7 @@ public abstract class AbstractCharacter {
     public void updateSpellsHashMap() throws CloneNotSupportedException {
         for (Spell spell : Spell.getAllSpells()) {
             if (spell.getSpellLevelRequirement() <= this.getLevel() && !this.getSpellsHashMap().containsKey(spell.getSpellName())) {
-                this.putSpellsHashMap((Spell) spell.clone());
+                this.putSpellsHashMap(spell.clone());
             }
         }
         updateSpellsKeyList(this.getSpellsHashMap());
@@ -240,14 +286,13 @@ public abstract class AbstractCharacter {
             spellBaseDamage = (Math.exp(this.getLevel() * getDifficulty().getEnemyDiffMultiplier()) * spellRandomDamage) / 15;
         }
 
-//        System.out.println("spell base dmg: " + spellBaseDamage);
-
-        double potionDamagePercentIncrease = getActivePotionValueSum(PotionType.DAMAGE) * (1 + housePotionPercent);
+        // DAMAGE POTION ALREADY IMPLEMENTED HERE
+        double damagePotionPercentIncrease = getActivePotionValueSum(PotionType.DAMAGE) * (1 + housePotionPercent);
         double characterStateDamageMultiplier = attackCharacter.getCharacterState().getDamageMultiplier();
         attackCharacter.setCharacterState(spell.getCharacterState());
 
         return spellBaseDamage
-                * (1 + potionDamagePercentIncrease)
+                * (1 + damagePotionPercentIncrease)
                 * (1 + characterStateDamageMultiplier)
                 * (1 + houseDamagePercent)
                 * (1 + strengthPercent);
@@ -450,6 +495,7 @@ public abstract class AbstractCharacter {
         if (this.getClass() == Wizard.class) {
             text1 = returnColoredText("You dodged " + returnFormattedEnum(((Enemy) attackingCharacter).getEnemyName()) + "'s attack.", ANSI_YELLOW);
             text2 = returnColoredText("You were unable to dodge " + returnFormattedEnum(((Enemy) attackingCharacter).getEnemyName()) + "'s attack.", ANSI_RED);
+            spellChance = spellChance / 3;
         } else if (this.getClass() == Enemy.class) {
             text1 = returnColoredText(returnFormattedEnum(((Enemy) this).getEnemyName()) + " dodged your attack.", ANSI_YELLOW);
             text2 = returnColoredText(returnFormattedEnum(((Enemy) this).getEnemyName()) + " was unable to dodge your attack.", ANSI_RED);
@@ -476,6 +522,7 @@ public abstract class AbstractCharacter {
             text1 = returnColoredText("You parried " + parrySpell.getSpellName() + " and returned ", ANSI_YELLOW)
                     + returnColoredText((int) newDamage + " Damage.", ANSI_RED);
             text2 = returnColoredText("You were unable to parry " + returnFormattedEnum(((Enemy) enemyAttacker).getEnemyName()) + "'s attack.", ANSI_RED);
+            defensePoints = defensePoints / 2;
         } else if (this.getClass() == Enemy.class) {
             text1 = returnColoredText(returnFormattedEnum(((Enemy) this).getEnemyName()) + " parried your attack and returned", ANSI_YELLOW)
                     + returnColoredText((int) newDamage + " Damage.", ANSI_RED);
