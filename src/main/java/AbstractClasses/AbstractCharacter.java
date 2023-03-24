@@ -158,6 +158,8 @@ public abstract class AbstractCharacter {
     }
 
     public void applyPotionEffect() {
+        // TODO - IDK CHECK THIS
+
         List<Potion> activePotionsList = this.getActivePotionsList();
 
         for(Potion potion:activePotionsList) {
