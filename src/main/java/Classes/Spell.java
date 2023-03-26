@@ -41,25 +41,25 @@ public class Spell implements Cloneable{
             .spellType(MoveType.ATTACK)
             .spellDescription("Summons and then throws special environmental objects at the targeted enemy.")
             .spellSpecialAttackLine("You've thrown an object at the enemy!")
-            .spellLevelRequirement(1)
+            .spellLevelRequirement(0)
             .spellDamage(new double[]{100, 120})
             .characterState(CharacterState.STUNNED)
-            .spellChance(0.7)
-            .spellCooldown(1)
+            .spellChance(0.9)
+            .spellCooldown(0)
             .spellReadyIn(0)
             .spellColor(ANSI_RED)
             .build();
 
     public static Spell basicCast = Spell.builder()
-            .spellName("Basic Spell")
+            .spellName("Basic Cast")
             .spellType(MoveType.ATTACK)
             .spellDescription("Deals minor damage to enemies and objects.")
-            .spellSpecialAttackLine("Basic Attack!")
+            .spellSpecialAttackLine("Basic Cast!")
             .spellLevelRequirement(0)
             .spellDamage(new double[]{40, 60})
             .characterState(CharacterState.STANDING)
             .spellChance(0.9)
-            .spellCooldown(2)
+            .spellCooldown(0)
             .spellReadyIn(0)
             .spellColor(ANSI_RED)
             .build();
@@ -125,7 +125,7 @@ public class Spell implements Cloneable{
             .spellType(MoveType.ATTACK)
             .spellDescription("Summon a variety of objects and enemies to close range.")
             .spellSpecialAttackLine("The enemy has been pulled close to you!")
-            .spellLevelRequirement(0)
+            .spellLevelRequirement(1)
             .spellDamage(new double[]{50, 80})
             .characterState(CharacterState.LEVITATING)
             .spellChance(0.7)
@@ -246,11 +246,27 @@ public class Spell implements Cloneable{
             .spellColor(ANSI_RED)
             .build();
 
-    public static Spell testSpell = Spell.builder()
-            .spellName("Test Spell")
+    public static Spell legendarySword = Spell.builder()
+            .spellName("Legendary Sword")
             .spellType(MoveType.ATTACK)
-            .spellDescription("test spell")
-            .spellSpecialAttackLine("test spell attack line")
+            .spellDescription("Godric Gryffindor's Legendary Sword.")
+            .spellSpecialAttackLine("You've slashed the enemy!")
+            .spellLevelRequirement(-1)
+            .spellDamage(new double[]{1000, 1000})
+            .characterState(CharacterState.BLEEDING)
+            .spellChance(0.8)
+            .spellCooldown(0)
+            .spellReadyIn(0)
+            .spellColor(ANSI_YELLOW)
+            .build();
+
+
+
+    public static Spell oneClap = Spell.builder()
+            .spellName("One Clap")
+            .spellType(MoveType.ATTACK)
+            .spellDescription("enemy insta ded")
+            .spellSpecialAttackLine("The enemy got one clapped")
             .spellLevelRequirement(0)
             .spellDamage(new double[]{20000000, 20000000})
             .characterState(CharacterState.STUNNED)
@@ -331,7 +347,7 @@ public class Spell implements Cloneable{
         String column3Bis = returnColoredText(String.format(column3BisFormat , (int) generateDoubleBetween(this.spellDamage[0], this.spellDamage[1])), ANSI_RED);
         String column3 = returnColoredText(String.format(column3Format , " ~ Base Damage"), ANSI_RED);
         String column5 = returnColoredText(String.format(column5Format , spellChance + "% Chance Success"), ANSI_YELLOW);
-        String column6 = returnColoredText(String.format(column6Format , (this.spellCooldown - 1) + " Turn(s) Cooldown"), ANSI_BLUE);
+        String column6 = returnColoredText(String.format(column6Format , this.spellCooldown + " Turn(s) Cooldown"), ANSI_BLUE);
 
         return column1 + printColumnSeparator("||")
                 + column2 + printColumnSeparator("||")

@@ -1,38 +1,74 @@
 package Enums;
 
+import Classes.Spell;
 import lombok.Getter;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import static Enums.EnumMethods.returnFormattedEnum;
 
 @Getter
 public enum EnemyName {
-    GOBLIN(EnemyCombat.MELEE, EnemyType.BASIC, 50, 0, 30, 20),
-    DARK_WIZARD(EnemyCombat.SPELL, EnemyType.BASIC, 70, 0.1, 60, 30),
-    TROLL(EnemyCombat.MELEE, EnemyType.BOSS, 200, 0.2, 60, 60),
-    BASILISK(EnemyCombat.MELEE, EnemyType.BOSS, 140, 0.5, 100, 70),
-    DEMENTOR(EnemyCombat.MELEE, EnemyType.BASIC, 30, 0, 110, 20),
-    DEATH_EATER(EnemyCombat.MELEE, EnemyType.BASIC, 90, 0, 120, 25);
+    // TODO - REMOVE ALL SPELL COOLDOWNS AFTER A FIGHT IS OVER
+
+    GOBLIN(EnemyCombat.MELEE, EnemyType.BASIC, Spell.getAllSpells(), 50, 0, 1, 30, 20, null),
+    DARK_WIZARD(EnemyCombat.SPELL, EnemyType.BASIC, Spell.getAllSpells(), 70, 0.1, 1, 60, 30, null),
+    TROLL(EnemyCombat.MELEE, EnemyType.BOSS, new ArrayList<>(), 200, 0.2, 1, 60, 120, new Object() {
+        List<String> evaluate() {
+            List<String> strings = new ArrayList<>();
+            strings.add(trollDeathLine);
+            return strings;
+        }
+    }.evaluate()),
+    BASILISK(EnemyCombat.MELEE, EnemyType.BOSS, new ArrayList<>(), 140, 0.5, 0.4, 100, 70, new Object() {
+        List<String> evaluate() {
+            List<String> strings = new ArrayList<>();
+            strings.add(basiliskDeathLine1);
+            strings.add(basiliskDeathLine2);
+            return strings;
+        }
+    }.evaluate()),
+    DEMENTOR(EnemyCombat.MELEE, EnemyType.BASIC, Spell.getAllSpells(), 30, 0, 1, 110, 20, null),
+    DEATH_EATER(EnemyCombat.MELEE, EnemyType.BASIC, Spell.getAllSpells(), 90, 0, 1, 120, 25, null);
 
     private final EnemyCombat enemyCombat;
     private final EnemyType enemyType;
+    private final List<Spell> vulnerableSpellList;
     private final int enemyBaseHp;
     private final double enemyDmgMultiplier;
+    private final double enemyHpLimitRatio;
     private final int enemyBaseDp;
     private final int enemyXp;
+    private final List<String> enemyDeathLine;
 
-    EnemyName(EnemyCombat enemyCombat, EnemyType enemyType, int enemyBaseHp, double enemyDmgMultiplier, int enemyBaseDp, int enemyXp) {
+    private static final String trollDeathLine = "You threw an object at the Troll and he finally collapsed.";
+    private static final String basiliskDeathLine1 = "You stabbed the Basilisk with Godric Gryffindor's Legendary sword. The Basilisk isn't moving anymore.";
+    private static final String basiliskDeathLine2 = "You removed one of the Basilisk's teeth and stabbed Tom Riddle's journal with it. The Basilisk suddenly collapsed.";
+
+    EnemyName(EnemyCombat enemyCombat, EnemyType enemyType, List<Spell> vulnerableSpellList, int enemyBaseHp, double enemyDmgMultiplier, double enemyHpLimitRatio, int enemyBaseDp, int enemyXp, List<String> enemyDeathLine) {
         this.enemyCombat = enemyCombat;
         this.enemyType = enemyType;
+        this.vulnerableSpellList = vulnerableSpellList;
         this.enemyBaseHp = enemyBaseHp;
         this.enemyDmgMultiplier = enemyDmgMultiplier;
+        this.enemyHpLimitRatio = enemyHpLimitRatio;
         this.enemyBaseDp = enemyBaseDp;
         this.enemyXp = enemyXp;
+        this.enemyDeathLine = enemyDeathLine;
     }
+
+    public void addVulnerableSpell(Spell spell) {
+        this.vulnerableSpellList.add(spell);
+    }
+
+    public void resetVulnerableSpellsList() {
+        Iterator<Spell> itr = this.vulnerableSpellList.iterator();
+        while (itr.hasNext()) {
+            itr.remove();
+        }
+    }
+
+
 
     public static int getEnemyNameMaxLength() {
         return getEnemyNameList().stream().map(String::length).toList().stream().reduce(0, Integer::max);

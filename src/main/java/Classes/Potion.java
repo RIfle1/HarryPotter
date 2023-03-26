@@ -1,9 +1,7 @@
 package Classes;
 
 import AbstractClasses.AbstractItem;
-import Enums.ItemType;
 import Enums.PotionType;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,8 +14,8 @@ import java.util.List;
 @Setter
 public class Potion extends AbstractItem implements Cloneable {
     @Builder
-    public Potion(String itemName, String itemDescription, ItemType itemType, double itemDropChance, String itemColor, PotionType potionType, double potionDuration, double potionValue) {
-        super(itemName, itemDescription, itemType, itemDropChance, itemColor);
+    public Potion(String itemName, String itemDescription, double itemDropChance, String itemColor, PotionType potionType, double potionDuration, double potionValue) {
+        super(itemName, itemDescription, itemDropChance, itemColor);
         this.potionType = potionType;
         this.potionDuration = potionDuration;
         this.potionValue = potionValue;
@@ -30,7 +28,6 @@ public class Potion extends AbstractItem implements Cloneable {
     public static Potion minorHealthPotion = Potion.builder()
             .itemName("Minor Health Potion")
             .itemDescription("A minor healing potion which heals 40hp.")
-            .itemType(ItemType.CONSUMABLE)
             .itemDropChance(0.8)
             .itemColor(Color.ANSI_BLUE)
             .potionType(PotionType.HEALTH)
@@ -41,7 +38,6 @@ public class Potion extends AbstractItem implements Cloneable {
     public static Potion mediumHealthPotion = Potion.builder()
             .itemName("Medium Health Potion")
             .itemDescription("A medium healing potion which heals 70hp.")
-            .itemType(ItemType.CONSUMABLE)
             .itemDropChance(0.5)
             .itemColor(Color.ANSI_YELLOW)
             .potionType(PotionType.HEALTH)
@@ -52,7 +48,6 @@ public class Potion extends AbstractItem implements Cloneable {
     public static Potion highHealthPotion = Potion.builder()
             .itemName("High Health Potion")
             .itemDescription("A high healing potion which heals 100hp.")
-            .itemType(ItemType.CONSUMABLE)
             .itemDropChance(0.2)
             .itemColor(Color.ANSI_RED)
             .potionType(PotionType.HEALTH)
@@ -63,7 +58,6 @@ public class Potion extends AbstractItem implements Cloneable {
     public static Potion minorDefensePotion = Potion.builder()
             .itemName("Minor Defense Potion")
             .itemDescription("A minor defense potion which adds 40 defense.")
-            .itemType(ItemType.CONSUMABLE)
             .itemDropChance(0.8)
             .itemColor(Color.ANSI_BLUE)
             .potionType(PotionType.DEFENSE)
@@ -74,7 +68,6 @@ public class Potion extends AbstractItem implements Cloneable {
     public static Potion mediumDefensePotion = Potion.builder()
             .itemName("Medium Defense Potion")
             .itemDescription("A medium defense potion which adds 70 defense.")
-            .itemType(ItemType.CONSUMABLE)
             .itemDropChance(0.5)
             .itemColor(Color.ANSI_YELLOW)
             .potionType(PotionType.DEFENSE)
@@ -85,7 +78,6 @@ public class Potion extends AbstractItem implements Cloneable {
     public static Potion highDefensePotion = Potion.builder()
             .itemName("High Defense Potion")
             .itemDescription("A high defense potion which adds 100 defense.")
-            .itemType(ItemType.CONSUMABLE)
             .itemDropChance(0.2)
             .itemColor(Color.ANSI_RED)
             .potionType(PotionType.DEFENSE)
@@ -96,7 +88,6 @@ public class Potion extends AbstractItem implements Cloneable {
     public static Potion minorRegenerationPotion = Potion.builder()
             .itemName("Minor Regeneration Potion")
             .itemDescription("A minor regeneration potion which regenerates 10 hp per turn.")
-            .itemType(ItemType.CONSUMABLE)
             .itemDropChance(0.8)
             .itemColor(Color.ANSI_BLUE)
             .potionType(PotionType.REGENERATION)
@@ -107,7 +98,6 @@ public class Potion extends AbstractItem implements Cloneable {
     public static Potion mediumRegenerationPotion = Potion.builder()
             .itemName("Medium Regeneration Potion")
             .itemDescription("A minor regeneration potion which regenerates 15 hp per turn.")
-            .itemType(ItemType.CONSUMABLE)
             .itemDropChance(0.5)
             .itemColor(Color.ANSI_YELLOW)
             .potionType(PotionType.REGENERATION)
@@ -118,7 +108,6 @@ public class Potion extends AbstractItem implements Cloneable {
     public static Potion highRegenerationPotion = Potion.builder()
             .itemName("High Regeneration Potion")
             .itemDescription("A minor regeneration potion which regenerates 25 hp per turn.")
-            .itemType(ItemType.CONSUMABLE)
             .itemDropChance(0.2)
             .itemColor(Color.ANSI_RED)
             .potionType(PotionType.REGENERATION)
@@ -129,7 +118,6 @@ public class Potion extends AbstractItem implements Cloneable {
     public static Potion minorDamagePotion = Potion.builder()
             .itemName("Minor Damage Potion")
             .itemDescription("A minor damage potion which increases damage by 10%.")
-            .itemType(ItemType.CONSUMABLE)
             .itemDropChance(0.8)
             .itemColor(Color.ANSI_BLUE)
             .potionType(PotionType.DAMAGE)
@@ -140,7 +128,6 @@ public class Potion extends AbstractItem implements Cloneable {
     public static Potion mediumDamagePotion = Potion.builder()
             .itemName("Medium Damage Potion")
             .itemDescription("A minor damage potion which increases damage by 15%.")
-            .itemType(ItemType.CONSUMABLE)
             .itemDropChance(0.5)
             .itemColor(Color.ANSI_YELLOW)
             .potionType(PotionType.DAMAGE)
@@ -151,7 +138,6 @@ public class Potion extends AbstractItem implements Cloneable {
     public static Potion highDamagePotion = Potion.builder()
             .itemName("High Damage Potion")
             .itemDescription("A minor damage potion which increases damage by 25%.")
-            .itemType(ItemType.CONSUMABLE)
             .itemDropChance(0.2)
             .itemColor(Color.ANSI_RED)
             .potionType(PotionType.DAMAGE)
@@ -162,7 +148,6 @@ public class Potion extends AbstractItem implements Cloneable {
     public static Potion minorCooldownPotion = Potion.builder()
             .itemName("Minor Cooldown Potion")
             .itemDescription("A minor cooldown potion which reduces all spells cooldown by 2 turns.")
-            .itemType(ItemType.CONSUMABLE)
             .itemDropChance(0.8)
             .itemColor(Color.ANSI_BLUE)
             .potionType(PotionType.COOLDOWN)
@@ -173,7 +158,6 @@ public class Potion extends AbstractItem implements Cloneable {
     public static Potion mediumCooldownPotion = Potion.builder()
             .itemName("Medium Cooldown Potion")
             .itemDescription("A minor cooldown potion which reduces all spells cooldown by 4 turns.")
-            .itemType(ItemType.CONSUMABLE)
             .itemDropChance(0.5)
             .itemColor(Color.ANSI_YELLOW)
             .potionType(PotionType.COOLDOWN)
@@ -184,7 +168,6 @@ public class Potion extends AbstractItem implements Cloneable {
     public static Potion highCooldownPotion = Potion.builder()
             .itemName("High Cooldown Potion")
             .itemDescription("A minor cooldown potion which reduces all spells cooldown by 6 turns.")
-            .itemType(ItemType.CONSUMABLE)
             .itemDropChance(0.2)
             .itemColor(Color.ANSI_RED)
             .potionType(PotionType.COOLDOWN)
@@ -195,7 +178,6 @@ public class Potion extends AbstractItem implements Cloneable {
     public static Potion invincibilityPotion = Potion.builder()
             .itemName("Invincibility Potion")
             .itemDescription("An invincibility potion which makes you invincible to all attacks.")
-            .itemType(ItemType.CONSUMABLE)
             .itemDropChance(0.1)
             .itemColor(Color.ANSI_PURPLE)
             .potionType(PotionType.INVINCIBILITY)

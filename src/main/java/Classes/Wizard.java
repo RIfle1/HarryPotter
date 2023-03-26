@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import static Classes.Color.*;
+import static Enums.EnumMethods.returnFormattedEnum;
+import static Enums.HouseName.getHouseNameMaxLength;
 import static Main.ConsoleFunctions.*;
 
 @Getter
@@ -55,27 +57,31 @@ public class Wizard extends AbstractCharacter {
     private final int dungeonLevels = 7;
     private final double maxPercent = 0.25;
 
-    public String printSpecs() {
+    public String returnStringSpecs() {
 
+        String column0Format = "%-" + getHouseNameMaxLength() + "s";
         String column1Format = "%-" + 14 + "s";
         String column2Format = "%-" + 14 + "s";
         String column3Format = "%-" + 14 + "s";
         String column4Format = "%-" + 14 + "s";
 
+        String column0 = returnColoredText(String.format(column0Format , returnFormattedEnum(this.getHouse().getHouseName())), this.getHouse().getHouseName().getHouseColor());
         String column1 = returnColoredText(String.format(column1Format ,(int) this.getCharisma() + " Charisma"), ANSI_YELLOW);
         String column2 = returnColoredText(String.format(column2Format ,(int) this.getStrength() + " Strength"), ANSI_RED);
         String column3 = returnColoredText(String.format(column3Format ,(int) this.getIntelligence() + " Intelligence"), ANSI_BLUE);
         String column4 = returnColoredText(String.format(column4Format ,(int) this.getLuck() + " Luck"), ANSI_PURPLE);
 
-        return printColumnSeparator("||") + column1 +
+
+        return printColumnSeparator("||") + column0 +
+                printColumnSeparator("||") + column1 +
                 printColumnSeparator("||") + column2 +
                 printColumnSeparator("||") + column3 +
                 printColumnSeparator("||") + column4;
     }
 
-    public String printAllStats() throws CloneNotSupportedException {
+    public String returnAllStringStats() throws CloneNotSupportedException {
         this.updateStats();
-        return this.printStats() + this.printSpecs();
+        return this.returnStringStats() + this.returnStringSpecs();
     }
 
     public HashMap<String, Double> getWizardSpecsPercent() {
@@ -135,8 +141,8 @@ public class Wizard extends AbstractCharacter {
 
     // UPDATE WIZARD HEALTH AND DEFENSE POINTS BASED ON THEIR LEVEL
     public void updateWizardHpDf() {
-        double wizardNewHp = (int) (this.getLevel() * wizardBaseHp);
-        double wizardNewDp = (int) (this.getLevel() * wizardBaseDp);
+        double wizardNewHp = (int) (this.getLevel() * wizardBaseHp + wizardBaseHp);
+        double wizardNewDp = (int) (this.getLevel() * wizardBaseDp + wizardBaseDp);
 
         this.setMaxDefensePoints(wizardNewDp);
         this.setMaxHealthPoints(wizardNewHp);
@@ -192,10 +198,6 @@ public class Wizard extends AbstractCharacter {
         this.updateSpellsHashMap();
     }
 
-    public void checkStats() {
-
-    }
-
     public void usePotion() {
         List<String> potionNamesList = this.getPotionNamesList();
 
@@ -226,12 +228,12 @@ public class Wizard extends AbstractCharacter {
             .gender(null)
             .pet(null)
             .wand(null)
-            .house(new House(HouseName.SLYTHERIN))
+            .house(new House(HouseName.GRYFFINDOR))
             .spellsHashMap(new HashMap<>())
             .spellsKeyList(new ArrayList<>())
             .itemList(new ArrayList<>())
             .activePotionsList(new ArrayList<>())
-            .experience(10000)
+            .experience(0)
             .charisma(0)
             .strength(0)
             .intelligence(0)

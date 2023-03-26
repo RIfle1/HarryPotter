@@ -15,7 +15,9 @@ public enum CharacterState {
     STUNNED(0.2),
     FROZEN(0.5),
     ON_FIRE(0.4),
-    CURSED(0.7);
+    CURSED(0.7),
+    BLEEDING(0.3),
+    INVINCIBLE(0);
 
     private final double damageMultiplier;
 

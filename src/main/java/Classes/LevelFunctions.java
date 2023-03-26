@@ -1,10 +1,7 @@
 package Classes;
 
 import AbstractClasses.AbstractCharacter;
-import Enums.EnemyCombat;
-import Enums.EnemyName;
-import Enums.Level;
-import Enums.MoveType;
+import Enums.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -129,12 +126,15 @@ public class LevelFunctions {
         wizard.applyPotionEffect();
 
         // PRINT WIZARD STATS
-        printTitle(wizard.printAllStats());
+        printTitle(wizard.returnAllStringStats());
 
         // CHOOSE THE ENEMY
         printTitle("Choose an enemy.");
         printEnemies();
         enemyVictim = enemiesHashMap.get(enemiesKeyList.get(returnChoiceInt(enemiesKeyList.size(), false) - 1));
+
+        // TELL THE PLAYER THE CHANGES IN THE ENEMY
+        enemyVictim.checkHpRatio();
 
         // CHOOSE THE SPELL
         printTitle("Choose the spell you want to use.");
@@ -154,40 +154,80 @@ public class LevelFunctions {
         int generateRandomMoveType = (int) generateDoubleBetween(0, moveTypeList.size() - 1);
         enemyMoveType = MoveType.setMoveType(moveTypeList.get(generateRandomMoveType));
 
-        // EXECUTE ACTION BASED ON RANDOM CHOICE
-        if (enemyMoveType == MoveType.DODGE) {
-            enemyDodgeOrParrySuccess = enemyVictim.dodgeSpell(wizard.getSpellChance(wizardChosenSpell), wizard);
-        } else if (enemyMoveType == MoveType.PARRY) {
-            enemyDodgeOrParrySuccess = enemyVictim.parry(wizardChosenSpell.getSpellName(), wizard, wizardCalculatedDamage);
-        }
+        // CHECK IF ENEMY IS A BOSS AND HIS HP LIMIT HAS BEEN REACHED AND RETURN IF CHOSEN SPELL CAN AFFECT THE ENEMY OR NOT
+        boolean isVulnerableSpell = enemyVictim.vulnerabilityChecker(enemyVictim.getEnemyName().getEnemyHpLimitRatio(), wizardChosenSpell);
 
-        // IF DODGE OR PARRY FAILED, THE WIZARD WILL ATTACK
-        if(!enemyDodgeOrParrySuccess) {
-            wizard.spellAttack(wizardChosenSpell, enemyVictim, wizardCalculatedDamage, true);
+        if(isVulnerableSpell) {
+            // EXECUTE ACTION BASED ON RANDOM CHOICE
+            if (enemyMoveType == MoveType.DODGE) {
+                enemyDodgeOrParrySuccess = enemyVictim.dodgeSpell(wizard.getSpellChance(wizardChosenSpell), wizard);
+            } else if (enemyMoveType == MoveType.PARRY) {
+                enemyDodgeOrParrySuccess = enemyVictim.parry(wizardChosenSpell.getSpellName(), wizard, wizardCalculatedDamage);
+            }
+
+            // IF DODGE OR PARRY FAILED, THE WIZARD WILL ATTACK
+            if(!enemyDodgeOrParrySuccess) {
+                wizard.spellAttack(wizardChosenSpell, enemyVictim, wizardCalculatedDamage, true);
+            }
         }
         continuePromptExtra();
     }
 
     public static void chooseAction() throws CloneNotSupportedException {
-        List<String> actionList = new ArrayList<>(Arrays.asList("Check Stats", "Use Potion", "Fight!"));
+        List<String> actionList = new ArrayList<>(Arrays.asList("Fight!", "Check Stats", "Use Potion"));
         printColoredHeader("What would you like to do?");
         printChoices(actionList);
         int choice = returnChoiceInt(1, actionList.size(), false);
 
         switch (choice) {
-            case 1 -> wizard.printStats();
+            case 1 -> fight();
             case 2 -> wizard.usePotion();
-            case 3 -> fight();
+            case 3 -> wizard.returnStringStats();
         }
     }
 
     public static void level1() throws CloneNotSupportedException {
         String levelName = returnFormattedEnum(Level.The_Philosophers_Stone);
+        EnemyName enemyName = EnemyName.TROLL;
+
         printColoredHeader(levelName);
         printTitle("Your objective is to kill the troll by using Wingardium Leviosa.");
         continuePromptExtra();
 
-        generateEnemies(1, 1,1, EnemyName.TROLL);
+        generateEnemies(1, 1,1, enemyName);
+        while (!enemiesHashMap.isEmpty() && wizard.getHealthPoints() > 0) {
+            chooseAction();
+            clearConsole();
+        }
+
+        if (enemiesHashMap.isEmpty()) {
+            printTitle(enemyName.getEnemyDeathLine().get(0));
+            printTitle(returnColoredText("You graduated Hogwarts's first year, you are now a second year student.", ANSI_YELLOW));
+            unlockNextLevel(Level.The_Philosophers_Stone);
+            continuePrompt();
+        } else if (wizard.getHealthPoints() <= 0) {
+            printTitle(returnColoredText("You died.", ANSI_RED));
+        }
+        EnemyName.BASILISK.resetVulnerableSpellsList();
+    }
+
+    public static void level2() throws CloneNotSupportedException {
+        String levelName = returnFormattedEnum(Level.The_Chamber_of_Secrets);
+        EnemyName enemyName = EnemyName.BASILISK;
+        boolean gryffindorHouse = wizard.getHouse().getHouseName() == HouseName.GRYFFINDOR;
+
+        printColoredHeader(levelName);
+        if(gryffindorHouse) {
+            printTitle("Your Objective is to kill the Basilisk with Godric Gryffindor's legendary Sword.");
+        }
+        else {
+            printTitle("Your Objective is to kill the Basilisk by removing one of his teeth with Accio and then stabbing Tom Riddle's Journal.");
+        }
+        continuePrompt();
+        generateEnemies(1, 1,1, enemyName);
+
+        //TODO - THIS
+
         wizard.updateStats();
         wizard.restoreWizardHpDf();
         while (!enemiesHashMap.isEmpty() && wizard.getHealthPoints() > 0) {
@@ -195,12 +235,26 @@ public class LevelFunctions {
             clearConsole();
         }
         if (enemiesHashMap.isEmpty()) {
-            printTitle(returnColoredText("You graduated Hogwarts's first year, you are now a second year student.", ANSI_YELLOW));
-            unlockNextLevel(Level.The_Philosophers_Stone);
+            if(gryffindorHouse) {
+                printTitle(enemyName.getEnemyDeathLine().get(0));
+            }
+            else {
+                printTitle(enemyName.getEnemyDeathLine().get(1));
+            }
+
+            printTitle(returnColoredText("You graduated Hogwarts's second year, you are now a third year student.", ANSI_YELLOW));
+            unlockNextLevel(Level.The_Chamber_of_Secrets);
+            continuePrompt();
         } else if (wizard.getHealthPoints() <= 0) {
             printTitle(returnColoredText("You died.", ANSI_RED));
         }
     }
+
+    public static void level3() {}
+    public static void level4() {}
+    public static void level5() {}
+    public static void level6() {}
+    public static void level7() {}
 
     public static void battleArena() throws CloneNotSupportedException {
         spawnEnemies();

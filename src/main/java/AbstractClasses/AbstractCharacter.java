@@ -55,8 +55,8 @@ public abstract class AbstractCharacter {
     private final static int enemyParryDivider = 3;
     private final static int enemyDodgeDivider = 5;
     private final static int wizardDodgeDivider = 3;
-    private final static int enemyDamageDivider = 15;
-    private final static int wizardDamageDivider = 10;
+    private final static double enemyDamageDivider = 1.7;
+    private final static double wizardDamageDivider = 1;
 
     public String getStatBar(String statLogo, String statLogoColor, double value, double maxValue) {
         final int statBarLength = 30;
@@ -71,7 +71,7 @@ public abstract class AbstractCharacter {
                 returnColoredText(" " + (int) value + "/" + (int) maxValue, ANSI_RED);
     }
 
-    public String printStats() {
+    public String returnStringStats() {
         String name;
         int nameLength;
 
@@ -248,7 +248,7 @@ public abstract class AbstractCharacter {
 
     public void updateSpellsHashMap() throws CloneNotSupportedException {
         for (Spell spell : Spell.getAllSpells()) {
-            if (spell.getSpellLevelRequirement() <= this.getLevel() && !this.getSpellsHashMap().containsKey(spell.getSpellName())) {
+            if (spell.getSpellLevelRequirement() >= 0 && spell.getSpellLevelRequirement() <= this.getLevel() && !this.getSpellsHashMap().containsKey(spell.getSpellName())) {
                 this.putSpellsHashMap(spell.clone());
             }
         }
@@ -348,7 +348,7 @@ public abstract class AbstractCharacter {
     public void printAllCharacterSpells() {
         int index = 1;
         for (Map.Entry<String, Spell> spell : this.getSpellsHashMap().entrySet()) {
-            System.out.printf("%-6s", "(" + index + ")");
+            System.out.printf("%-15s", "("+returnColoredText(String.valueOf(index), ANSI_YELLOW)+")");
             System.out.println(spell.getValue().printStats());
             index++;
         }
@@ -412,7 +412,7 @@ public abstract class AbstractCharacter {
         return spell.getSpellChance() * (1 + luckPercent);
     }
 
-    public void castAttack(double spellChance, CharacterState characterState, AbstractCharacter attackedCharacter, double calculatedDamage, boolean attackAfterCast) {
+    public void castAttack(double attackChance, CharacterState characterState, AbstractCharacter attackedCharacter, double calculatedDamage, boolean attackAfterCast) {
         String attackedCharacterName = "";
         String attackingCharacterName = "";
 
@@ -425,7 +425,7 @@ public abstract class AbstractCharacter {
         }
 
         double spellSuccess = Math.random();
-        if (spellSuccess <= spellChance) {
+        if (spellSuccess <= attackChance) {
             // TAKE DAMAGE
             double damageTaken = attackedCharacter.takeDamage(calculatedDamage);
 
@@ -446,30 +446,29 @@ public abstract class AbstractCharacter {
             }
 
         } else {
-            System.out.println(attackingCharacterName + returnColoredText(" missed ", ANSI_YELLOW) + "their spell!");
+            System.out.println(attackingCharacterName + returnColoredText(" missed ", ANSI_YELLOW) + "their attack!");
         }
     }
 
     private static void attackAfterCast(AbstractCharacter attackedCharacter, String attackedCharacterName, String attackingCharacterName, int damageTaken, double healthPoints, double maxHealthPoints) {
         String text1 = attackingCharacterName + " hit " + attackedCharacterName + " with " + returnColoredText(damageTaken + " damage", ANSI_RED) + "!";
         String text2 = attackedCharacterName + " is now " + returnColoredText(returnFormattedEnum(attackedCharacter.getCharacterState()), ANSI_BLUE) + ".";
-        String text4 = attackedCharacterName + " has " + returnColoredText((int) healthPoints + "/" + (int) maxHealthPoints + " hp", ANSI_GREEN) + " left.";
-        StringBuilder text5 = new StringBuilder();
+        String text3 = attackedCharacterName + " has " + returnColoredText((int) healthPoints + "/" + (int) maxHealthPoints + " hp", ANSI_GREEN) + " left.";
+        StringBuilder text4 = new StringBuilder();
 
         if (attackedCharacter.getClass() == Wizard.class) {
-            text5.append(attackingCharacterName).append(" killed you.");
+            text4.append(attackingCharacterName).append(" killed you.");
         } else if (attackedCharacter.getClass() == Enemy.class) {
-            text5.append("You killed ")
+            text4.append("You killed ")
                     .append(returnColoredText(attackedCharacterName, ANSI_PURPLE))
                     .append(".\nYou received ")
-                    .append(returnColoredText((int) ((Enemy) attackedCharacter).getExperiencePoints() + " XP.", ANSI_BLUE))
-                    .append("\n");
+                    .append(returnColoredText((int) ((Enemy) attackedCharacter).getExperiencePoints() + " XP.", ANSI_BLUE));
 
             List<AbstractItem> enemyItemList = attackedCharacter.getItemList();
 
             if(enemyItemList.size() > 0) {
-                text5.append("You found:\n");
-                enemyItemList.forEach(Item -> text5.append("- ").append(returnColoredText(Item.getItemName(), Item.getItemColor())).append("\n"));
+                text4.append("\nYou found:\n");
+                enemyItemList.forEach(Item -> text4.append("- ").append(returnColoredText(Item.getItemName(), Item.getItemColor())).append("\n"));
             }
         }
 
@@ -478,9 +477,9 @@ public abstract class AbstractCharacter {
             if (attackedCharacter.getCharacterState() != CharacterState.STANDING) {
                 System.out.println(text2);
             }
-            System.out.println(text4);
+            System.out.println(text3);
         } else {
-            System.out.println(text5);
+            System.out.println(text4);
         }
     }
 
@@ -493,6 +492,9 @@ public abstract class AbstractCharacter {
 
         // CONSOLE STUFF
         System.out.println(returnColoredText(spellName + "!", spell.getSpellColor()));
+        if(this.getClass() == Wizard.class) {
+            System.out.println(returnColoredText(spell.getSpellSpecialAttackLine(), ANSI_PURPLE));
+        }
         castAttack(getSpellChance(spell), spell.getCharacterState(), attackedCharacter, calculatedDamage, attackAfterCast);
     }
 

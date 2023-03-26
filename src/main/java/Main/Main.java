@@ -1,7 +1,9 @@
 package Main;
 
+import Enums.EnemyName;
 import Enums.Level;
 
+import static Classes.Enemy.*;
 import static Classes.Wizard.testWizard;
 import static Classes.Wizard.wizard;
 import static Enums.Level.unlockNextLevel;
@@ -13,8 +15,9 @@ public class Main {
 //        gameCredits();
 //        checkSaves();
 //        CharacterCreation.characterInit();
-        wizard.setSpecPoints(10);
         chooseAction();
+
+//        System.out.println(enemiesHashMap.get(enemiesKeyList.get(0)).getExperiencePoints());
 //        unlockNextLevel(Level.The_Philosophers_Stone);
     }
 }

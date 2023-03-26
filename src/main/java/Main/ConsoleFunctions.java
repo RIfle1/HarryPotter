@@ -4,12 +4,11 @@ import Classes.Color;
 
 import java.util.*;
 
-import static Classes.LevelFunctions.battleArena;
 import static Classes.Color.*;
 import static Classes.Color.returnColoredText;
-import static Classes.LevelFunctions.level1;
+import static Classes.Enemy.clearEnemies;
+import static Classes.LevelFunctions.*;
 import static Classes.Wizard.wizard;
-import static Enums.Level.getLevelList;
 import static Enums.Level.getUnlockedLevelList;
 import static java.lang.System.exit;
 
@@ -162,19 +161,33 @@ public class ConsoleFunctions {
 
         switch (returnChoiceInt(getUnlockedLevelList().size(), true)) {
             case 1 -> level1();
-            case  2, 3, 4, 5, 6, 7, 8 -> battleArena();
+            case 2 -> level2();
+            case 3 -> level3();
+            case 4 -> level4();
+            case 5 -> level5();
+            case 6 -> level6();
+            case 7 -> level7();
+            case 8 -> battleArena();
             case -2 -> func.run();
         }
+        clearEnemies();
+        wizard.reduceSpellsCooldown();
+        ConsoleFunctions.chooseAction();
     }
 
     public static void chooseAction() throws CloneNotSupportedException {
         String[] actionList = {
                 "Choose Level",
-                "Upgrade Specs"
+                "Upgrade Specs",
+                "Check Stats",
+                "Check Available Spells"
         };
 
         printColoredHeader("Choose your action: ");
         printChoices(actionList);
+
+        wizard.updateStats();
+        wizard.restoreWizardHpDf();
 
         switch (returnChoiceInt(actionList.length, false)) {
             case 1 -> chooseLevel(() -> {
@@ -191,6 +204,10 @@ public class ConsoleFunctions {
                         throw new RuntimeException(e);
                     }
             });
+            case 3 -> System.out.println(wizard.returnAllStringStats());
+            case 4 -> wizard.printAllCharacterSpells();
         }
+        continuePromptExtra();
+        chooseAction();
     }
 }
