@@ -6,6 +6,7 @@ import Enums.*;
 import lombok.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -16,7 +17,7 @@ import static Main.ConsoleFunctions.*;
 @Setter
 public class Wizard extends AbstractCharacter {
     @Builder
-    public Wizard(String name, double healthPoints, double defensePoints, double maxHealthPoints, double maxDefensePoints, Difficulty difficulty, CharacterState characterState, List<AbstractItem> itemList, List<Potion> activePotionsList, HashMap<String, Spell> spellsHashMap, List<String> spellsKeyList, double level, String firstName, String lastName, Gender gender, Pet pet, Wand wand, House house, double experience, double charisma, double strength, double intelligence, double luck) {
+    public Wizard(String name, double healthPoints, double defensePoints, double maxHealthPoints, double maxDefensePoints, Difficulty difficulty, CharacterState characterState, List<AbstractItem> itemList, List<Potion> activePotionsList, HashMap<String, Spell> spellsHashMap, List<String> spellsKeyList, double level, String firstName, String lastName, Gender gender, Pet pet, Wand wand, House house, double experience, double specPoints, double charisma, double strength, double intelligence, double luck) {
         super(name, healthPoints, defensePoints, maxHealthPoints, maxDefensePoints, difficulty, characterState, itemList, activePotionsList, spellsHashMap, spellsKeyList, level);
         this.firstName = firstName;
         this.lastName = lastName;
@@ -25,6 +26,7 @@ public class Wizard extends AbstractCharacter {
         this.wand = wand;
         this.house = house;
         this.experience = experience;
+        this.specPoints = specPoints;
         this.charisma = charisma;
         this.strength = strength;
         this.intelligence = intelligence;
@@ -39,6 +41,7 @@ public class Wizard extends AbstractCharacter {
     private House house;
 
     private double experience;
+    private double specPoints;
     private double charisma; // for dodging
     private double strength; // for more attack damage
     private double intelligence; // for parrying
@@ -48,6 +51,9 @@ public class Wizard extends AbstractCharacter {
     public static final int wizardBaseDp = 40;
     private final double baseLevelExperience = 100;
     private final double levelIncrement = 20;
+    private final int wizardSpecs = 4;
+    private final int dungeonLevels = 7;
+    private final double maxPercent = 0.25;
 
     public String printSpecs() {
 
@@ -72,24 +78,59 @@ public class Wizard extends AbstractCharacter {
         return this.printStats() + this.printSpecs();
     }
 
-    public HashMap<String, Double> getWizardStatsPercent() {
-        final int wizardStats = 4;
-        final int dungeonLevels = 7;
-        final double maxPercent = 0.25;
-        int maxPoints = wizardStats * dungeonLevels;
+    public HashMap<String, Double> getWizardSpecsPercent() {
+        int maxPoints = wizardSpecs * dungeonLevels;
 
         double strengthPercent = (this.getStrength() * maxPercent) / maxPoints;
         double luckPercent = (this.getLuck() * maxPercent) / maxPoints;
         double intelligencePercent = (this.getIntelligence() * maxPercent) / maxPoints;
         double charismaPercent = (this.getCharisma() * maxPercent) / maxPoints;
 
-        HashMap<String, Double> WizardStatsPercent = new HashMap<String, Double>();
+        HashMap<String, Double> WizardStatsPercent = new HashMap<>();
         WizardStatsPercent.put("strength", strengthPercent);
         WizardStatsPercent.put("luck", luckPercent);
         WizardStatsPercent.put("intelligence", intelligencePercent);
         WizardStatsPercent.put("charisma", charismaPercent);
 
         return WizardStatsPercent;
+    }
+
+    public void setWizardSpec(String spec, int specPoints) {
+        switch (spec) {
+            case "strength" -> this.setStrength(this.getStrength() + specPoints);
+            case "luck" -> this.setLuck(this.getLuck() + specPoints);
+            case "intelligence" -> this.setIntelligence(this.getIntelligence() + specPoints);
+            case "charisma" -> this.setCharisma(this.getCharisma() + specPoints);
+        }
+    }
+
+    public void upgradeSpec(Runnable func) throws CloneNotSupportedException {
+        List<String> specsList = new ArrayList<>(Arrays.asList("Strength", "Luck", "Intelligence", "Charisma"));
+
+        if(this.getSpecPoints() > 0) {
+            printTitle("What spec would you like to upgrade?");
+            printChoices(specsList);
+            int choiceInt = returnChoiceInt(1, specsList.size(), true);
+            if(choiceInt == -2) {
+                func.run();
+            }
+            String spec = specsList.get(choiceInt - 1).toLowerCase();
+
+            printTitle("You have " + (int) this.getSpecPoints() + " points, how many would you like to add?");
+            int specPoints =  returnChoiceInt(0, (int) this.getSpecPoints(), true);
+            if(specPoints == -2) {
+                func.run();
+            }
+
+            setWizardSpec(spec, specPoints);
+            this.setSpecPoints(this.getSpecPoints() - specPoints);
+        }
+        else {
+            printTitle("You have no spec points.");
+        }
+
+        continuePromptExtra();
+        chooseAction();
     }
 
     // UPDATE WIZARD HEALTH AND DEFENSE POINTS BASED ON THEIR LEVEL
@@ -124,6 +165,7 @@ public class Wizard extends AbstractCharacter {
         double currentExperience = this.getExperience();
         double xpFx;
         double xpCumulativeFunction = 0;
+        double oldLevel = this.getLevel();
 
         for (int x = 1; x <= AbstractCharacter.maxLevel; x++) {
             xpFx = levelIncrement * Math.pow(x, 2) + baseLevelExperience;
@@ -138,6 +180,7 @@ public class Wizard extends AbstractCharacter {
             }
         }
     }
+
 
     public void addExperience(double experience) {
         this.setExperience(this.getExperience() + experience);
@@ -165,7 +208,7 @@ public class Wizard extends AbstractCharacter {
             printTitle("You don't have any potions in your inventory.");
         }
 
-        Potion chosenPotion = getPotion(potionNamesList.get(returnChoiceInt(0, potionNamesList.size()) - 1));
+        Potion chosenPotion = getPotion(potionNamesList.get(returnChoiceInt(0, potionNamesList.size(), false) - 1));
         this.drinkPotion(chosenPotion);
     }
 
@@ -193,6 +236,7 @@ public class Wizard extends AbstractCharacter {
             .strength(0)
             .intelligence(0)
             .luck(0)
+            .specPoints(0)
             .build();
 
     public static Wizard testWizard = Wizard.builder()
@@ -209,7 +253,7 @@ public class Wizard extends AbstractCharacter {
             .gender(Gender.MALE)
             .pet(Pet.CAT)
             .wand(new Wand(Core.PHEONIX_FEATHER, 12))
-            .house(new House(HouseName.SLYTHERIN))
+            .house(new House(HouseName.RAVENCLAW))
             .spellsHashMap(new HashMap<>())
             .spellsKeyList(new ArrayList<>())
             .itemList(new ArrayList<>())
@@ -217,6 +261,7 @@ public class Wizard extends AbstractCharacter {
             .experience(580)
             .charisma(0)
             .strength(0)
+            .specPoints(0)
             .intelligence(0)
             .luck(0)
             .build();

@@ -67,7 +67,7 @@ public class Potion extends AbstractItem implements Cloneable {
             .itemDropChance(0.8)
             .itemColor(Color.ANSI_BLUE)
             .potionType(PotionType.DEFENSE)
-            .potionDuration(3)
+            .potionDuration(1)
             .potionValue(40)
             .build();
 

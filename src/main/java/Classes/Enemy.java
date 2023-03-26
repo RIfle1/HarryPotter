@@ -10,8 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static Classes.Color.ANSI_YELLOW;
-import static Classes.Color.returnColoredText;
+import static Classes.Color.*;
 import static Classes.Wizard.wizard;
 import static Enums.EnumMethods.returnFormattedEnum;
 import static Main.MechanicsFunctions.generateDoubleBetween;
@@ -43,8 +42,8 @@ public class Enemy extends AbstractCharacter {
     }
 
     public void giveItems(Wizard wizard) {
-        List<AbstractItem> enemyItemList =  this.getItemList();
-        for(AbstractItem item:enemyItemList) {
+        List<AbstractItem> enemyItemList = this.getItemList();
+        for (AbstractItem item : enemyItemList) {
             wizard.getItemList().add(item);
         }
     }
@@ -75,12 +74,12 @@ public class Enemy extends AbstractCharacter {
         List<Potion> allPotionsList = Potion.getAllPotions();
         List<AbstractItem> randomPotions = new ArrayList<>();
 
-        for(int y = 0; y < potionNumber; y++) {
+        for (int y = 0; y < potionNumber; y++) {
             double potionChance = Math.random();
             int potionIndex = (int) generateDoubleBetween(0, allPotionsList.toArray().length);
             Potion chosenPotion = allPotionsList.get(potionIndex - 1);
 
-            if(potionChance <= chosenPotion.getItemDropChance()) {
+            if (potionChance <= chosenPotion.getItemDropChance()) {
                 randomPotions.add(chosenPotion.clone());
             }
 
@@ -92,16 +91,15 @@ public class Enemy extends AbstractCharacter {
         enemiesHashMap.forEach((key, value) -> enemiesKeyList.add(key));
     }
 
-    public static void generateEnemiesSub(double minLevel, double maxLevel, EnemyName enemyName, HashMap<String, Enemy> enemiesHashMap, Enemy[] enemies, int i) throws CloneNotSupportedException {
+    public static void generateEnemiesSub(double minLevel, double maxLevel, EnemyName enemyName, Enemy[] enemies, int i) throws CloneNotSupportedException {
         int enemyLevel;
-        if(minLevel == maxLevel) {
+        if (minLevel == maxLevel) {
             enemyLevel = (int) minLevel;
-        }
-        else {
+        } else {
             enemyLevel = (int) generateDoubleBetween(minLevel, maxLevel);
         }
 
-        int enemyHp = (int) Math.round(Math.exp(enemyLevel * wizard.getDifficulty().getEnemyDiffMultiplier()) * enemyName.getEnemyBaseHp()) ;
+        int enemyHp = (int) Math.round(Math.exp(enemyLevel * wizard.getDifficulty().getEnemyDiffMultiplier()) * enemyName.getEnemyBaseHp());
         int enemyDp = (int) Math.round((Math.exp(enemyLevel * wizard.getDifficulty().getEnemyDiffMultiplier()) * enemyName.getEnemyBaseDp()) / 3);
         int enemyXp = (int) Math.round(enemyName.getEnemyXp() * enemyXpIncrement * enemyLevel + enemyName.getEnemyXp());
 
@@ -117,7 +115,7 @@ public class Enemy extends AbstractCharacter {
                 .spellsHashMap(new HashMap<>())
                 .spellsKeyList(new ArrayList<>())
                 .level(enemyLevel)
-                .name(returnFormattedEnum(enemyName)+"-"+(i+1))
+                .name(returnFormattedEnum(enemyName) + "-" + (i + 1))
                 .enemyName(enemyName)
                 .experiencePoints(enemyXp)
                 .distanceFromPlayer((int) generateDoubleBetween(0, 100))
@@ -125,45 +123,44 @@ public class Enemy extends AbstractCharacter {
 
 //        System.out.println(enemyName + " " + enemyLevel + " " + enemyXp);
 
-        enemies[i].updateSpellsHashMap();
+        if (enemies[i].getEnemyCombat() == EnemyCombat.SPELL) {
+            enemies[i].updateSpellsHashMap();
+        }
         enemiesHashMap.put(enemies[i].getName(), enemies[i]);
     }
 
-    public static HashMap<String, Enemy> generateEnemies(double minLevel, double maxLevel, int amount) throws CloneNotSupportedException {
+    public static void generateEnemies(double minLevel, double maxLevel, int amount) throws CloneNotSupportedException {
         // ENEMIES LIST
-        HashMap<String, Enemy> enemiesHashMap = new HashMap<>();
         Enemy[] enemies = new Enemy[amount];
-
-        for(int i = 0; i < amount; i++) {
+        for (int i = 0; i < amount; i++) {
             EnemyName enemyName = generateRandomBasicEnemy();
-            generateEnemiesSub(minLevel, maxLevel, enemyName, enemiesHashMap, enemies, i);
+            generateEnemiesSub(minLevel, maxLevel, enemyName, enemies, i);
         }
-
         updateEnemiesKeyList(enemiesHashMap);
-        return enemiesHashMap;
     }
 
-    public static HashMap<String, Enemy> generateEnemies(double minLevel, double maxLevel, int amount, EnemyName enemyName) throws CloneNotSupportedException {
+    public static void generateEnemies(double minLevel, double maxLevel, int amount, EnemyName enemyName) throws CloneNotSupportedException {
         // ENEMIES LIST
-        HashMap<String, Enemy> enemiesHashMap = new HashMap<>();
         Enemy[] enemies = new Enemy[amount];
-
-        for(int i = 0; i < amount; i++) {
-            generateEnemiesSub(minLevel, maxLevel, enemyName, enemiesHashMap, enemies, i);
+        for (int i = 0; i < amount; i++) {
+            generateEnemiesSub(minLevel, maxLevel, enemyName, enemies, i);
         }
         updateEnemiesKeyList(enemiesHashMap);
-        return enemiesHashMap;
     }
 
     public static void printEnemies() {
         int index = 1;
-        for(Map.Entry<String, Enemy> enemy : enemiesHashMap.entrySet()) {
-            System.out.printf("%-15s", "("+returnColoredText(index+"", ANSI_YELLOW)+")");
+        for (Map.Entry<String, Enemy> enemy : enemiesHashMap.entrySet()) {
+            System.out.printf("%-15s", "(" + returnColoredText(index + "", ANSI_YELLOW) + ")");
             System.out.println(enemy.getValue().printStats());
             index++;
         }
     }
 
 
-
+    public void meleeAttack(AbstractCharacter attackedCharacter, double calculatedDamage, boolean attackAfterCast) {
+        // CONSOLE STUFF
+        System.out.println(returnColoredText(returnFormattedEnum(this.getEnemyName()) + " melee attack!", ANSI_RED));
+        castAttack(this.getEnemyCombat().getCombatChance(), CharacterState.STANDING, attackedCharacter, calculatedDamage, attackAfterCast);
+    }
 }

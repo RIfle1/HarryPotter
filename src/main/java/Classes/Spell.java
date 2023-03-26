@@ -29,7 +29,6 @@ public class Spell implements Cloneable{
     private CharacterState characterState;
     private double spellLevelRequirement;
     private double[] spellDamage;
-    private double[] spellEffectiveDistance;
     private double spellChance;
     private int spellCooldown;
     private int spellReadyIn;
@@ -44,10 +43,9 @@ public class Spell implements Cloneable{
             .spellSpecialAttackLine("You've thrown an object at the enemy!")
             .spellLevelRequirement(1)
             .spellDamage(new double[]{100, 120})
-            .spellEffectiveDistance(new double[]{})
             .characterState(CharacterState.STUNNED)
             .spellChance(0.7)
-            .spellCooldown(2)
+            .spellCooldown(1)
             .spellReadyIn(0)
             .spellColor(ANSI_RED)
             .build();
@@ -59,10 +57,9 @@ public class Spell implements Cloneable{
             .spellSpecialAttackLine("Basic Attack!")
             .spellLevelRequirement(0)
             .spellDamage(new double[]{40, 60})
-            .spellEffectiveDistance(new double[]{})
             .characterState(CharacterState.STANDING)
             .spellChance(0.9)
-            .spellCooldown(1)
+            .spellCooldown(2)
             .spellReadyIn(0)
             .spellColor(ANSI_RED)
             .build();
@@ -74,10 +71,9 @@ public class Spell implements Cloneable{
 //            .spellSpecialAttackLine("You've cancelled the enemy's spell!")
 //            .spellLevelRequirement(0)
 //            .spellDamage(new double[]{100, 120})
-//            .spellEffectiveDistance(new double[]{})
 //            .characterState(CharacterState.STANDING)
 //            .spellChance(0.8)
-//            .spellCooldown(1)
+//            .spellCooldown(2)
 //            .spellReadyIn(0)
 //            .spellColor(ANSI_BLUE)
 //            .build();
@@ -89,10 +85,9 @@ public class Spell implements Cloneable{
             .spellSpecialAttackLine("You've cancelled the enemy's spell!")
             .spellLevelRequirement(0)
             .spellDamage(new double[]{0, 0})
-            .spellEffectiveDistance(new double[]{})
             .characterState(CharacterState.STUNNED)
             .spellChance(0.8)
-            .spellCooldown(0)
+            .spellCooldown(1)
             .spellReadyIn(0)
             .spellColor(ANSI_YELLOW)
             .build();
@@ -104,10 +99,9 @@ public class Spell implements Cloneable{
             .spellSpecialAttackLine("You've cancelled the enemy's spell!")
             .spellLevelRequirement(5)
             .spellDamage(new double[]{60, 70})
-            .spellEffectiveDistance(new double[]{})
             .characterState(CharacterState.FROZEN)
             .spellChance(0.6)
-            .spellCooldown(1)
+            .spellCooldown(2)
             .spellReadyIn(0)
             .spellColor(ANSI_RED)
             .build();
@@ -119,7 +113,6 @@ public class Spell implements Cloneable{
             .spellSpecialAttackLine("You've transformed the enemy into a ")
             .spellLevelRequirement(10)
             .spellDamage(new double[]{0, 0})
-            .spellEffectiveDistance(new double[]{})
             .characterState(CharacterState.STANDING)
             .spellChance(0.4)
             .spellCooldown(2)
@@ -134,10 +127,9 @@ public class Spell implements Cloneable{
             .spellSpecialAttackLine("The enemy has been pulled close to you!")
             .spellLevelRequirement(0)
             .spellDamage(new double[]{50, 80})
-            .spellEffectiveDistance(new double[]{})
             .characterState(CharacterState.LEVITATING)
             .spellChance(0.7)
-            .spellCooldown(1)
+            .spellCooldown(2)
             .spellReadyIn(0)
             .spellColor(ANSI_RED)
             .build();
@@ -149,10 +141,9 @@ public class Spell implements Cloneable{
             .spellSpecialAttackLine("You've slammed the enemy into the ground!")
             .spellLevelRequirement(4)
             .spellDamage(new double[]{70, 90})
-            .spellEffectiveDistance(new double[]{})
             .characterState(CharacterState.KNOCKED)
             .spellChance(0.7)
-            .spellCooldown(1)
+            .spellCooldown(2)
             .spellReadyIn(0)
             .spellColor(ANSI_RED)
             .build();
@@ -164,7 +155,6 @@ public class Spell implements Cloneable{
             .spellSpecialAttackLine("You've kicked the enemy into the wall!")
             .spellLevelRequirement(6)
             .spellDamage(new double[]{80, 100})
-            .spellEffectiveDistance(new double[]{})
             .characterState(CharacterState.KNOCKED)
             .spellChance(0.6)
             .spellCooldown(2)
@@ -179,7 +169,6 @@ public class Spell implements Cloneable{
             .spellSpecialAttackLine("You blew up your enemies!")
             .spellLevelRequirement(8)
             .spellDamage(new double[]{120, 140})
-            .spellEffectiveDistance(new double[]{})
             .characterState(CharacterState.ON_FIRE)
             .spellChance(0.35)
             .spellCooldown(3)
@@ -194,7 +183,6 @@ public class Spell implements Cloneable{
             .spellSpecialAttackLine("Your enemy is on fire!")
             .spellLevelRequirement(5)
             .spellDamage(new double[]{60, 80})
-            .spellEffectiveDistance(new double[]{})
             .characterState(CharacterState.ON_FIRE)
             .spellChance(0.6)
             .spellCooldown(2)
@@ -209,10 +197,9 @@ public class Spell implements Cloneable{
             .spellSpecialAttackLine("Your enemy has been slashed!")
             .spellLevelRequirement(7)
             .spellDamage(new double[]{60, 80})
-            .spellEffectiveDistance(new double[]{})
             .characterState(CharacterState.STANDING)
             .spellChance(0.6)
-            .spellCooldown(1)
+            .spellCooldown(2)
             .spellReadyIn(0)
             .spellColor(ANSI_RED)
             .build();
@@ -224,10 +211,9 @@ public class Spell implements Cloneable{
             .spellSpecialAttackLine("Your enemy has been slashed!")
             .spellLevelRequirement(7)
             .spellDamage(new double[]{60, 80})
-            .spellEffectiveDistance(new double[]{0, 10})
             .characterState(CharacterState.ON_FIRE)
             .spellChance(0.6)
-            .spellCooldown(1)
+            .spellCooldown(2)
             .spellReadyIn(0)
             .spellColor(ANSI_RED)
             .build();
@@ -239,7 +225,6 @@ public class Spell implements Cloneable{
             .spellSpecialAttackLine("the enemy is kinda dead")
             .spellLevelRequirement(10)
             .spellDamage(new double[]{100000, 100000})
-            .spellEffectiveDistance(new double[]{})
             .characterState(CharacterState.STANDING)
             .spellChance(1)
             .spellCooldown(6)
@@ -254,7 +239,6 @@ public class Spell implements Cloneable{
             .spellSpecialAttackLine("You've cursed the enemy!")
             .spellLevelRequirement(8)
             .spellDamage(new double[]{50, 70})
-            .spellEffectiveDistance(new double[]{})
             .characterState(CharacterState.CURSED)
             .spellChance(0.8)
             .spellCooldown(4)
@@ -269,10 +253,9 @@ public class Spell implements Cloneable{
             .spellSpecialAttackLine("test spell attack line")
             .spellLevelRequirement(0)
             .spellDamage(new double[]{20000000, 20000000})
-            .spellEffectiveDistance(new double[]{})
             .characterState(CharacterState.STUNNED)
             .spellChance(1)
-            .spellCooldown(0)
+            .spellCooldown(1)
             .spellReadyIn(0)
             .spellColor(ANSI_RED)
             .build();
@@ -348,7 +331,7 @@ public class Spell implements Cloneable{
         String column3Bis = returnColoredText(String.format(column3BisFormat , (int) generateDoubleBetween(this.spellDamage[0], this.spellDamage[1])), ANSI_RED);
         String column3 = returnColoredText(String.format(column3Format , " ~ Base Damage"), ANSI_RED);
         String column5 = returnColoredText(String.format(column5Format , spellChance + "% Chance Success"), ANSI_YELLOW);
-        String column6 = returnColoredText(String.format(column6Format , this.spellCooldown + " Turn(s) Cooldown"), ANSI_BLUE);
+        String column6 = returnColoredText(String.format(column6Format , (this.spellCooldown - 1) + " Turn(s) Cooldown"), ANSI_BLUE);
 
         return column1 + printColumnSeparator("||")
                 + column2 + printColumnSeparator("||")

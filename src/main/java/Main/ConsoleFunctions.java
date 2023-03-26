@@ -4,9 +4,14 @@ import Classes.Color;
 
 import java.util.*;
 
-import static Classes.BattleArena.battleArena;
+import static Classes.LevelFunctions.battleArena;
 import static Classes.Color.*;
 import static Classes.Color.returnColoredText;
+import static Classes.LevelFunctions.level1;
+import static Classes.Wizard.wizard;
+import static Enums.Level.getLevelList;
+import static Enums.Level.getUnlockedLevelList;
+import static java.lang.System.exit;
 
 public class ConsoleFunctions {
     static Scanner scanner = new Scanner(System.in);
@@ -19,45 +24,55 @@ public class ConsoleFunctions {
         return scanner.next();
     }
 
-    public static int returnChoiceInt(int max) {
-        int input;
+
+    public static int returnChoiceInt(int max, boolean backSupport) {
+        int input = -1;
 
         do{
-            System.out.println(Color.returnColoredText("-> ", ANSI_YELLOW));
-            try{
-                input = Integer.parseInt(scanner.next());
-            }
-            catch(Exception e) {
-                input = -1;
-                System.out.println(Color.returnColoredText("Input must be an integer", ANSI_RED));
-            }
-            if(input > max) {
+            input = getInput(input, backSupport);
+            if(input > max && input != -2) {
                 input = -1;
                 System.out.println(Color.returnColoredText("Input must be between 1 and " + max, ANSI_RED));
             }
         }
-        while(input < 1);
+        while(input == -1);
         return input;
     }
 
-    public static int returnChoiceInt(int min, int max) {
-        int input;
+    public static int returnChoiceInt(int min, int max, boolean backSupport) {
+        int input = -1;
 
         do{
-            System.out.println(Color.returnColoredText("-> ", ANSI_YELLOW));
-            try{
-                input = Integer.parseInt(scanner.next());
-            }
-            catch(Exception e) {
-                input = -1;
-                System.out.println(Color.returnColoredText("Input must be an integer", ANSI_RED));
-            }
-            if(input < min || input > max) {
+            input = getInput(input, backSupport);
+            if((input < min || input > max) && input != -2) {
                 input = -1;
                 System.out.println(Color.returnColoredText("Input must be between " + min + " and " + max, ANSI_RED));
             }
         }
-        while(input < 1);
+        while(input == -1);
+        return input;
+    }
+
+    public static int getInput(int input, boolean backSupport) {
+        String input2;
+        System.out.println(Color.returnColoredText("-> ", ANSI_YELLOW));
+        try{
+            input2 = scanner.next();
+            if(Objects.equals(input2, "exit")) {
+                exit(0);
+
+            }
+            else if(Objects.equals(input2, "back") && backSupport) {
+                return -2;
+            }
+            else {
+                input = Integer.parseInt(input2);
+            }
+        }
+        catch(Exception e) {
+            input = -1;
+            System.out.println(Color.returnColoredText("Input must be an integer", ANSI_RED));
+        }
         return input;
     }
 
@@ -141,23 +156,41 @@ public class ConsoleFunctions {
         continuePrompt();
     }
 
-    public static void chooseLevel() throws CloneNotSupportedException {
-        String[] optionsList = {
-                "The Philosopher's Stone",
-                "The Chamber of Secrets",
-                "The Prisoner of Azkaban",
-                "The Goblet of Fire",
-                "The Order of the Phoenix",
-                "The Half-Blooded Prince",
-                "The Deathly Hallows",
-                "Battle Arena",
+    public static void chooseLevel(Runnable func) throws CloneNotSupportedException {
+        printColoredHeader("Choose your level: ");
+        printChoices(getUnlockedLevelList());
+
+        switch (returnChoiceInt(getUnlockedLevelList().size(), true)) {
+            case 1 -> level1();
+            case  2, 3, 4, 5, 6, 7, 8 -> battleArena();
+            case -2 -> func.run();
+        }
+    }
+
+    public static void chooseAction() throws CloneNotSupportedException {
+        String[] actionList = {
+                "Choose Level",
+                "Upgrade Specs"
         };
 
-        printColoredHeader("Choose your level: ");
-        printChoices(optionsList);
+        printColoredHeader("Choose your action: ");
+        printChoices(actionList);
 
-        switch (returnChoiceInt(optionsList.length)) {
-            case 1, 2, 3, 4, 5, 6, 7, 8 -> battleArena();
+        switch (returnChoiceInt(actionList.length, false)) {
+            case 1 -> chooseLevel(() -> {
+                try {
+                    chooseAction();
+                } catch (CloneNotSupportedException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+            case 2 -> wizard.upgradeSpec(() -> {
+                    try {
+                        chooseAction();
+                    } catch (CloneNotSupportedException e) {
+                        throw new RuntimeException(e);
+                    }
+            });
         }
     }
 }

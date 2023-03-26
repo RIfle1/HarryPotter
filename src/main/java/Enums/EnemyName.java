@@ -11,23 +11,25 @@ import static Enums.EnumMethods.returnFormattedEnum;
 
 @Getter
 public enum EnemyName {
-    GOBLIN(EnemyCombat.MELEE, EnemyType.BASIC, 50, 30, 20),
-    DARK_WIZARD(EnemyCombat.MAGIC, EnemyType.BASIC, 70, 60, 30),
-    TROLL(EnemyCombat.MELEE, EnemyType.BOSS, 200, 60, 60),
-    BASILISK(EnemyCombat.MELEE, EnemyType.BOSS, 140, 100, 70),
-    DEMENTOR(EnemyCombat.MAGIC, EnemyType.BASIC, 30, 110, 20),
-    DEATH_EATER(EnemyCombat.MAGIC, EnemyType.BASIC, 90, 120, 25);
+    GOBLIN(EnemyCombat.MELEE, EnemyType.BASIC, 50, 0, 30, 20),
+    DARK_WIZARD(EnemyCombat.SPELL, EnemyType.BASIC, 70, 0.1, 60, 30),
+    TROLL(EnemyCombat.MELEE, EnemyType.BOSS, 200, 0.2, 60, 60),
+    BASILISK(EnemyCombat.MELEE, EnemyType.BOSS, 140, 0.5, 100, 70),
+    DEMENTOR(EnemyCombat.MELEE, EnemyType.BASIC, 30, 0, 110, 20),
+    DEATH_EATER(EnemyCombat.MELEE, EnemyType.BASIC, 90, 0, 120, 25);
 
     private final EnemyCombat enemyCombat;
     private final EnemyType enemyType;
     private final int enemyBaseHp;
+    private final double enemyDmgMultiplier;
     private final int enemyBaseDp;
     private final int enemyXp;
 
-    EnemyName(EnemyCombat enemyCombat, EnemyType enemyType, int enemyBaseHp, int enemyBaseDp, int enemyXp) {
+    EnemyName(EnemyCombat enemyCombat, EnemyType enemyType, int enemyBaseHp, double enemyDmgMultiplier, int enemyBaseDp, int enemyXp) {
         this.enemyCombat = enemyCombat;
         this.enemyType = enemyType;
         this.enemyBaseHp = enemyBaseHp;
+        this.enemyDmgMultiplier = enemyDmgMultiplier;
         this.enemyBaseDp = enemyBaseDp;
         this.enemyXp = enemyXp;
     }

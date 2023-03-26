@@ -51,6 +51,13 @@ public abstract class AbstractCharacter {
     // <1 PLAYER HAS BETTER STATS THAN THE ENEMIES
     public final static double difficultyDifference = 1.3;
 
+    private final static int wizardParryDivider = 2;
+    private final static int enemyParryDivider = 3;
+    private final static int enemyDodgeDivider = 5;
+    private final static int wizardDodgeDivider = 3;
+    private final static int enemyDamageDivider = 15;
+    private final static int wizardDamageDivider = 10;
+
     public String getStatBar(String statLogo, String statLogoColor, double value, double maxValue) {
         final int statBarLength = 30;
 
@@ -161,22 +168,23 @@ public abstract class AbstractCharacter {
         // TODO - IDK CHECK THIS
 
         List<Potion> activePotionsList = this.getActivePotionsList();
+        Potion potionToRemove = null;
 
         for(Potion potion:activePotionsList) {
             if(potion.getPotionType() == PotionType.DEFENSE && potion.getPotionDuration() == 0) {
                 this.setDefensePoints(this.getDefensePoints() - potion.getPotionValue());
-                activePotionsList.remove(potion);
+                potionToRemove = potion;
             }
             else if(potion.getPotionType() == PotionType.REGENERATION) {
                 double newHealth = this.getHealthPoints() + potion.getPotionValue();
                 this.setHealthPoints(Math.min(newHealth, this.getMaxHealthPoints()));
                 if(potion.getPotionDuration() == 0) {
-                    activePotionsList.remove(potion);
+                    potionToRemove = potion;
                 }
             }
             potion.setPotionDuration(potion.getPotionDuration() - 1);
-
         }
+        activePotionsList.remove(potionToRemove);
     }
 
 
@@ -257,7 +265,11 @@ public abstract class AbstractCharacter {
                 .reduce((double) 0, Double::sum);
     }
 
-    public double getSpellDamage(Spell spell, AbstractCharacter attackCharacter) {
+    public double getAttackBaseDamage(double attackDamage, double divider) {
+        return (Math.exp(this.getLevel() * getDifficulty().getWizardDiffMultiplier()) * attackDamage) / divider;
+    }
+
+    public double getSpellDamage(Spell spell, AbstractCharacter attackedCharacter) {
         double[] spellDamage = spell.getSpellDamage();
         double spellRandomDamage;
         double spellBaseDamage = 0;
@@ -281,17 +293,16 @@ public abstract class AbstractCharacter {
             } else if (houseName == HouseName.HUFFLEPUFF) {
                 housePotionPercent = houseName.getSpecValue();
             }
-            strengthPercent = ((Wizard) this).getWizardStatsPercent().get("strength");
+            strengthPercent = ((Wizard) this).getWizardSpecsPercent().get("strength");
 
-            spellBaseDamage = (Math.exp(this.getLevel() * getDifficulty().getWizardDiffMultiplier()) * spellRandomDamage) / 10;
+            spellBaseDamage = getAttackBaseDamage(spellRandomDamage, wizardDamageDivider);
         } else if (this.getClass() == Enemy.class) {
-            spellBaseDamage = (Math.exp(this.getLevel() * getDifficulty().getEnemyDiffMultiplier()) * spellRandomDamage) / 15;
+            spellBaseDamage = getAttackBaseDamage(spellRandomDamage, enemyDamageDivider);
         }
 
         // DAMAGE POTION ALREADY IMPLEMENTED HERE
         double damagePotionPercentIncrease = getActivePotionValueSum(PotionType.DAMAGE) * (1 + housePotionPercent);
-        double characterStateDamageMultiplier = attackCharacter.getCharacterState().getDamageMultiplier();
-        attackCharacter.setCharacterState(spell.getCharacterState());
+        double characterStateDamageMultiplier = attackedCharacter.getCharacterState().getDamageMultiplier();
 
         return spellBaseDamage
                 * (1 + damagePotionPercentIncrease)
@@ -300,24 +311,14 @@ public abstract class AbstractCharacter {
                 * (1 + strengthPercent);
     }
 
+    public double getMeleeDamage(AbstractCharacter attackedCharacter) {
+        double characterStateDamageMultiplier = attackedCharacter.getCharacterState().getDamageMultiplier();
+        return getAttackBaseDamage(((Enemy) this).getEnemyName().getEnemyCombat().getCombatDamage(), enemyDamageDivider) * (1 + characterStateDamageMultiplier);
+    }
+
     public double takeDamage(double calculatedDamage) {
         this.healthPoints -= calculatedDamage;
         return calculatedDamage;
-    }
-
-    public double getSpellEffectiveDistance(Spell spell) {
-        double[] spellEffectiveDistance = spell.getSpellEffectiveDistance();
-        double spellCalculatedEffectiveDistance;
-
-        if (spellEffectiveDistance.length == 0) {
-            spellCalculatedEffectiveDistance = -1;
-        } else if (spellEffectiveDistance[0] != spellEffectiveDistance[1]) {
-            spellCalculatedEffectiveDistance = generateDoubleBetween(spellEffectiveDistance[0], spellEffectiveDistance[1]);
-        } else {
-            spellCalculatedEffectiveDistance = spellEffectiveDistance[0];
-        }
-
-        return spellCalculatedEffectiveDistance;
     }
 
     public boolean checkSpellReady(Spell spell) {
@@ -389,22 +390,29 @@ public abstract class AbstractCharacter {
         });
     }
 
-    public double getCalculatedDamage(Spell spell, AbstractCharacter attackedCharacter) {
-        // CALCULATIONS FOR DAMAGE
-        double spellDamage = getSpellDamage(spell, attackedCharacter);
-        return spellDamage * (1 - (this.maxDefensePoints / this.maxHealthPoints) * maxDefenseReductionPercent);
+    public double defenseReductionRatio() {
+        return 1 - (this.maxDefensePoints / this.maxHealthPoints) * maxDefenseReductionPercent;
+    }
+
+    public double getSpellCalculatedDamage(Spell spell, AbstractCharacter attackedCharacter) {
+        // CALCULATIONS FOR SPELL DAMAGE
+        return getSpellDamage(spell, attackedCharacter) * defenseReductionRatio();
+    }
+
+    public double getMeleeCalculatedDamage(AbstractCharacter attackedCharacter) {
+        // CALCULATIONS FOR MELEE DAMAGE
+        return getMeleeDamage(attackedCharacter) * defenseReductionRatio();
     }
 
     public double getSpellChance(Spell spell) {
         double luckPercent = 0;
         if (this.getClass() == Wizard.class) {
-            luckPercent = ((Wizard) this).getWizardStatsPercent().get("luck");
+            luckPercent = ((Wizard) this).getWizardSpecsPercent().get("luck");
         }
         return spell.getSpellChance() * (1 + luckPercent);
     }
 
-    public void spellCast(Spell spell, AbstractCharacter attackedCharacter, double calculatedDamage, boolean spellAfterCast) {
-
+    public void castAttack(double spellChance, CharacterState characterState, AbstractCharacter attackedCharacter, double calculatedDamage, boolean attackAfterCast) {
         String attackedCharacterName = "";
         String attackingCharacterName = "";
 
@@ -417,15 +425,18 @@ public abstract class AbstractCharacter {
         }
 
         double spellSuccess = Math.random();
-        if (spellSuccess <= getSpellChance(spell)) {
+        if (spellSuccess <= spellChance) {
             // TAKE DAMAGE
             double damageTaken = attackedCharacter.takeDamage(calculatedDamage);
+
+            // CHANGE CHARACTER STATE
+            attackedCharacter.setCharacterState(characterState);
 
             // PRINT AFTER CAST STUFF INTO CONSOLE
             double healthPoints = attackedCharacter.getHealthPoints();
             double maxHealthPoints = attackedCharacter.getMaxHealthPoints();
-            if(spellAfterCast) {
-                spellAfterCast(attackedCharacter, attackedCharacterName, attackingCharacterName, (int) damageTaken, healthPoints, maxHealthPoints);
+            if(attackAfterCast) {
+                attackAfterCast(attackedCharacter, attackedCharacterName, attackingCharacterName, (int) damageTaken, healthPoints, maxHealthPoints);
             }
 
             // CHECK ENEMY'S CHARACTER AND ACT ACCORDINGLY (ADD XP AND ITEM DROPS)
@@ -439,7 +450,7 @@ public abstract class AbstractCharacter {
         }
     }
 
-    private static void spellAfterCast(AbstractCharacter attackedCharacter, String attackedCharacterName, String attackingCharacterName, int damageTaken, double healthPoints, double maxHealthPoints) {
+    private static void attackAfterCast(AbstractCharacter attackedCharacter, String attackedCharacterName, String attackingCharacterName, int damageTaken, double healthPoints, double maxHealthPoints) {
         String text1 = attackingCharacterName + " hit " + attackedCharacterName + " with " + returnColoredText(damageTaken + " damage", ANSI_RED) + "!";
         String text2 = attackedCharacterName + " is now " + returnColoredText(returnFormattedEnum(attackedCharacter.getCharacterState()), ANSI_BLUE) + ".";
         String text4 = attackedCharacterName + " has " + returnColoredText((int) healthPoints + "/" + (int) maxHealthPoints + " hp", ANSI_GREEN) + " left.";
@@ -473,11 +484,8 @@ public abstract class AbstractCharacter {
         }
     }
 
-    public void attack(Spell spell, AbstractCharacter attackCharacter, double calculatedDamage, boolean spellAfterCast) {
+    public void spellAttack(Spell spell, AbstractCharacter attackedCharacter, double calculatedDamage, boolean attackAfterCast) {
         String spellName = spell.getSpellName();
-
-        // TODO - USE SPELL EFFECTIVE DISTANCE
-        double spellEffectiveDistance = getSpellEffectiveDistance(spell);
 
         // SPELL GETS USED AND PUT ON A COOLDOWN
         this.reduceSpellsCooldown(1);
@@ -485,26 +493,26 @@ public abstract class AbstractCharacter {
 
         // CONSOLE STUFF
         System.out.println(returnColoredText(spellName + "!", spell.getSpellColor()));
-        spellCast(spell, attackCharacter, calculatedDamage, spellAfterCast);
+        castAttack(getSpellChance(spell), spell.getCharacterState(), attackedCharacter, calculatedDamage, attackAfterCast);
     }
 
-    public boolean dodge(Spell spell, AbstractCharacter attackingCharacter) {
+    public boolean dodgeSpell(double dodgeChance, AbstractCharacter attackingCharacter) {
         double spellSuccess = Math.random();
-        double spellChance = getSpellChance(spell);
         String text1 = "";
         String text2 = "";
 
         if (this.getClass() == Wizard.class) {
             text1 = returnColoredText("You dodged " + returnFormattedEnum(((Enemy) attackingCharacter).getEnemyName()) + "'s attack.", ANSI_YELLOW);
             text2 = returnColoredText("You were unable to dodge " + returnFormattedEnum(((Enemy) attackingCharacter).getEnemyName()) + "'s attack.", ANSI_RED);
-            spellChance = spellChance / 3;
+            double charismaPercent =  ((Wizard) this).getWizardSpecsPercent().get("charisma");
+            dodgeChance = (dodgeChance / wizardDodgeDivider) * (1 + charismaPercent);
         } else if (this.getClass() == Enemy.class) {
             text1 = returnColoredText(returnFormattedEnum(((Enemy) this).getEnemyName()) + " dodged your attack.", ANSI_YELLOW);
             text2 = returnColoredText(returnFormattedEnum(((Enemy) this).getEnemyName()) + " was unable to dodge your attack.", ANSI_RED);
-            spellChance = spellChance / 5;
+            dodgeChance = dodgeChance / enemyDodgeDivider;
         }
 
-        if (spellSuccess <= spellChance) {
+        if (spellSuccess <= dodgeChance) {
             printTitle(text1);
             return true;
         } else {
@@ -514,28 +522,28 @@ public abstract class AbstractCharacter {
 
     }
 
-    public boolean parry(Spell parrySpell, AbstractCharacter enemyAttacker, double calculatedDamage) {
+    public boolean parry(String parriedAttackName, AbstractCharacter attackingCharacter, double calculatedDamage) {
         String text1 = "";
         String text2 = "";
         double newDamage = calculatedDamage * (1 + parryMultiplier);
-        double defensePoints = this.getDefensePoints();
+        double parryPoints = this.getDefensePoints();
 
         if (this.getClass() == Wizard.class) {
-            text1 = returnColoredText("You parried " + parrySpell.getSpellName() + " and returned ", ANSI_YELLOW)
-                    + returnColoredText((int) newDamage + " Damage.", ANSI_RED);
-            text2 = returnColoredText("You were unable to parry " + returnFormattedEnum(((Enemy) enemyAttacker).getEnemyName()) + "'s attack.", ANSI_RED);
-            defensePoints = defensePoints / 2;
+            text1 = returnColoredText("You parried " + parriedAttackName + ".", ANSI_YELLOW);
+            text2 = returnColoredText("You were unable to parry " + returnFormattedEnum(((Enemy) attackingCharacter).getEnemyName()) + "'s attack.", ANSI_RED);
+            double intelligencePercent =  ((Wizard) this).getWizardSpecsPercent().get("intelligence");
+            parryPoints = (parryPoints / wizardParryDivider) * (1 + intelligencePercent);
         } else if (this.getClass() == Enemy.class) {
             text1 = returnColoredText(returnFormattedEnum(((Enemy) this).getEnemyName()) + " parried your attack and returned", ANSI_YELLOW)
                     + returnColoredText((int) newDamage + " Damage.", ANSI_RED);
             text2 = returnColoredText(returnFormattedEnum(((Enemy) this).getEnemyName()) + " was unable to parry your attack.", ANSI_RED);
-            defensePoints = defensePoints / 3;
+            parryPoints = parryPoints / enemyParryDivider;
         }
 
         // THE ATTACK CAN BE PARRIED ONLY IF THE ATTACKED CHARACTER'S DEFENSE IS HIGHER THAN THE ATTACKING CHARACTER'S CALCULATED SPELL DAMAGE
-        if (defensePoints > calculatedDamage) {
-            this.attack(stupefy, enemyAttacker, newDamage, false);
+        if (parryPoints > calculatedDamage) {
             printTitle(text1);
+            this.spellAttack(stupefy, attackingCharacter, newDamage, true);
             return true;
         } else {
             printTitle(text2);
