@@ -212,6 +212,9 @@ public class Enemy extends AbstractCharacter {
         else if(this.getEnemyName() == EnemyName.TROLL) {
             EnemyName.TROLL.addVulnerableSpell(Spell.wingardiumLeviosa.clone());
         }
+        else if(this.getEnemyName() == EnemyName.DEMENTOR) {
+            EnemyName.DEMENTOR.addVulnerableSpell(Spell.expectroPatronum.clone());
+        }
     }
 
     public void checkHpRatio() throws CloneNotSupportedException {

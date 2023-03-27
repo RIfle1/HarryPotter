@@ -9,8 +9,6 @@ import static Enums.EnumMethods.returnFormattedEnum;
 
 @Getter
 public enum EnemyName {
-    // TODO - REMOVE ALL SPELL COOLDOWNS AFTER A FIGHT IS OVER
-
     GOBLIN(EnemyCombat.MELEE, EnemyType.BASIC, Spell.getAllSpells(), 50, 0, 1, 30, 20, null),
     DARK_WIZARD(EnemyCombat.SPELL, EnemyType.BASIC, Spell.getAllSpells(), 70, 0.1, 1, 60, 30, null),
     TROLL(EnemyCombat.MELEE, EnemyType.BOSS, new ArrayList<>(), 200, 0.2, 1, 60, 120, new Object() {
@@ -28,7 +26,7 @@ public enum EnemyName {
             return strings;
         }
     }.evaluate()),
-    DEMENTOR(EnemyCombat.MELEE, EnemyType.BASIC, Spell.getAllSpells(), 30, 0, 1, 110, 20, null),
+    DEMENTOR(EnemyCombat.MELEE, EnemyType.BOSS, Spell.getAllSpells(), 30, 0, 1, 110, 20, null),
     DEATH_EATER(EnemyCombat.MELEE, EnemyType.BASIC, Spell.getAllSpells(), 90, 0, 1, 120, 25, null);
 
     private final EnemyCombat enemyCombat;
@@ -68,7 +66,9 @@ public enum EnemyName {
         }
     }
 
-
+    public static void resetAllVulnerableSpellsList() {
+        getAllBasicEnemyNames().forEach(EnemyName::resetVulnerableSpellsList);
+    }
 
     public static int getEnemyNameMaxLength() {
         return getEnemyNameList().stream().map(String::length).toList().stream().reduce(0, Integer::max);

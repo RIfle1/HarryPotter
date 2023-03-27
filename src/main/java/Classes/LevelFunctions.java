@@ -186,68 +186,69 @@ public class LevelFunctions {
         }
     }
 
-    public static void level1() throws CloneNotSupportedException {
-        String levelName = returnFormattedEnum(Level.The_Philosophers_Stone);
-        EnemyName enemyName = EnemyName.TROLL;
+    public static void levelRepetition(Level level, EnemyName enemyName,
+                                       String objective, int enemyMinLevel,
+                                       int enemyMaxLevel, int enemyAmount,
+                                       String enemyDeathLine, String graduationLine, Level nextLevel) throws CloneNotSupportedException {
+        String levelName = returnFormattedEnum(level);
 
         printColoredHeader(levelName);
-        printTitle("Your objective is to kill the troll by using Wingardium Leviosa.");
+        printTitle(objective);
         continuePromptExtra();
 
-        generateEnemies(1, 1,1, enemyName);
+        generateEnemies(enemyMinLevel, enemyMaxLevel, enemyAmount, enemyName);
         while (!enemiesHashMap.isEmpty() && wizard.getHealthPoints() > 0) {
             chooseAction();
             clearConsole();
         }
 
         if (enemiesHashMap.isEmpty()) {
-            printTitle(enemyName.getEnemyDeathLine().get(0));
-            printTitle(returnColoredText("You graduated Hogwarts's first year, you are now a second year student.", ANSI_YELLOW));
-            unlockNextLevel(Level.The_Philosophers_Stone);
+            printTitle(enemyDeathLine);
+            printTitle(returnColoredText(graduationLine, ANSI_YELLOW));
+            unlockNextLevel(nextLevel);
             continuePrompt();
         } else if (wizard.getHealthPoints() <= 0) {
             printTitle(returnColoredText("You died.", ANSI_RED));
         }
-        EnemyName.BASILISK.resetVulnerableSpellsList();
+        EnemyName.resetAllVulnerableSpellsList();
+    }
+
+    public static void level1() throws CloneNotSupportedException {
+        Level level = Level.The_Philosophers_Stone;
+        EnemyName enemyName = EnemyName.TROLL;
+        String objective = "Your objective is to kill the troll by using Wingardium Leviosa.";
+        int enemyMinLevel = 1;
+        int enemyMaxLevel = 1;
+        int enemyAmount = 1;
+        String enemyDeathLine = enemyName.getEnemyDeathLine().get(0);
+        String graduationLine = "You graduated Hogwarts's first year, you are now a second year student.";
+        Level nextLevel = Level.The_Chamber_of_Secrets;
+
+        levelRepetition(level, enemyName, objective, enemyMinLevel, enemyMaxLevel, enemyAmount, enemyDeathLine, graduationLine, nextLevel);
     }
 
     public static void level2() throws CloneNotSupportedException {
-        String levelName = returnFormattedEnum(Level.The_Chamber_of_Secrets);
+        Level level = Level.The_Chamber_of_Secrets;
         EnemyName enemyName = EnemyName.BASILISK;
+        String objective;
+        String enemyDeathLine;
         boolean gryffindorHouse = wizard.getHouse().getHouseName() == HouseName.GRYFFINDOR;
-
-        printColoredHeader(levelName);
         if(gryffindorHouse) {
-            printTitle("Your Objective is to kill the Basilisk with Godric Gryffindor's legendary Sword.");
+            objective = "Your Objective is to kill the Basilisk with Godric Gryffindor's legendary Sword.";
+            enemyDeathLine = enemyName.getEnemyDeathLine().get(0);
         }
         else {
-            printTitle("Your Objective is to kill the Basilisk by removing one of his teeth with Accio and then stabbing Tom Riddle's Journal.");
-        }
-        continuePrompt();
-        generateEnemies(1, 1,1, enemyName);
+            objective = "Your Objective is to kill the Basilisk by removing one of his teeth with Accio and then stabbing Tom Riddle's Journal.";
+            enemyDeathLine = enemyName.getEnemyDeathLine().get(1);
 
-        //TODO - THIS
-
-        wizard.updateStats();
-        wizard.restoreWizardHpDf();
-        while (!enemiesHashMap.isEmpty() && wizard.getHealthPoints() > 0) {
-            chooseAction();
-            clearConsole();
         }
-        if (enemiesHashMap.isEmpty()) {
-            if(gryffindorHouse) {
-                printTitle(enemyName.getEnemyDeathLine().get(0));
-            }
-            else {
-                printTitle(enemyName.getEnemyDeathLine().get(1));
-            }
+        int enemyMinLevel = 2;
+        int enemyMaxLevel = 2;
+        int enemyAmount = 1;
+        String graduationLine = "You graduated Hogwarts's first year, you are now a second year student.";
+        Level nextLevel = Level.The_Prisoner_of_Azkaban;
 
-            printTitle(returnColoredText("You graduated Hogwarts's second year, you are now a third year student.", ANSI_YELLOW));
-            unlockNextLevel(Level.The_Chamber_of_Secrets);
-            continuePrompt();
-        } else if (wizard.getHealthPoints() <= 0) {
-            printTitle(returnColoredText("You died.", ANSI_RED));
-        }
+        levelRepetition(level, enemyName, objective, enemyMinLevel, enemyMaxLevel, enemyAmount, enemyDeathLine, graduationLine, nextLevel);
     }
 
     public static void level3() {}

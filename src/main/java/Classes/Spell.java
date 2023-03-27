@@ -260,7 +260,19 @@ public class Spell implements Cloneable{
             .spellColor(ANSI_YELLOW)
             .build();
 
-
+    public static Spell expectroPatronum = Spell.builder()
+            .spellName("Expectro Patronum")
+            .spellType(MoveType.ATTACK)
+            .spellDescription("Spell used to kill dementors")
+            .spellSpecialAttackLine("A white light comes whizzing out of your wand.")
+            .spellLevelRequirement(3)
+            .spellDamage(new double[]{60, 90})
+            .characterState(CharacterState.STUNNED)
+            .spellChance(0.7)
+            .spellCooldown(0)
+            .spellReadyIn(0)
+            .spellColor(ANSI_BLUE)
+            .build();
 
     public static Spell oneClap = Spell.builder()
             .spellName("One Clap")
