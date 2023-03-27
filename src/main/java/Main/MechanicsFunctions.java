@@ -8,6 +8,9 @@ public class MechanicsFunctions {
         if(min == max) {
             return min;
         }
+        else if(max < min) {
+            return new Random().nextDouble(min - max) + max;
+        }
         else {
             return new Random().nextDouble(max - min) + min +1;
         }

@@ -2,10 +2,9 @@ package Classes;
 
 import AbstractClasses.AbstractCharacter;
 import Enums.*;
+import Main.ConsoleFunctions;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static Classes.Color.*;
 import static Classes.Wizard.wizard;
@@ -17,10 +16,68 @@ import static Main.MechanicsFunctions.generateDoubleBetween;
 
 
 public class LevelFunctions {
+    public static HashMap<Level, Runnable> levelHashMap = new HashMap<>() {{
+        put(Level.The_Philosophers_Stone, () -> {
+            try {
+                level1();
+            } catch (CloneNotSupportedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        put(Level.The_Chamber_of_Secrets,  () -> {
+            try {
+                level2();
+            } catch (CloneNotSupportedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        put(Level.The_Prisoner_of_Azkaban, () -> {
+            try {
+                level3();
+            } catch (CloneNotSupportedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        put(Level.The_Goblet_of_Fire, () -> {
+            try {
+                level4();
+            } catch (CloneNotSupportedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        put(Level.The_Order_of_the_Phoenix, () -> {
+            try {
+                level5();
+            } catch (CloneNotSupportedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        put(Level.The_Half_Blooded_Prince, () -> {
+            try {
+                level6();
+            } catch (CloneNotSupportedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        put(Level.The_Deathly_Hallows, () -> {
+            try {
+                level7();
+            } catch (CloneNotSupportedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        put(Level.Battle_Arena, () -> {
+            try {
+                battleArena();
+            } catch (CloneNotSupportedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }};
+
+
 
     public static void spawnEnemies() throws CloneNotSupportedException {
-        Enemy.clearEnemies();
-
         int minLevel;
         int maxLevel;
         int enemyAmount;
@@ -33,7 +90,7 @@ public class LevelFunctions {
         printColoredHeader("Select enemy amount: ");
         enemyAmount = returnChoiceInt(0, 100, false);
 
-        generateEnemies(minLevel, maxLevel, enemyAmount, EnemyName.GOBLIN);
+        generateEnemies(minLevel, maxLevel, enemyAmount);
     }
 
     public static void fight() throws CloneNotSupportedException {
@@ -125,16 +182,25 @@ public class LevelFunctions {
         // ACTIVATE POTIONS
         wizard.applyPotionEffect();
 
-        // PRINT WIZARD STATS
-        printTitle(wizard.returnAllStringStats());
-
         // CHOOSE THE ENEMY
-        printTitle("Choose an enemy.");
-        printEnemies();
-        enemyVictim = enemiesHashMap.get(enemiesKeyList.get(returnChoiceInt(enemiesKeyList.size(), false) - 1));
+        if(enemiesHashMap.size() > 1) {
+            // PRINT WIZARD STATS
+            printTitle(wizard.returnAllStringStats(5));
 
-        // TELL THE PLAYER THE CHANGES IN THE ENEMY
-        enemyVictim.checkHpRatio();
+            printTitle("Choose an enemy.");
+            printEnemies();
+            enemyVictim = enemiesHashMap.get(enemiesKeyList.get(returnChoiceInt(enemiesKeyList.size(), false) - 1));
+        }
+        else {
+            // PRINT WIZARD STATS
+            printTitle(wizard.returnAllStringStats(0));
+
+            enemyVictim = enemiesHashMap.get(enemiesKeyList.get(0));
+            System.out.println(enemyVictim.returnStringStats(0));
+        }
+
+        // WARN THE PLAYER ABOUT ENEMY CHANGES
+        checkEnemiesHpRatio();
 
         // CHOOSE THE SPELL
         printTitle("Choose the spell you want to use.");
@@ -182,37 +248,88 @@ public class LevelFunctions {
         switch (choice) {
             case 1 -> fight();
             case 2 -> wizard.usePotion();
-            case 3 -> wizard.returnStringStats();
+            case 3 -> wizard.returnStringStats(0);
         }
     }
 
-    public static void levelRepetition(Level level, EnemyName enemyName,
-                                       String objective, int enemyMinLevel,
-                                       int enemyMaxLevel, int enemyAmount,
-                                       String enemyDeathLine, String graduationLine, Level nextLevel) throws CloneNotSupportedException {
-        String levelName = returnFormattedEnum(level);
-
-        printColoredHeader(levelName);
-        printTitle(objective);
-        continuePromptExtra();
-
-        generateEnemies(enemyMinLevel, enemyMaxLevel, enemyAmount, enemyName);
-        while (!enemiesHashMap.isEmpty() && wizard.getHealthPoints() > 0) {
-            chooseAction();
-            clearConsole();
+    public static boolean wizardHasRequiredSpell(Level level) {
+        boolean hasRequiredSpell = true;
+        if(level.getRequiredSpellList().size() > 0) {
+            for (Spell spell : level.getRequiredSpellList()) {
+                if(!wizard.getSpellsKeyList().contains(spell.getSpellName()) && spell != Spell.legendarySword) {
+                    printTitle(returnColoredText("You need to learn " + spell.getSpellName() + " before trying this level.", ANSI_RED));
+                    hasRequiredSpell = false;
+                }
+            }
         }
 
-        if (enemiesHashMap.isEmpty()) {
-            printTitle(enemyDeathLine);
-            printTitle(returnColoredText(graduationLine, ANSI_YELLOW));
-            unlockNextLevel(nextLevel);
-            continuePrompt();
+        return hasRequiredSpell;
+    }
+
+    public static void levelRepetition(Level level, String objective,
+                                       List<String> enemyDeathLine, String graduationLine,
+                                       Level nextLevel, int combatTimeout) throws CloneNotSupportedException {
+
+        boolean supposedTimeout = true;
+        List<String> enemyDeathLineCopy = new ArrayList<>(enemyDeathLine);
+
+        if(enemyDeathLine.size() < 2) {
+            enemyDeathLineCopy.add("You Took Too Long To Defeat The Enemies. Just go to the next level already...");
+            supposedTimeout = false;
+        }
+
+        if (wizardHasRequiredSpell(level)) {
+            String levelName = returnFormattedEnum(level);
+            printColoredHeader(levelName);
+            printTitle(objective);
+            checkEnemiesHpRatio();
+
+            printTitle(returnColoredText("Do you accept the challenge?", ANSI_BLUE));
+            boolean answer = returnYesOrNo();
+            if(answer) {
+                while (!enemiesHashMap.isEmpty() && wizard.getHealthPoints() > 0 && combatTimeout > 0) {
+                    chooseAction();
+                    clearConsole();
+                    combatTimeout--;
+                }
+
+                levelOutcome(enemyDeathLineCopy, graduationLine, nextLevel, combatTimeout, supposedTimeout);
+            }
+            else {
+                printTitle(returnColoredText("You coward!", ANSI_RED));
+            }
+        }
+
+        continuePromptExtra();
+        ConsoleFunctions.chooseAction();
+        EnemyName.resetBossVulnerableSpellsList();
+    }
+
+    private static void levelOutcome(List<String> enemyDeathLine, String graduationLine, Level nextLevel, int combatTimeout, boolean supposedTimeout) {
+        if(combatTimeout == 0) {
+            printTitle(enemyDeathLine.get(1));
+        }
+        else if (enemiesHashMap.isEmpty()) {
+            printTitle(enemyDeathLine.get(0));
         } else if (wizard.getHealthPoints() <= 0) {
             printTitle(returnColoredText("You died.", ANSI_RED));
         }
+        if((enemiesHashMap.isEmpty() || supposedTimeout) && wizard.getHealthPoints() > 0) {
+            printTitle(returnColoredText(graduationLine, ANSI_YELLOW));
+            unlockNextLevel(nextLevel);
+        }
+    }
 
-        // TODO - DEBUG THIS
-        EnemyName.resetAllVulnerableSpellsList();
+    public static void battleArena() throws CloneNotSupportedException {
+        Level level = Level.Battle_Arena;
+        String objective = "Your objective is to defeat all the enemies in the arena.";
+        List<String> enemyDeathLine = Collections.singletonList("All the enemies in the arena have been defeated.");
+        String graduationLine = "You have graduated from the Battle Arena!";
+
+        spawnEnemies();
+        wizard.updateStats();
+
+        levelRepetition(level, objective, enemyDeathLine, graduationLine, null, 100);
     }
 
     public static void level1() throws CloneNotSupportedException {
@@ -220,70 +337,104 @@ public class LevelFunctions {
         EnemyName enemyName = EnemyName.TROLL;
         String objective = "Your objective is to kill the troll by using Wingardium Leviosa.";
         int enemyMinLevel = 1;
-        int enemyMaxLevel = 1;
+        int enemyMaxLevel = (int) wizard.getLevel();
         int enemyAmount = 1;
-        String enemyDeathLine = enemyName.getEnemyDeathLine().get(0);
+        List<String> enemyDeathLine = Collections.singletonList(enemyName.getEnemyDeathLine().get(0));
         String graduationLine = "You graduated Hogwarts's first year, you are now a second year student.";
         Level nextLevel = Level.The_Chamber_of_Secrets;
 
-        levelRepetition(level, enemyName, objective, enemyMinLevel, enemyMaxLevel, enemyAmount, enemyDeathLine, graduationLine, nextLevel);
+        generateEnemies(enemyMinLevel, enemyMaxLevel, enemyAmount, enemyName);
+        levelRepetition(level, objective, enemyDeathLine, graduationLine, nextLevel, 100);
+
     }
 
     public static void level2() throws CloneNotSupportedException {
         Level level = Level.The_Chamber_of_Secrets;
         EnemyName enemyName = EnemyName.BASILISK;
         String objective;
-        String enemyDeathLine;
+        List<String> enemyDeathLine = new ArrayList<>();
         boolean gryffindorHouse = wizard.getHouse().getHouseName() == HouseName.GRYFFINDOR;
         if(gryffindorHouse) {
             objective = "Your Objective is to kill the Basilisk with Godric Gryffindor's legendary Sword.";
-            enemyDeathLine = enemyName.getEnemyDeathLine().get(0);
+            enemyDeathLine.add(enemyName.getEnemyDeathLine().get(0));
         }
         else {
             objective = "Your Objective is to kill the Basilisk by removing one of his teeth with Accio and then stabbing Tom Riddle's Journal.";
-            enemyDeathLine = enemyName.getEnemyDeathLine().get(1);
-
+            enemyDeathLine.add(enemyName.getEnemyDeathLine().get(1));
         }
         int enemyMinLevel = 2;
-        int enemyMaxLevel = 2;
+        int enemyMaxLevel = (int) wizard.getLevel();
         int enemyAmount = 1;
-        String graduationLine = "You graduated Hogwarts's first year, you are now a second year student.";
+        String graduationLine = "You graduated Hogwarts's second year, you are now a third year student.";
         Level nextLevel = Level.The_Prisoner_of_Azkaban;
 
-        levelRepetition(level, enemyName, objective, enemyMinLevel, enemyMaxLevel, enemyAmount, enemyDeathLine, graduationLine, nextLevel);
+        generateEnemies(enemyMinLevel, enemyMaxLevel, enemyAmount, enemyName);
+        levelRepetition(level, objective, enemyDeathLine, graduationLine, nextLevel, 100);
     }
 
     public static void level3() throws CloneNotSupportedException {
         Level level = Level.The_Prisoner_of_Azkaban;
         EnemyName enemyName = EnemyName.DEMENTOR;
         String objective = "The dementors are everywhere! Your objective is to use Expectro Patronum to eliminate them.";
-        String enemyDeathLine = "Dementor has been sent back to the hole it crawled out of.";
-        int enemyMinLevel = 2;
-        int enemyMaxLevel = 2;
-        int enemyAmount = 1;
-        String graduationLine = "You graduated Hogwarts's first year, you are now a second year student.";
+        List<String> enemyDeathLine = Collections.singletonList("All Dementors have been sent back to hell.");
+        int enemyMinLevel = 3;
+        int enemyMaxLevel = (int) wizard.getLevel();
+        int enemyAmount = 5;
+        String graduationLine = "You graduated Hogwarts's third year, you are now a fourth year student.";
         Level nextLevel = Level.The_Goblet_of_Fire;
 
-        levelRepetition(level, enemyName, objective, enemyMinLevel, enemyMaxLevel, enemyAmount, enemyDeathLine, graduationLine, nextLevel);
-    }
-    public static void level4() {}
-    public static void level5() {}
-    public static void level6() {}
-    public static void level7() {}
+        generateEnemies(enemyMinLevel, enemyMaxLevel, enemyAmount, enemyName);
+        levelRepetition(level, objective, enemyDeathLine, graduationLine, nextLevel, 100);
 
-    public static void battleArena() throws CloneNotSupportedException {
-        spawnEnemies();
-        wizard.updateStats();
-        wizard.restoreWizardHpDf();
-        while (!enemiesHashMap.isEmpty() && wizard.getHealthPoints() > 0) {
-            chooseAction();
-            clearConsole();
-        }
-        if (enemiesHashMap.isEmpty()) {
-            printTitle(returnColoredText("Congrats, you defeated all the enemies.", ANSI_YELLOW));
-        } else if (wizard.getHealthPoints() <= 0) {
-            printTitle(returnColoredText("You died.", ANSI_RED));
-        }
+    }
+    public static void level4() throws CloneNotSupportedException {
+        Level level = Level.The_Goblet_of_Fire;
+        EnemyName enemyName = EnemyName.PETER_PETTIGREW;
+        String objective = "You're in a cemetery where you see Voldemort and Peter Pettigrew.\n" +
+                "Your only hope of escape is to defeat Peter Pettigrew by using accio.";
+        List<String> enemyDeathLine = Collections.singletonList(enemyName.getEnemyDeathLine().get(0));
+        int enemyMinLevel = 4;
+        int enemyMaxLevel = (int) wizard.getLevel();
+        int enemyAmount = 1;
+        String graduationLine = "You graduated Hogwarts's fourth year, you are now a fifth year student.";
+        Level nextLevel = Level.The_Order_of_the_Phoenix;
+
+        generateEnemies(enemyMinLevel, enemyMaxLevel, enemyAmount, enemyName);
+        levelRepetition(level, objective, enemyDeathLine, graduationLine, nextLevel, 100);
+    }
+    public static void level5() throws CloneNotSupportedException {
+        Level level = Level.The_Order_of_the_Phoenix;
+        EnemyName enemyName = EnemyName.DOLORES_UMBRIDGE;
+        String objective = "It's time for your exams! Your objective is to distract Dolores Umbridge until the fireworks are ready.\n" +
+                "Don't worry, your spells won't kill her (Or will they?)";
+        List<String> enemyDeathLine = Arrays.asList(enemyName.getEnemyDeathLine().get(1), enemyName.getEnemyDeathLine().get(0));
+        int enemyMinLevel = 6;
+        int enemyMaxLevel = (int) wizard.getLevel();
+        int enemyAmount = 1;
+        String graduationLine = "You graduated Hogwarts's fifth year, you are now a sixth year student.";
+        Level nextLevel = Level.The_Half_Blooded_Prince;
+
+        generateEnemies(enemyMinLevel, enemyMaxLevel, enemyAmount, enemyName);
+        levelRepetition(level, objective, enemyDeathLine, graduationLine, nextLevel, 6);
+    }
+    public static void level6() throws CloneNotSupportedException {
+        // TODO THIS LEVEL IS NOT FINISHED
+        Level level = Level.The_Half_Blooded_Prince;
+        EnemyName enemyName = EnemyName.DEATH_EATER;
+        String objective = "It's time for your exams! Your objective is to distract Dolores Umbridge until the fireworks are ready.\n" +
+                "Don't worry, your spells won't kill her (Or will they?)";
+        List<String> enemyDeathLine = Arrays.asList(enemyName.getEnemyDeathLine().get(1), enemyName.getEnemyDeathLine().get(0));
+        int enemyMinLevel = 6;
+        int enemyMaxLevel = (int) wizard.getLevel();
+        int enemyAmount = 1;
+        String graduationLine = "You graduated Hogwarts's fifth year, you are now a sixth year student.";
+        Level nextLevel = Level.The_Deathly_Hallows;
+
+        generateEnemies(enemyMinLevel, enemyMaxLevel, enemyAmount, enemyName);
+        levelRepetition(level, objective, enemyDeathLine, graduationLine, nextLevel, 6);
+    }
+    public static void level7() throws CloneNotSupportedException {
+
     }
 
 }

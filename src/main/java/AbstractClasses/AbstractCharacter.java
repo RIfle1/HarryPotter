@@ -7,10 +7,13 @@ import lombok.*;
 import java.util.*;
 
 import static Classes.Color.*;
+import static Classes.Enemy.getEnemyNameMaxLength;
 import static Classes.Spell.*;
+import static Classes.Wizard.wizard;
 import static Enums.EnumMethods.returnFormattedEnum;
 import static Main.ConsoleFunctions.*;
 import static Main.MechanicsFunctions.generateDoubleBetween;
+import static java.lang.Math.max;
 
 @Getter
 @Setter
@@ -65,22 +68,23 @@ public abstract class AbstractCharacter {
         int empty = statBarLength - stat;
 
         return returnColoredText(statLogo, statLogoColor) +
-                returnColoredText("[", Color.ANSI_CYAN) + returnColoredText("|", Color.ANSI_GREEN).repeat(Math.max(0, stat)) +
-                returnColoredText("-", Color.ANSI_RED).repeat(Math.max(0, empty)) +
-                returnColoredText("]", Color.ANSI_CYAN) +
+                returnColoredText("[", ANSI_CYAN) + returnColoredText("|", ANSI_GREEN).repeat(max(0, stat)) +
+                returnColoredText("-", ANSI_RED).repeat(max(0, empty)) +
+                returnColoredText("]", ANSI_CYAN) +
                 returnColoredText(" " + (int) value + "/" + (int) maxValue, ANSI_RED);
     }
 
-    public String returnStringStats() {
+    public String returnStringStats(int extraNameLength) {
         String name;
-        int nameLength;
+        String color;
+        int nameLength = max(getEnemyNameMaxLength(), wizard.getName().length()) + extraNameLength;
 
         if (this.getClass() == Wizard.class) {
             name = this.getName();
-            nameLength = this.getName().length();
+            color = ANSI_PURPLE;
         } else {
             name = returnFormattedEnum(((Enemy) this).getEnemyName());
-            nameLength = getSpellNameMaxLength();
+            color = ANSI_RED;
         }
 
         String column1Format = "%-" + (nameLength + 1) + "s";
@@ -90,9 +94,9 @@ public abstract class AbstractCharacter {
         String column5Format = "%-" + 12 + "s";
 
 
-        String column1 = returnColoredText(String.format(column1Format, name), Color.ANSI_PURPLE);
-        String column2 = returnColoredText(String.format(column2Format, "Level " + (int) this.getLevel()), Color.ANSI_YELLOW);
-        String column3 = String.format(column3Format, getStatBar("❤", Color.ANSI_RED, this.getHealthPoints(), this.getMaxHealthPoints()));
+        String column1 = returnColoredText(String.format(column1Format, name), color);
+        String column2 = returnColoredText(String.format(column2Format, "Level " + (int) this.getLevel()), ANSI_YELLOW);
+        String column3 = String.format(column3Format, getStatBar("❤", ANSI_RED, this.getHealthPoints(), this.getMaxHealthPoints()));
         String column4 = returnColoredText(String.format(column4Format, (int) this.getDefensePoints() + " Defense"), ANSI_BLUE);
         String column5 = "";
 

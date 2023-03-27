@@ -1,15 +1,16 @@
 package Main;
 
 import Classes.Color;
+import Enums.Level;
 
 import java.util.*;
 
 import static Classes.Color.*;
 import static Classes.Color.returnColoredText;
 import static Classes.Enemy.clearEnemies;
-import static Classes.LevelFunctions.*;
+import static Classes.LevelFunctions.levelHashMap;
 import static Classes.Wizard.wizard;
-import static Enums.Level.getUnlockedLevelList;
+import static Enums.Level.*;
 import static java.lang.System.exit;
 
 public class ConsoleFunctions {
@@ -23,6 +24,11 @@ public class ConsoleFunctions {
         return scanner.next();
     }
 
+    public static boolean returnYesOrNo() {
+        printChoices(yesOrNo);
+        int answer = returnChoiceInt(yesOrNo.length, false) - 1;
+        return answer == 0;
+    }
 
     public static int returnChoiceInt(int max, boolean backSupport) {
         int input = -1;
@@ -156,21 +162,15 @@ public class ConsoleFunctions {
     }
 
     public static void chooseLevel(Runnable func) throws CloneNotSupportedException {
-        printColoredHeader("Choose your level: ");
-        printChoices(getUnlockedLevelList());
-
-        switch (returnChoiceInt(getUnlockedLevelList().size(), true)) {
-            case 1 -> level1();
-            case 2 -> level2();
-            case 3 -> level3();
-            case 4 -> level4();
-            case 5 -> level5();
-            case 6 -> level6();
-            case 7 -> level7();
-            case 8 -> battleArena();
-            case -2 -> func.run();
-        }
         clearEnemies();
+
+        printColoredHeader("Choose your level: ");
+        printChoices(getUnlockedLevelsList());
+
+        String chosenLevelString = getUnlockedLevelsList().get(returnChoiceInt(getUnlockedLevelsList().size(), true) - 1);
+        Level chosenLevel = setLevel(chosenLevelString);
+        levelHashMap.get(chosenLevel).run();
+
         wizard.reduceSpellsCooldown();
         ConsoleFunctions.chooseAction();
     }
@@ -204,7 +204,7 @@ public class ConsoleFunctions {
                         throw new RuntimeException(e);
                     }
             });
-            case 3 -> System.out.println(wizard.returnAllStringStats());
+            case 3 -> System.out.println(wizard.returnAllStringStats(0));
             case 4 -> wizard.printAllCharacterSpells();
         }
         continuePromptExtra();

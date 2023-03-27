@@ -43,9 +43,9 @@ public class CharacterCreation {
         house = sortingHat();
 
         printColoredHeader("The sorting hat thinks you should be in the house of " + EnumMethods.returnFormattedEnum(house.getHouseName())+". Do you accept?");
-        printChoices(yesOrNo);
-        int answer = returnChoiceInt(yesOrNo.length, false) - 1;
-        if(answer == 1) {
+
+        boolean answer = returnYesOrNo();
+        if(answer) {
             house = houseChoice();
         }
         printColoredHeader("Congratulations!, You are now part of the " + EnumMethods.returnFormattedEnum(house.getHouseName()) + " House.");

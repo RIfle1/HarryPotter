@@ -274,6 +274,20 @@ public class Spell implements Cloneable{
             .spellColor(ANSI_BLUE)
             .build();
 
+    public static Spell sectumsempra = Spell.builder()
+            .spellName("Sectumsempra")
+            .spellType(MoveType.ATTACK)
+            .spellDescription("Spell used to kill death eaters")
+            .spellSpecialAttackLine("Sends a chill down the enemy's spine.")
+            .spellLevelRequirement(5)
+            .spellDamage(new double[]{60, 90})
+            .characterState(CharacterState.STANDING)
+            .spellChance(0.7)
+            .spellCooldown(0)
+            .spellReadyIn(0)
+            .spellColor(ANSI_RED)
+            .build();
+
     public static Spell oneClap = Spell.builder()
             .spellName("One Clap")
             .spellType(MoveType.ATTACK)

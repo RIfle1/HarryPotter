@@ -121,7 +121,7 @@ public class Enemy extends AbstractCharacter {
 
 //        System.out.println(enemyName + " " + enemyLevel + " " + enemyXp);
 
-        if (enemies[i].getEnemyCombat() == EnemyCombat.SPELL) {
+        if (enemies[i].getEnemyName().getEnemyCombat() == EnemyCombat.SPELL) {
             enemies[i].updateSpellsHashMap();
         }
         enemiesHashMap.put(enemies[i].getName(), enemies[i]);
@@ -150,7 +150,7 @@ public class Enemy extends AbstractCharacter {
         int index = 1;
         for (Map.Entry<String, Enemy> enemy : enemiesHashMap.entrySet()) {
             System.out.printf("%-15s", "(" + returnColoredText(index + "", ANSI_YELLOW) + ")");
-            System.out.println(enemy.getValue().returnStringStats());
+            System.out.println(enemy.getValue().returnStringStats(0));
             index++;
         }
     }
@@ -222,7 +222,7 @@ public class Enemy extends AbstractCharacter {
 
         if(this.getEnemyName().getEnemyType() == EnemyType.BOSS && this.getHealthPoints() <= hpLimit && this.getEnemyName().getVulnerableSpellList().size() == 0) {
             this.updateBossVulnerableSpellsList();
-            String text = returnFormattedEnum(this.getEnemyName()) + " is now only " +  returnColoredText("vulnerable ", ANSI_YELLOW) + "to: \n" + getVulnerableSpellsList();
+            String text = returnFormattedEnum(this.getEnemyName()) + " is only " +  returnColoredText("vulnerable ", ANSI_YELLOW) + "to: \n" + getVulnerableSpellsList();
             printTitle(text);
 
             if(this.getEnemyName() == EnemyName.BASILISK && wizard.getHouse().getHouseName() == HouseName.GRYFFINDOR) {
@@ -233,6 +233,27 @@ public class Enemy extends AbstractCharacter {
                 updateSpellsKeyList(this.getSpellsHashMap());
             }
         }
+    }
+
+    public static void checkEnemiesHpRatio() {
+        // TELL THE PLAYER THE CHANGES IN THE ENEMY
+        enemiesHashMap.forEach((key, value) -> {
+            try {
+                value.checkHpRatio();
+            } catch (CloneNotSupportedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    public static int getEnemyNameMaxLength() {
+        int maxLength = 0;
+        for (Map.Entry<String, Enemy> enemy : enemiesHashMap.entrySet()) {
+            if (enemy.getKey().length() > maxLength) {
+                maxLength = enemy.getKey().length();
+            }
+        }
+        return maxLength;
     }
 
 }

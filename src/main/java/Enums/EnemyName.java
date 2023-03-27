@@ -9,16 +9,17 @@ import static Enums.EnumMethods.returnFormattedEnum;
 
 @Getter
 public enum EnemyName {
-    GOBLIN(EnemyCombat.MELEE, EnemyType.BASIC, Spell.getAllSpells(), 50, 0, 1, 30, 20, null),
-    DARK_WIZARD(EnemyCombat.SPELL, EnemyType.BASIC, Spell.getAllSpells(), 70, 0.1, 1, 60, 30, null),
-    TROLL(EnemyCombat.MELEE, EnemyType.BOSS, new ArrayList<>(), 200, 0.2, 0.2, 60, 120, new Object() {
+    GOBLIN(EnemyCombat.MELEE, EnemyType.BASIC, null, 50, 0, 1, 30, 20, null),
+    DARK_WIZARD(EnemyCombat.SPELL, EnemyType.BASIC, null, 70, 0.1, 1, 60, 30, null),
+    DEATH_EATER(EnemyCombat.MELEE, EnemyType.BASIC, null, 90, 0, 1, 120, 25, null),
+    TROLL(EnemyCombat.MELEE, EnemyType.BOSS, new ArrayList<>(), 200, 0.2, 1, 60, 120, new Object() {
         List<String> evaluate() {
             List<String> strings = new ArrayList<>();
             strings.add(trollDeathLine);
             return strings;
         }
     }.evaluate()),
-    BASILISK(EnemyCombat.MELEE, EnemyType.BOSS, new ArrayList<>(), 140, 0.5, 0.4, 100, 70, new Object() {
+    BASILISK(EnemyCombat.MELEE, EnemyType.BOSS, new ArrayList<>(), 250, 0.5, 0.4, 100, 180, new Object() {
         List<String> evaluate() {
             List<String> strings = new ArrayList<>();
             strings.add(basiliskDeathLine1);
@@ -26,8 +27,23 @@ public enum EnemyName {
             return strings;
         }
     }.evaluate()),
-    DEMENTOR(EnemyCombat.MELEE, EnemyType.BOSS, Spell.getAllSpells(), 30, 0, 1, 110, 20, null),
-    DEATH_EATER(EnemyCombat.MELEE, EnemyType.BASIC, Spell.getAllSpells(), 90, 0, 1, 120, 25, null);
+    DEMENTOR(EnemyCombat.MELEE, EnemyType.BOSS, new ArrayList<>(), 100, 0, 0.1, 110, 30, null),
+    PETER_PETTIGREW(EnemyCombat.SPELL, EnemyType.BOSS, new ArrayList<>(), 300, 0.2, 0.2, 80, 40, new Object() {
+        List<String> evaluate() {
+            List<String> strings = new ArrayList<>();
+            strings.add(peterPettigrewDeathLine);
+            return strings;
+        }
+    }.evaluate()),
+    DOLORES_UMBRIDGE(EnemyCombat.SPELL, EnemyType.BOSS, new ArrayList<>(), 10000, 0, 0.2, 80, 40, new Object() {
+        List<String> evaluate() {
+            List<String> strings = new ArrayList<>();
+            strings.add(doloresUmbridgeDeathLine1);
+            strings.add(doloresUmbridgeDeathLine2);
+            return strings;
+        }
+    }.evaluate());
+
 
     private final EnemyCombat enemyCombat;
     private final EnemyType enemyType;
@@ -42,6 +58,9 @@ public enum EnemyName {
     private static final String trollDeathLine = "You threw an object at the Troll and he finally collapsed.";
     private static final String basiliskDeathLine1 = "You stabbed the Basilisk with Godric Gryffindor's Legendary sword. The Basilisk isn't moving anymore.";
     private static final String basiliskDeathLine2 = "You removed one of the Basilisk's teeth and stabbed Tom Riddle's journal with it. The Basilisk suddenly collapsed.";
+    private static final String peterPettigrewDeathLine = "You stole Peter Pettigrew's keys and you escaped the cemetery.";
+    private static final String doloresUmbridgeDeathLine1 = "You distracted Dolores Umbridge long enough for the fireworks to go off.";
+    private static final String doloresUmbridgeDeathLine2 = "Damn you actually killed her. The cops are coming for you. jk she was actually annoying af";;
 
     EnemyName(EnemyCombat enemyCombat, EnemyType enemyType, List<Spell> vulnerableSpellList, int enemyBaseHp, double enemyDmgMultiplier, double enemyHpLimitRatio, int enemyBaseDp, int enemyXp, List<String> enemyDeathLine) {
         this.enemyCombat = enemyCombat;
@@ -64,8 +83,8 @@ public enum EnemyName {
         vulnerableSpellList.forEach(this.vulnerableSpellList::remove);
     }
 
-    public static void resetAllVulnerableSpellsList() {
-        getAllBasicEnemyNames().forEach(EnemyName::resetVulnerableSpellsList);
+    public static void resetBossVulnerableSpellsList() {
+        getAllBasicEnemyNames().stream().filter(enemyName -> enemyName.getEnemyType().equals(EnemyType.BOSS)).forEach(EnemyName::resetVulnerableSpellsList);
     }
 
     public static int getEnemyNameMaxLength() {

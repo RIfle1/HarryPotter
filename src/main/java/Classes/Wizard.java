@@ -79,9 +79,9 @@ public class Wizard extends AbstractCharacter {
                 printColumnSeparator("||") + column4;
     }
 
-    public String returnAllStringStats() throws CloneNotSupportedException {
+    public String returnAllStringStats(int extraNameLength) throws CloneNotSupportedException {
         this.updateStats();
-        return this.returnStringStats() + this.returnStringSpecs();
+        return this.returnStringStats(extraNameLength) + this.returnStringSpecs();
     }
 
     public HashMap<String, Double> getWizardSpecsPercent() {
@@ -233,7 +233,7 @@ public class Wizard extends AbstractCharacter {
             .spellsKeyList(new ArrayList<>())
             .itemList(new ArrayList<>())
             .activePotionsList(new ArrayList<>())
-            .experience(0)
+            .experience(10000)
             .charisma(0)
             .strength(0)
             .intelligence(0)
