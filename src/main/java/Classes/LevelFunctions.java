@@ -210,6 +210,8 @@ public class LevelFunctions {
         } else if (wizard.getHealthPoints() <= 0) {
             printTitle(returnColoredText("You died.", ANSI_RED));
         }
+
+        // TODO - DEBUG THIS
         EnemyName.resetAllVulnerableSpellsList();
     }
 
@@ -251,7 +253,19 @@ public class LevelFunctions {
         levelRepetition(level, enemyName, objective, enemyMinLevel, enemyMaxLevel, enemyAmount, enemyDeathLine, graduationLine, nextLevel);
     }
 
-    public static void level3() {}
+    public static void level3() throws CloneNotSupportedException {
+        Level level = Level.The_Prisoner_of_Azkaban;
+        EnemyName enemyName = EnemyName.DEMENTOR;
+        String objective = "The dementors are everywhere! Your objective is to use Expectro Patronum to eliminate them.";
+        String enemyDeathLine = "Dementor has been sent back to the hole it crawled out of.";
+        int enemyMinLevel = 2;
+        int enemyMaxLevel = 2;
+        int enemyAmount = 1;
+        String graduationLine = "You graduated Hogwarts's first year, you are now a second year student.";
+        Level nextLevel = Level.The_Goblet_of_Fire;
+
+        levelRepetition(level, enemyName, objective, enemyMinLevel, enemyMaxLevel, enemyAmount, enemyDeathLine, graduationLine, nextLevel);
+    }
     public static void level4() {}
     public static void level5() {}
     public static void level6() {}

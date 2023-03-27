@@ -11,7 +11,7 @@ import static Enums.EnumMethods.returnFormattedEnum;
 public enum EnemyName {
     GOBLIN(EnemyCombat.MELEE, EnemyType.BASIC, Spell.getAllSpells(), 50, 0, 1, 30, 20, null),
     DARK_WIZARD(EnemyCombat.SPELL, EnemyType.BASIC, Spell.getAllSpells(), 70, 0.1, 1, 60, 30, null),
-    TROLL(EnemyCombat.MELEE, EnemyType.BOSS, new ArrayList<>(), 200, 0.2, 1, 60, 120, new Object() {
+    TROLL(EnemyCombat.MELEE, EnemyType.BOSS, new ArrayList<>(), 200, 0.2, 0.2, 60, 120, new Object() {
         List<String> evaluate() {
             List<String> strings = new ArrayList<>();
             strings.add(trollDeathLine);
@@ -60,10 +60,8 @@ public enum EnemyName {
     }
 
     public void resetVulnerableSpellsList() {
-        Iterator<Spell> itr = this.vulnerableSpellList.iterator();
-        while (itr.hasNext()) {
-            itr.remove();
-        }
+        List<Spell> vulnerableSpellList = new ArrayList<>(this.vulnerableSpellList);
+        vulnerableSpellList.forEach(this.vulnerableSpellList::remove);
     }
 
     public static void resetAllVulnerableSpellsList() {

@@ -200,7 +200,6 @@ public class Potion extends AbstractItem implements Cloneable {
                 }
             }
         }
-
         return potionList;
     }
 
