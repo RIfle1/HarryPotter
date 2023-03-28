@@ -14,8 +14,8 @@ public enum Level {
     The_Prisoner_of_Azkaban(true, Collections.singletonList(Spell.expectroPatronum)),
     The_Goblet_of_Fire(true, Collections.singletonList(Spell.accio)),
     The_Order_of_the_Phoenix(true, new ArrayList<>()),
-    The_Half_Blooded_Prince(false, Collections.singletonList(Spell.sectumsempra)),
-    The_Deathly_Hallows(false, new ArrayList<>()),
+    The_Half_Blooded_Prince(true, Collections.singletonList(Spell.sectumsempra)),
+    The_Deathly_Hallows(true, new ArrayList<>()),
     Battle_Arena(true, Collections.singletonList(Spell.avadaKedavra));
 
     private boolean unlocked;

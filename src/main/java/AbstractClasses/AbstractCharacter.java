@@ -89,7 +89,7 @@ public abstract class AbstractCharacter {
 
         String column1Format = "%-" + (nameLength + 1) + "s";
         String column2Format = "%-" + 10 + "s";
-        String column3Format = "%-" + 20 + "s";
+        String column3Format = "%-" + 351 + "s";
         String column4Format = "%-" + 12 + "s";
         String column5Format = "%-" + 12 + "s";
 

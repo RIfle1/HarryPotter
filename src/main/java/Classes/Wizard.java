@@ -72,7 +72,7 @@ public class Wizard extends AbstractCharacter {
         String column4 = returnColoredText(String.format(column4Format ,(int) this.getLuck() + " Luck"), ANSI_PURPLE);
 
 
-        return printColumnSeparator("||") + column0 +
+        return "\n\n" + column0 +
                 printColumnSeparator("||") + column1 +
                 printColumnSeparator("||") + column2 +
                 printColumnSeparator("||") + column3 +
@@ -225,10 +225,10 @@ public class Wizard extends AbstractCharacter {
             .firstName("null")
             .lastName("null")
             .name("null null")
-            .gender(null)
+            .gender(Gender.MALE)
             .pet(null)
             .wand(null)
-            .house(new House(HouseName.GRYFFINDOR))
+            .house(new House(HouseName.SLYTHERIN))
             .spellsHashMap(new HashMap<>())
             .spellsKeyList(new ArrayList<>())
             .itemList(new ArrayList<>())

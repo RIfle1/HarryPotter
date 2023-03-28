@@ -215,6 +215,9 @@ public class Enemy extends AbstractCharacter {
         else if(this.getEnemyName() == EnemyName.DEMENTOR) {
             EnemyName.DEMENTOR.addVulnerableSpell(Spell.expectroPatronum.clone());
         }
+        else if(this.getEnemyName() == EnemyName.DEATH_EATER) {
+            EnemyName.DEATH_EATER.addVulnerableSpell(Spell.sectumsempra.clone());
+        }
     }
 
     public void checkHpRatio() throws CloneNotSupportedException {
