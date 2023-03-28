@@ -13,8 +13,8 @@ import java.util.Map;
 import static Classes.Color.*;
 import static Classes.Wizard.wizard;
 import static Enums.EnumMethods.returnFormattedEnum;
-import static Main.ConsoleFunctions.printTitle;
-import static Main.MechanicsFunctions.generateDoubleBetween;
+import static Functions.ConsoleFunctions.printTitle;
+import static Functions.MechanicsFunctions.generateDoubleBetween;
 
 
 @Getter

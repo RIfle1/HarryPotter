@@ -1,4 +1,4 @@
-package Main;
+package Functions;
 import Classes.*;
 import Enums.*;
 
@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static Classes.Wizard.*;
-import static Main.ConsoleFunctions.*;
+import static Functions.ConsoleFunctions.*;
 
 public class CharacterCreation {
     public static void characterInit() throws CloneNotSupportedException {

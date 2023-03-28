@@ -4,6 +4,7 @@ import AbstractClasses.AbstractCharacter;
 import AbstractClasses.AbstractItem;
 import Enums.*;
 import lombok.*;
+import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,7 +14,7 @@ import java.util.List;
 import static Classes.Color.*;
 import static Enums.EnumMethods.returnFormattedEnum;
 import static Enums.HouseName.getHouseNameMaxLength;
-import static Main.ConsoleFunctions.*;
+import static Functions.ConsoleFunctions.*;
 
 @Getter
 @Setter
@@ -48,6 +49,41 @@ public class Wizard extends AbstractCharacter {
     private double strength; // for more attack damage
     private double intelligence; // for parrying
     private double luck; // for more attackChance
+
+
+    public JSONObject toJsonObject() {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("name", this.getName());
+        jsonObject.put("healthPoints", this.getHealthPoints());
+        jsonObject.put("defensePoints", this.getDefensePoints());
+        jsonObject.put("maxHealthPoints", this.getMaxHealthPoints());
+        jsonObject.put("maxDefensePoints", this.getMaxDefensePoints());
+
+        jsonObject.put("difficulty", this.getDifficulty().toString());
+        jsonObject.put("characterState", this.getCharacterState().toString());
+
+        jsonObject.put("itemList", this.getItemList());
+        jsonObject.put("activePotionsList", this.getActivePotionsList());
+        jsonObject.put("spellsHashMap", this.getSpellsHashMap());
+        jsonObject.put("spellsKeyList", this.getSpellsKeyList());
+        jsonObject.put("level", this.getLevel());
+        jsonObject.put("firstName", this.getFirstName());
+        jsonObject.put("lastName", this.getLastName());
+
+        jsonObject.put("gender", this.getGender().toString());
+        jsonObject.put("pet", this.getPet().toString());
+        jsonObject.put("wand", this.getWand().toString());
+        jsonObject.put("house", this.getHouse().toString());
+
+        jsonObject.put("experience", this.getExperience());
+        jsonObject.put("specPoints", this.getSpecPoints());
+        jsonObject.put("charisma", this.getCharisma());
+        jsonObject.put("strength", this.getStrength());
+        jsonObject.put("intelligence", this.getIntelligence());
+        jsonObject.put("luck", this.getLuck());
+        return jsonObject;
+    }
+
 
     public static final int wizardBaseHp = 120;
     public static final int wizardBaseDp = 40;
@@ -214,6 +250,8 @@ public class Wizard extends AbstractCharacter {
         this.drinkPotion(chosenPotion);
     }
 
+
+
     public static Wizard wizard = Wizard.builder()
             .healthPoints(wizardBaseHp)
             .defensePoints(wizardBaseDp)
@@ -226,8 +264,8 @@ public class Wizard extends AbstractCharacter {
             .lastName("null")
             .name("null null")
             .gender(Gender.MALE)
-            .pet(null)
-            .wand(null)
+            .pet(Pet.TOAD)
+            .wand(new Wand(Core.PHEONIX_FEATHER, 12))
             .house(new House(HouseName.SLYTHERIN))
             .spellsHashMap(new HashMap<>())
             .spellsKeyList(new ArrayList<>())

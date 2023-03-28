@@ -1,10 +1,13 @@
 package Enums;
 
+import lombok.Getter;
+
 import java.util.HashMap;
 import java.util.List;
 
 import static Enums.EnumMethods.returnFormattedEnum;
 
+@Getter
 public enum Pet {
     OWL,
     RAT,

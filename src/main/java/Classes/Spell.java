@@ -13,8 +13,8 @@ import java.util.List;
 
 import static Classes.Color.*;
 import static Classes.Color.returnColoredText;
-import static Main.ConsoleFunctions.printColumnSeparator;
-import static Main.MechanicsFunctions.generateDoubleBetween;
+import static Functions.ConsoleFunctions.printColumnSeparator;
+import static Functions.MechanicsFunctions.generateDoubleBetween;
 
 @Getter
 @Setter

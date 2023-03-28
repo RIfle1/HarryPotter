@@ -11,8 +11,8 @@ import static Classes.Enemy.getEnemyNameMaxLength;
 import static Classes.Spell.*;
 import static Classes.Wizard.wizard;
 import static Enums.EnumMethods.returnFormattedEnum;
-import static Main.ConsoleFunctions.*;
-import static Main.MechanicsFunctions.generateDoubleBetween;
+import static Functions.ConsoleFunctions.*;
+import static Functions.MechanicsFunctions.generateDoubleBetween;
 import static java.lang.Math.max;
 
 @Getter

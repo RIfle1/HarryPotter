@@ -1,4 +1,4 @@
-package Main;
+package Functions;
 
 import Classes.Color;
 import Enums.Level;
@@ -8,7 +8,7 @@ import java.util.*;
 import static Classes.Color.*;
 import static Classes.Color.returnColoredText;
 import static Classes.Enemy.clearEnemies;
-import static Classes.LevelFunctions.levelHashMap;
+import static Functions.LevelFunctions.levelHashMap;
 import static Classes.Wizard.wizard;
 import static Enums.Level.*;
 import static java.lang.System.exit;

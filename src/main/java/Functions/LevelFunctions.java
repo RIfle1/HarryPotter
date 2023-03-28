@@ -1,8 +1,10 @@
-package Classes;
+package Functions;
 
 import AbstractClasses.AbstractCharacter;
+import Classes.Enemy;
+import Classes.Spell;
 import Enums.*;
-import Main.ConsoleFunctions;
+import Functions.ConsoleFunctions;
 
 import java.util.*;
 
@@ -10,9 +12,9 @@ import static Classes.Color.*;
 import static Classes.Wizard.wizard;
 import static Enums.EnumMethods.returnFormattedEnum;
 import static Enums.Level.unlockNextLevel;
-import static Main.ConsoleFunctions.*;
+import static Functions.ConsoleFunctions.*;
 import static Classes.Enemy.*;
-import static Main.MechanicsFunctions.generateDoubleBetween;
+import static Functions.MechanicsFunctions.generateDoubleBetween;
 import static java.lang.System.exit;
 
 
