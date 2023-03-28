@@ -10,12 +10,12 @@ import static Enums.EnumMethods.returnFormattedEnum;
 @Getter
 public enum Level {
     The_Philosophers_Stone(true, Collections.singletonList(Spell.wingardiumLeviosa)),
-    The_Chamber_of_Secrets(true, Arrays.asList(Spell.legendarySword, Spell.accio)),
-    The_Prisoner_of_Azkaban(true, Collections.singletonList(Spell.expectroPatronum)),
-    The_Goblet_of_Fire(true, Collections.singletonList(Spell.accio)),
-    The_Order_of_the_Phoenix(true, new ArrayList<>()),
-    The_Half_Blooded_Prince(true, Collections.singletonList(Spell.sectumsempra)),
-    The_Deathly_Hallows(true, new ArrayList<>()),
+    The_Chamber_of_Secrets(false, Arrays.asList(Spell.legendarySword, Spell.accio)),
+    The_Prisoner_of_Azkaban(false, Collections.singletonList(Spell.expectroPatronum)),
+    The_Goblet_of_Fire(false, Collections.singletonList(Spell.accio)),
+    The_Order_of_the_Phoenix(false, new ArrayList<>()),
+    The_Half_Blooded_Prince(false, Collections.singletonList(Spell.sectumsempra)),
+    The_Deathly_Hallows(false, new ArrayList<>()),
     Battle_Arena(true, Collections.singletonList(Spell.avadaKedavra));
 
     private boolean unlocked;

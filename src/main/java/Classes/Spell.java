@@ -42,8 +42,8 @@ public class Spell implements Cloneable{
             .spellDescription("Summons and then throws special environmental objects at the targeted enemy.")
             .spellSpecialAttackLine("You've thrown an object at the enemy!")
             .spellLevelRequirement(0)
-            .spellDamage(new double[]{100, 120})
-            .characterState(CharacterState.STUNNED)
+            .spellDamage(new double[]{50, 120})
+            .characterState(CharacterState.LEVITATING)
             .spellChance(0.9)
             .spellCooldown(0)
             .spellReadyIn(0)
@@ -56,7 +56,7 @@ public class Spell implements Cloneable{
             .spellDescription("Deals minor damage to enemies and objects.")
             .spellSpecialAttackLine("Basic Cast!")
             .spellLevelRequirement(0)
-            .spellDamage(new double[]{40, 60})
+            .spellDamage(new double[]{40, 80})
             .characterState(CharacterState.STANDING)
             .spellChance(0.9)
             .spellCooldown(0)
@@ -85,7 +85,7 @@ public class Spell implements Cloneable{
             .spellSpecialAttackLine("You've cancelled the enemy's spell!")
             .spellLevelRequirement(0)
             .spellDamage(new double[]{0, 0})
-            .characterState(CharacterState.STUNNED)
+            .characterState(CharacterState.KNOCKED)
             .spellChance(0.8)
             .spellCooldown(1)
             .spellReadyIn(0)
@@ -98,7 +98,7 @@ public class Spell implements Cloneable{
             .spellDescription("Stuns enemies, making them easy targets for follow-up spells.")
             .spellSpecialAttackLine("You've cancelled the enemy's spell!")
             .spellLevelRequirement(5)
-            .spellDamage(new double[]{60, 70})
+            .spellDamage(new double[]{60, 80})
             .characterState(CharacterState.FROZEN)
             .spellChance(0.6)
             .spellCooldown(2)
@@ -106,19 +106,19 @@ public class Spell implements Cloneable{
             .spellColor(ANSI_RED)
             .build();
 
-    public static Spell transformation = Spell.builder()
-            .spellName("Transformation")
-            .spellType(MoveType.ATTACK)
-            .spellDescription("Enemies struck with the Transformation spell transform into explosive objects.")
-            .spellSpecialAttackLine("You've transformed the enemy into a ")
-            .spellLevelRequirement(10)
-            .spellDamage(new double[]{0, 0})
-            .characterState(CharacterState.STANDING)
-            .spellChance(0.4)
-            .spellCooldown(2)
-            .spellReadyIn(0)
-            .spellColor(ANSI_RED)
-            .build();
+//    public static Spell transformation = Spell.builder()
+//            .spellName("Transformation")
+//            .spellType(MoveType.ATTACK)
+//            .spellDescription("Enemies struck with the Transformation spell transform into explosive objects.")
+//            .spellSpecialAttackLine("You've transformed the enemy into a ")
+//            .spellLevelRequirement(10)
+//            .spellDamage(new double[]{0, 0})
+//            .characterState(CharacterState.STANDING)
+//            .spellChance(0.4)
+//            .spellCooldown(2)
+//            .spellReadyIn(0)
+//            .spellColor(ANSI_RED)
+//            .build();
 
     public static Spell accio = Spell.builder()
             .spellName("Accio")
@@ -333,21 +333,6 @@ public class Spell implements Cloneable{
             spellNameList.add(spell.getSpellName());
         }
         return spellNameList;
-    }
-
-
-
-    public static void printSeparator(int length) {
-        for(int i = 0; i < length; i++) {
-            System.out.print("/");
-        }
-        System.out.println();
-    }
-
-    public static void printSpell(Spell AbstractSpell) {
-        printSeparator(AbstractSpell.spellName.length());
-        System.out.println(AbstractSpell.spellName);
-        printSeparator(AbstractSpell.spellName.length());
     }
 
     public String printStats() {
