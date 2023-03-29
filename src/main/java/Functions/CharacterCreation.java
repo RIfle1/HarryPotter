@@ -10,15 +10,15 @@ import static Classes.Wizard.*;
 import static Functions.ConsoleFunctions.*;
 
 public class CharacterCreation {
-    public static void characterInit() throws CloneNotSupportedException {
+    public static void characterInit() {
         String firstName;
         String lastName;
 
         Gender gender;
         Pet pet;
+        HouseName houseName;
 
         Wand wand;
-        House house;
         Difficulty difficulty;
 
         double charisma; // for dodging
@@ -40,15 +40,15 @@ public class CharacterCreation {
         pet = Pet.setPet(Pet.getPetList().get(returnChoiceInt(Pet.getPetList().size(), false) - 1));
 
         wand = wandCreation();
-        house = sortingHat();
+        houseName = sortingHat();
 
-        printColoredHeader("The sorting hat thinks you should be in the house of " + EnumMethods.returnFormattedEnum(house.getHouseName())+". Do you accept?");
+        printColoredHeader("The sorting hat thinks you should be in the house of " + EnumMethods.returnFormattedEnum(houseName)+". Do you accept?");
 
         boolean answer = returnYesOrNo();
         if(answer) {
-            house = houseChoice();
+            houseName = houseChoice();
         }
-        printColoredHeader("Congratulations!, You are now part of the " + EnumMethods.returnFormattedEnum(house.getHouseName()) + " House.");
+        printColoredHeader("Congratulations!, You are now part of the " + EnumMethods.returnFormattedEnum(houseName) + " House.");
 
         printColoredHeader("Choose the difficulty of your game: ");
         printChoices(Difficulty.getDifficultyList());
@@ -62,7 +62,7 @@ public class CharacterCreation {
                         pet +
                         wand.getSize() +
                         EnumMethods.returnFormattedEnum(wand.getCore()) + " " +
-                        house.getHouseName()
+                        houseName
 
         );
 
@@ -80,7 +80,7 @@ public class CharacterCreation {
                 .gender(gender)
                 .pet(pet)
                 .wand(wand)
-                .house(house)
+                .houseName(houseName)
                 .spellsHashMap(new HashMap<>())
                 .spellsKeyList(new ArrayList<>())
                 .itemList(new ArrayList<>())
@@ -111,19 +111,14 @@ public class CharacterCreation {
         return new Wand(core, size);
     }
 
-    public static House houseChoice() {
-        HouseName houseName;
-
+    public static HouseName houseChoice() {
         printColoredHeader("Select your House:");
         printChoices(HouseName.getHouseNameList());
-        houseName = HouseName.setHouseName(HouseName.getHouseNameList().get(returnChoiceInt(HouseName.getHouseNameList().size(), false) - 1));
+        return HouseName.setHouseName(HouseName.getHouseNameList().get(returnChoiceInt(HouseName.getHouseNameList().size(), false) - 1));
 
-        return new House(houseName);
     }
 
-    public static House sortingHat() {
-        HouseName houseName;
-
+    public static HouseName sortingHat() {
         printColoredHeader("The sorting hat has been placed on your head." +
                 "\nThe sorting hat whispers: You come here with preferences and preconceptions — certain expectations.");
         List<String> questionList1 = new ArrayList<>();
@@ -143,9 +138,8 @@ public class CharacterCreation {
         questionMap2.forEach((key, value) -> questionList2.add(key));
 
         printChoices(questionList2);
-        houseName = questionMap2.get(questionList2.get(returnChoiceInt(questionList2.size(), false) - 1));
+        return questionMap2.get(questionList2.get(returnChoiceInt(questionList2.size(), false) - 1));
 
-        return new House(houseName);
     }
 
 }

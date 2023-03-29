@@ -14,7 +14,7 @@ import java.util.List;
 import static Classes.Color.*;
 import static Classes.Color.returnColoredText;
 import static Functions.ConsoleFunctions.printColumnSeparator;
-import static Functions.MechanicsFunctions.generateDoubleBetween;
+import static Functions.GeneralFunctions.generateDoubleBetween;
 
 @Getter
 @Setter
@@ -304,10 +304,10 @@ public class Spell implements Cloneable{
 
 
     public static int getSpellNameMaxLength() {
-        return getAllSpellsNamesList().stream().map(String::length).toList().stream().reduce(0, Integer::max);
+        return returnAllSpellsNamesList().stream().map(String::length).toList().stream().reduce(0, Integer::max);
     }
 
-    public static List<Spell> getAllSpells(){
+    public static List<Spell> returnAllSpells(){
         List<Spell> spellList = new ArrayList<>();
         Field[] declaredFields = Spell.class.getDeclaredFields();
 
@@ -326,10 +326,10 @@ public class Spell implements Cloneable{
         return spellList;
     }
 
-    public static List<String> getAllSpellsNamesList() {
+    public static List<String> returnAllSpellsNamesList() {
         List<String> spellNameList = new ArrayList<>();
 
-        for(Spell spell: getAllSpells()) {
+        for(Spell spell: returnAllSpells()) {
             spellNameList.add(spell.getSpellName());
         }
         return spellNameList;

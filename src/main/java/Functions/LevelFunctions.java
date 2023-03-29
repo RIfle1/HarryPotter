@@ -4,7 +4,6 @@ import AbstractClasses.AbstractCharacter;
 import Classes.Enemy;
 import Classes.Spell;
 import Enums.*;
-import Functions.ConsoleFunctions;
 
 import java.util.*;
 
@@ -14,73 +13,23 @@ import static Enums.EnumMethods.returnFormattedEnum;
 import static Enums.Level.unlockNextLevel;
 import static Functions.ConsoleFunctions.*;
 import static Classes.Enemy.*;
-import static Functions.MechanicsFunctions.generateDoubleBetween;
+import static Functions.GeneralFunctions.generateDoubleBetween;
 import static java.lang.System.exit;
 
 
 public class LevelFunctions {
     public static HashMap<Level, Runnable> levelHashMap = new HashMap<>() {{
-        put(Level.The_Philosophers_Stone, () -> {
-            try {
-                level1();
-            } catch (CloneNotSupportedException e) {
-                throw new RuntimeException(e);
-            }
-        });
-        put(Level.The_Chamber_of_Secrets,  () -> {
-            try {
-                level2();
-            } catch (CloneNotSupportedException e) {
-                throw new RuntimeException(e);
-            }
-        });
-        put(Level.The_Prisoner_of_Azkaban, () -> {
-            try {
-                level3();
-            } catch (CloneNotSupportedException e) {
-                throw new RuntimeException(e);
-            }
-        });
-        put(Level.The_Goblet_of_Fire, () -> {
-            try {
-                level4();
-            } catch (CloneNotSupportedException e) {
-                throw new RuntimeException(e);
-            }
-        });
-        put(Level.The_Order_of_the_Phoenix, () -> {
-            try {
-                level5();
-            } catch (CloneNotSupportedException e) {
-                throw new RuntimeException(e);
-            }
-        });
-        put(Level.The_Half_Blooded_Prince, () -> {
-            try {
-                level6();
-            } catch (CloneNotSupportedException e) {
-                throw new RuntimeException(e);
-            }
-        });
-        put(Level.The_Deathly_Hallows, () -> {
-            try {
-                level7();
-            } catch (CloneNotSupportedException e) {
-                throw new RuntimeException(e);
-            }
-        });
-        put(Level.Battle_Arena, () -> {
-            try {
-                battleArena();
-            } catch (CloneNotSupportedException e) {
-                throw new RuntimeException(e);
-            }
-        });
+        put(Level.The_Philosophers_Stone, LevelFunctions::level1);
+        put(Level.The_Chamber_of_Secrets, LevelFunctions::level2);
+        put(Level.The_Prisoner_of_Azkaban, LevelFunctions::level3);
+        put(Level.The_Goblet_of_Fire, LevelFunctions::level4);
+        put(Level.The_Order_of_the_Phoenix, LevelFunctions::level5);
+        put(Level.The_Half_Blooded_Prince, LevelFunctions::level6);
+        put(Level.The_Deathly_Hallows, LevelFunctions::level7);
+        put(Level.Battle_Arena, LevelFunctions::battleArena);
     }};
 
-
-
-    public static void spawnEnemies() throws CloneNotSupportedException {
+    public static void spawnEnemies() {
         int minLevel;
         int maxLevel;
         int enemyAmount;
@@ -96,7 +45,7 @@ public class LevelFunctions {
         generateEnemies(minLevel, maxLevel, enemyAmount);
     }
 
-    public static void fight() throws CloneNotSupportedException {
+    public static void fight() {
         MoveType attackMoveType = MoveType.ATTACK;
         List<String> moveTypeList = MoveType.getMoveTypeList(new ArrayList<>(Arrays.asList(MoveType.ATTACK, MoveType.FOLLOW_UP)));
 
@@ -126,17 +75,17 @@ public class LevelFunctions {
             // CALCULATE THE ENEMY'S SPELL DAMAGE
             if(attackingEnemy.getEnemyName().getEnemyCombat() == EnemyCombat.SPELL) {
                 // CHOOSE A RANDOM SPELL FROM THE ENEMY'S SPELL LIST
-                randomEnemySpellIndex = (int) generateDoubleBetween(0, attackingEnemy.getTypedSpellsList(attackMoveType).size() - 1);
-                enemyChosenSpell = attackingEnemy.getTypedSpellsFromInt(attackMoveType, randomEnemySpellIndex);
+                randomEnemySpellIndex = (int) generateDoubleBetween(0, attackingEnemy.returnTypedSpellsList(attackMoveType).size() - 1);
+                enemyChosenSpell = attackingEnemy.returnTypedSpellsFromInt(attackMoveType, randomEnemySpellIndex);
 
-                enemyCalculatedDamage = attackingEnemy.getSpellCalculatedDamage(enemyChosenSpell, wizard);
+                enemyCalculatedDamage = attackingEnemy.returnSpellCalculatedDamage(enemyChosenSpell, wizard);
                 parriedAttackName = enemyChosenSpell.getSpellName();
-                dodgeChance = attackingEnemy.getSpellChance(enemyChosenSpell);
+                dodgeChance = attackingEnemy.returnSpellChance(enemyChosenSpell);
 
                 chosenSpellName = returnColoredText(enemyChosenSpell.getSpellName(), enemyChosenSpell.getSpellColor());
             }
             else if(attackingEnemy.getEnemyName().getEnemyCombat() == EnemyCombat.MELEE) {
-                enemyCalculatedDamage = attackingEnemy.getMeleeCalculatedDamage(wizard);
+                enemyCalculatedDamage = attackingEnemy.returnMeleeCalculatedDamage(wizard);
                 parriedAttackName = returnFormattedEnum(attackingEnemy.getEnemyName()) + " melee attack";
                 dodgeChance = attackingEnemy.getEnemyName().getEnemyCombat().getCombatChance();
 
@@ -175,7 +124,7 @@ public class LevelFunctions {
         }
     }
 
-    private static void wizardTurn(MoveType attackMoveType, List<String> moveTypeList) throws CloneNotSupportedException {
+    private static void wizardTurn(MoveType attackMoveType, List<String> moveTypeList) {
         Spell wizardChosenSpell;
         Enemy enemyVictim;
         double wizardCalculatedDamage;
@@ -208,17 +157,17 @@ public class LevelFunctions {
         // CHOOSE THE SPELL
         printTitle("Choose the spell you want to use.");
         wizard.printTypedSpells(attackMoveType);
-        wizardChosenSpell = wizard.getTypedSpellsFromInt(attackMoveType, returnChoiceInt(wizard.getTypedSpellsList(attackMoveType).size(), false) - 1);
+        wizardChosenSpell = wizard.returnTypedSpellsFromInt(attackMoveType, returnChoiceInt(wizard.returnTypedSpellsList(attackMoveType).size(), false) - 1);
 
         // IF THE SPELL IS READY IT WILL BE USED, OTHERWISE IT WILL PROMPT FOR ANOTHER SPELL
         while (!wizard.checkSpellReady(wizardChosenSpell)) {
             System.out.println(returnColoredText(wizardChosenSpell.getSpellName() + " will be ready in " + wizardChosenSpell.getSpellReadyIn() + " turn(s).", ANSI_RED));
             System.out.println(returnColoredText("Choose another spell.", ANSI_BLUE));
-            wizardChosenSpell = wizard.getTypedSpellsFromInt(attackMoveType, returnChoiceInt(wizard.getTypedSpellsList(attackMoveType).size(), false) - 1);
+            wizardChosenSpell = wizard.returnTypedSpellsFromInt(attackMoveType, returnChoiceInt(wizard.returnTypedSpellsList(attackMoveType).size(), false) - 1);
         }
 
         // CALCULATE THE SPELL DAMAGE BASED ON OTHER BUFFS AND THEN ATTACK THE CHOSEN ENEMY
-        wizardCalculatedDamage = wizard.getSpellCalculatedDamage(wizardChosenSpell, enemyVictim);
+        wizardCalculatedDamage = wizard.returnSpellCalculatedDamage(wizardChosenSpell, enemyVictim);
 
         int generateRandomMoveType = (int) generateDoubleBetween(0, moveTypeList.size() - 1);
         enemyMoveType = MoveType.setMoveType(moveTypeList.get(generateRandomMoveType));
@@ -229,7 +178,7 @@ public class LevelFunctions {
         if(isVulnerableSpell) {
             // EXECUTE ACTION BASED ON RANDOM CHOICE
             if (enemyMoveType == MoveType.DODGE) {
-                enemyDodgeOrParrySuccess = enemyVictim.dodgeSpell(wizard.getSpellChance(wizardChosenSpell), wizard);
+                enemyDodgeOrParrySuccess = enemyVictim.dodgeSpell(wizard.returnSpellChance(wizardChosenSpell), wizard);
             } else if (enemyMoveType == MoveType.PARRY) {
                 enemyDodgeOrParrySuccess = enemyVictim.parry(wizardChosenSpell.getSpellName(), wizard, wizardCalculatedDamage);
             }
@@ -242,10 +191,10 @@ public class LevelFunctions {
         continuePromptExtra();
     }
 
-    public static void chooseAction(boolean switchTeams) throws CloneNotSupportedException {
+    public static void chooseAction(boolean switchTeams) {
         List<String> actionList = new ArrayList<>(Arrays.asList("Fight!", "Check Stats", "Use Potion"));
         printColoredHeader("What would you like to do?");
-        if(switchTeams && wizard.getHouse().getHouseName() == HouseName.SLYTHERIN) {
+        if(switchTeams && wizard.getHouseName() == HouseName.SLYTHERIN) {
             printTitle(returnColoredText("You have the possibility the join the enemies.", ANSI_RED));
             actionList.add("Switch Teams");
         }
@@ -260,7 +209,7 @@ public class LevelFunctions {
         }
     }
 
-    private static void switchTeams() throws CloneNotSupportedException {
+    private static void switchTeams() {
         printTitle(returnColoredText("You have joined the enemies!", ANSI_RED));
         resetLevel();
         // TODO - MAYBE ADD SOMETHING HERE IF THE ENEMY JOINS THE ENEMY TEAM
@@ -283,7 +232,7 @@ public class LevelFunctions {
 
     public static void levelRepetition(Level level, String objective,
                                        List<String> enemyDeathLine, String graduationLine,
-                                       Level nextLevel, int combatTimeout, boolean switchTeams) throws CloneNotSupportedException {
+                                       Level nextLevel, int combatTimeout, boolean switchTeams) {
 
         boolean supposedTimeout = true;
         List<String> enemyDeathLineCopy = new ArrayList<>(enemyDeathLine);
@@ -319,7 +268,7 @@ public class LevelFunctions {
         resetLevel();
     }
 
-    private static void resetLevel() throws CloneNotSupportedException {
+    private static void resetLevel() {
         continuePromptExtra();
         ConsoleFunctions.chooseAction();
         EnemyName.resetBossVulnerableSpellsList();
@@ -341,7 +290,7 @@ public class LevelFunctions {
         }
     }
 
-    public static void battleArena() throws CloneNotSupportedException {
+    public static void battleArena() {
         Level level = Level.Battle_Arena;
         String objective = "Your objective is to defeat all the enemies in the arena.";
         List<String> enemyDeathLine = Collections.singletonList("All the enemies in the arena have been defeated.");
@@ -353,7 +302,7 @@ public class LevelFunctions {
         levelRepetition(level, objective, enemyDeathLine, graduationLine, null, 100, false);
     }
 
-    public static void level1() throws CloneNotSupportedException {
+    public static void level1() {
         Level level = Level.The_Philosophers_Stone;
         EnemyName enemyName = EnemyName.TROLL;
         String objective = "Your objective is to kill the troll by using Wingardium Leviosa.";
@@ -369,12 +318,12 @@ public class LevelFunctions {
 
     }
 
-    public static void level2() throws CloneNotSupportedException {
+    public static void level2() {
         Level level = Level.The_Chamber_of_Secrets;
         EnemyName enemyName = EnemyName.BASILISK;
         String objective;
         List<String> enemyDeathLine = new ArrayList<>();
-        boolean gryffindorHouse = wizard.getHouse().getHouseName() == HouseName.GRYFFINDOR;
+        boolean gryffindorHouse = wizard.getHouseName() == HouseName.GRYFFINDOR;
         if(gryffindorHouse) {
             objective = "Your Objective is to kill the Basilisk with Godric Gryffindor's legendary Sword.";
             enemyDeathLine.add(enemyName.getEnemyDeathLine().get(0));
@@ -393,7 +342,7 @@ public class LevelFunctions {
         levelRepetition(level, objective, enemyDeathLine, graduationLine, nextLevel, 100, false);
     }
 
-    public static void level3() throws CloneNotSupportedException {
+    public static void level3() {
         Level level = Level.The_Prisoner_of_Azkaban;
         EnemyName enemyName = EnemyName.DEMENTOR;
         String objective = "The dementors are everywhere! Your objective is to use Expectro Patronum to eliminate them.";
@@ -408,7 +357,7 @@ public class LevelFunctions {
         levelRepetition(level, objective, enemyDeathLine, graduationLine, nextLevel, 100, false);
 
     }
-    public static void level4() throws CloneNotSupportedException {
+    public static void level4() {
         Level level = Level.The_Goblet_of_Fire;
         EnemyName enemyName = EnemyName.PETER_PETTIGREW;
         String objective = "You're in a cemetery where you see Voldemort and Peter Pettigrew.\n" +
@@ -423,7 +372,7 @@ public class LevelFunctions {
         generateEnemies(enemyMinLevel, enemyMaxLevel, enemyAmount, enemyName);
         levelRepetition(level, objective, enemyDeathLine, graduationLine, nextLevel, 100, false);
     }
-    public static void level5() throws CloneNotSupportedException {
+    public static void level5() {
         Level level = Level.The_Order_of_the_Phoenix;
         EnemyName enemyName = EnemyName.DOLORES_UMBRIDGE;
         String objective = "It's time for your exams! Your objective is to distract Dolores Umbridge until the fireworks are ready.\n" +
@@ -438,7 +387,7 @@ public class LevelFunctions {
         generateEnemies(enemyMinLevel, enemyMaxLevel, enemyAmount, enemyName);
         levelRepetition(level, objective, enemyDeathLine, graduationLine, nextLevel, 6, false);
     }
-    public static void level6() throws CloneNotSupportedException {
+    public static void level6() {
         Level level = Level.The_Half_Blooded_Prince;
         EnemyName enemyName = EnemyName.DEATH_EATER;
         String objective = "The death eaters have invaded Hogwarts, your objective is to eliminate all of them.";
@@ -452,7 +401,7 @@ public class LevelFunctions {
         generateEnemies(enemyMinLevel, enemyMaxLevel, enemyAmount, enemyName);
         levelRepetition(level, objective, enemyDeathLine, graduationLine, nextLevel, 100, true);
     }
-    public static void level7() throws CloneNotSupportedException {
+    public static void level7() {
         Level level = Level.The_Deathly_Hallows;
         EnemyName enemyName1 = EnemyName.VOLDEMORT;
         EnemyName enemyName2 = EnemyName.BELLATRIX_LESTRANGE;

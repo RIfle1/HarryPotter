@@ -30,22 +30,26 @@ public enum Level {
         this.unlocked = unlocked;
     }
 
-    public static List<String> getLevelList() {
+    public static List<String> returnLevelList() {
         Level[] levelValues = Level.values();
         return EnumMethods.getEnumList(levelValues);
     }
 
-    public static List<String> getUnlockedLevelsList() {
+    public static List<String> returnUnlockedLevelsList() {
         Level[] levelValues = Arrays.stream(Level.values()).filter(Level::isUnlocked).toList().toArray(new Level[0]);
         return EnumMethods.getEnumList(levelValues);
     }
 
-    public static List<Level> getAllUnlockedLevelsList() {
+    public static List<Level> returnAllUnlockedLevelsList() {
         return Arrays.stream(Level.values()).filter(Level::isUnlocked).toList();
     }
 
+    public static List<Level> returnAllLevels() {
+        return Arrays.stream(Level.values()).toList();
+    }
+
     public static void unlockNextLevel(Level previousLevel) {
-        Level nextLevel = setLevel(getLevelList().get(getLevelList().indexOf(returnFormattedEnum(previousLevel)) + 1));
+        Level nextLevel = setLevel(returnLevelList().get(returnLevelList().indexOf(returnFormattedEnum(previousLevel)) + 1));
         nextLevel.setLevelStatus(true);
     }
 

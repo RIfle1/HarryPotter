@@ -1,38 +1,26 @@
 package test;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Main2 {
-    public static Runnable test() {
-        return () -> System.out.println("Test");
 
-    }
+    List<String> stringList = new ArrayList<String>();
+    List<Integer> integerList = new ArrayList<Integer>();
 
-    public static Runnable test2() {
-        return () -> System.out.println("Teleport");
+    public static void main(String... args) throws Exception {
+        Field stringListField = Main2.class.getDeclaredFields()[0];
+        ParameterizedType stringListType = (ParameterizedType) stringListField.getGenericType();
+        Class<?> stringListClass = (Class<?>) stringListType.getActualTypeArguments()[0];
+        System.out.println(stringListClass); // class java.lang.String.
 
-    }
-
-    public static void main(String[] args) throws CloneNotSupportedException {
-//        gameCredits();
-//        checkSaves();
-//        CharacterCreation.characterInit();
-//        chooseAction();
-
-
-
-        Map<Character, Runnable> commands = new HashMap<>();
-
-        // Populate commands map
-        commands.put('h', test());
-        commands.put('t', test2());
-
-        // Invoke some command
-        char cmd = 't';
-        commands.get(cmd).run();   // Prints "Teleport"
-
-//        System.out.println(enemiesHashMap.get(enemiesKeyList.get(0)).getExperiencePoints());
-//        unlockNextLevel(Level.The_Philosophers_Stone);
+        Field integerListField = Main2.class.getDeclaredField("integerList");
+        ParameterizedType integerListType = (ParameterizedType) integerListField.getGenericType();
+        Class<?> integerListClass = (Class<?>) integerListType.getActualTypeArguments()[0];
+        System.out.println(integerListClass); // class java.lang.Integer.
     }
 }

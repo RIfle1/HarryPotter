@@ -161,13 +161,13 @@ public class ConsoleFunctions {
         continuePrompt();
     }
 
-    public static void chooseLevel(Runnable func) throws CloneNotSupportedException {
+    public static void chooseLevel() {
         clearEnemies();
 
         printColoredHeader("Choose your level: ");
-        printChoices(getUnlockedLevelsList());
+        printChoices(returnUnlockedLevelsList());
 
-        String chosenLevelString = getUnlockedLevelsList().get(returnChoiceInt(getUnlockedLevelsList().size(), true) - 1);
+        String chosenLevelString = returnUnlockedLevelsList().get(returnChoiceInt(returnUnlockedLevelsList().size(), true) - 1);
         Level chosenLevel = setLevel(chosenLevelString);
         levelHashMap.get(chosenLevel).run();
 
@@ -175,7 +175,7 @@ public class ConsoleFunctions {
         ConsoleFunctions.chooseAction();
     }
 
-    public static void chooseAction() throws CloneNotSupportedException {
+    public static void chooseAction() {
         String[] actionList = {
                 "Choose Level",
                 "Upgrade Specs",
@@ -190,20 +190,8 @@ public class ConsoleFunctions {
         wizard.restoreWizardHpDf();
 
         switch (returnChoiceInt(actionList.length, false)) {
-            case 1 -> chooseLevel(() -> {
-                try {
-                    chooseAction();
-                } catch (CloneNotSupportedException e) {
-                    throw new RuntimeException(e);
-                }
-            });
-            case 2 -> wizard.upgradeSpec(() -> {
-                    try {
-                        chooseAction();
-                    } catch (CloneNotSupportedException e) {
-                        throw new RuntimeException(e);
-                    }
-            });
+            case 1 -> chooseLevel();
+            case 2 -> wizard.upgradeSpec(ConsoleFunctions::chooseAction);
             case 3 -> System.out.println(wizard.returnAllStringStats(0));
             case 4 -> wizard.printAllCharacterSpells();
         }

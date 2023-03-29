@@ -12,7 +12,7 @@ import static Classes.Spell.*;
 import static Classes.Wizard.wizard;
 import static Enums.EnumMethods.returnFormattedEnum;
 import static Functions.ConsoleFunctions.*;
-import static Functions.MechanicsFunctions.generateDoubleBetween;
+import static Functions.GeneralFunctions.generateDoubleBetween;
 import static java.lang.Math.max;
 
 @Getter
@@ -61,7 +61,7 @@ public abstract class AbstractCharacter {
     private final static double enemyDamageDivider = 1.7;
     private final static double wizardDamageDivider = 1;
 
-    public String getStatBar(String statLogo, String statLogoColor, double value, double maxValue) {
+    public String returnStatBar(String statLogo, String statLogoColor, double value, double maxValue) {
         final int statBarLength = 30;
 
         int stat = (int) ((value / maxValue) * statBarLength);
@@ -96,7 +96,7 @@ public abstract class AbstractCharacter {
 
         String column1 = returnColoredText(String.format(column1Format, name), color);
         String column2 = returnColoredText(String.format(column2Format, "Level " + (int) this.getLevel()), ANSI_YELLOW);
-        String column3 = String.format(column3Format, getStatBar("❤", ANSI_RED, this.getHealthPoints(), this.getMaxHealthPoints()));
+        String column3 = String.format(column3Format, returnStatBar("❤", ANSI_RED, this.getHealthPoints(), this.getMaxHealthPoints()));
         String column4 = returnColoredText(String.format(column4Format, (int) this.getDefensePoints() + " Defense"), ANSI_BLUE);
         String column5 = "";
 
@@ -112,7 +112,7 @@ public abstract class AbstractCharacter {
                 column5;
     }
 
-    public List<String> getItemNameList() {
+    public List<String> returnItemNameList() {
         List<AbstractItem> currentItemList = this.getItemList();
         List<String> currentItemNameList = new ArrayList<>();
         for (AbstractItem currentItem : currentItemList) {
@@ -122,24 +122,24 @@ public abstract class AbstractCharacter {
         return currentItemNameList;
     }
 
-    public Potion getPotion(String potionName) {
-        return (Potion) getPotionsList().stream()
+    public Potion returnPotion(String potionName) {
+        return (Potion) returnPotionsList().stream()
                 .filter(AbstractItem -> AbstractItem.getItemName().equals(potionName))
                 .findFirst()
                 .orElse(null);
     }
 
-    public List<AbstractItem> getPotionsList() {
+    public List<AbstractItem> returnPotionsList() {
             return this.getItemList().stream().filter(AbstractItem -> AbstractItem.getClass() == Potion.class).toList();
     }
 
-    public List<String> getPotionNamesList() {
+    public List<String> returnPotionNamesList() {
         List<String> potionNamesList = new ArrayList<>();
-        this.getPotionsList().forEach(AbstractItem -> potionNamesList.add(AbstractItem.getItemName()));
+        this.returnPotionsList().forEach(AbstractItem -> potionNamesList.add(AbstractItem.getItemName()));
         return potionNamesList;
     }
 
-    public List<String> getActivePotionNamesList() {
+    public List<String> returnActivePotionNamesList() {
         List<String> activePotionNamesList = new ArrayList<>();
         this.getActivePotionsList().forEach(AbstractItem -> activePotionNamesList.add(AbstractItem.getItemName()));
         return activePotionNamesList;
@@ -233,12 +233,8 @@ public abstract class AbstractCharacter {
         continuePromptExtra();
     }
 
-    public Spell getSpellFromInt(int number) {
-        return this.getSpellsHashMap().get(this.getSpellsKeyList().get(number));
-    }
-
-    public Spell getTypedSpellsFromInt(MoveType spellType, int number) {
-        return this.getAllSpells().stream().filter(spell -> spell.getSpellType().equals(spellType)).toList().get(number);
+    public Spell returnTypedSpellsFromInt(MoveType spellType, int number) {
+        return this.returnAllSpells().stream().filter(spell -> spell.getSpellType().equals(spellType)).toList().get(number);
     }
 
     public void putSpellsHashMap(Spell spell) {
@@ -250,16 +246,20 @@ public abstract class AbstractCharacter {
         spellsHashMap.forEach((key, value) -> spellsKeyList.add(key));
     }
 
-    public void updateSpellsHashMap() throws CloneNotSupportedException {
-        for (Spell spell : Spell.getAllSpells()) {
+    public void updateSpellsHashMap() {
+        for (Spell spell : Spell.returnAllSpells()) {
             if (spell.getSpellLevelRequirement() >= 0 && spell.getSpellLevelRequirement() <= this.getLevel() && !this.getSpellsHashMap().containsKey(spell.getSpellName())) {
-                this.putSpellsHashMap(spell.clone());
+                try {
+                    this.putSpellsHashMap(spell.clone());
+                } catch (CloneNotSupportedException e) {
+                    e.printStackTrace();
+                }
             }
         }
         updateSpellsKeyList(this.getSpellsHashMap());
     }
 
-    public double getActivePotionValueSum(PotionType potionType) {
+    public double returnActivePotionValueSum(PotionType potionType) {
         List<Potion> activePotionList = this.activePotionsList;
 
         return activePotionList
@@ -269,11 +269,11 @@ public abstract class AbstractCharacter {
                 .reduce((double) 0, Double::sum);
     }
 
-    public double getAttackBaseDamage(double attackDamage, double divider) {
+    public double returnAttackBaseDamage(double attackDamage, double divider) {
         return (Math.exp(this.getLevel() * getDifficulty().getWizardDiffMultiplier()) * attackDamage) / divider;
     }
 
-    public double getSpellDamage(Spell spell, AbstractCharacter attackedCharacter) {
+    public double returnSpellDamage(Spell spell, AbstractCharacter attackedCharacter) {
         double[] spellDamage = spell.getSpellDamage();
         double spellRandomDamage;
         double spellBaseDamage = 0;
@@ -291,21 +291,21 @@ public abstract class AbstractCharacter {
         // CHANGE SPELL BASE DAMAGE DEPENDING ON ENEMY OR PLAYER
         if (this.getClass() == Wizard.class) {
             // UPDATE WIZARD DAMAGE OR POTION EFFICIENCY BASED ON WHICH HOUSE THEY BELONG TO
-            HouseName houseName = ((Wizard) this).getHouse().getHouseName();
+            HouseName houseName = ((Wizard) this).getHouseName();
             if (houseName == HouseName.SLYTHERIN) {
                 houseDamagePercent = houseName.getSpecValue();
             } else if (houseName == HouseName.HUFFLEPUFF) {
                 housePotionPercent = houseName.getSpecValue();
             }
-            strengthPercent = ((Wizard) this).getWizardSpecsPercent().get("strength");
+            strengthPercent = ((Wizard) this).returnWizardSpecsPercent().get("strength");
 
-            spellBaseDamage = getAttackBaseDamage(spellRandomDamage, wizardDamageDivider);
+            spellBaseDamage = returnAttackBaseDamage(spellRandomDamage, wizardDamageDivider);
         } else if (this.getClass() == Enemy.class) {
-            spellBaseDamage = getAttackBaseDamage(spellRandomDamage, enemyDamageDivider);
+            spellBaseDamage = returnAttackBaseDamage(spellRandomDamage, enemyDamageDivider);
         }
 
         // DAMAGE POTION ALREADY IMPLEMENTED HERE
-        double damagePotionPercentIncrease = getActivePotionValueSum(PotionType.DAMAGE) * (1 + housePotionPercent);
+        double damagePotionPercentIncrease = returnActivePotionValueSum(PotionType.DAMAGE) * (1 + housePotionPercent);
         double characterStateDamageMultiplier = attackedCharacter.getCharacterState().getDamageMultiplier();
 
         return spellBaseDamage
@@ -315,9 +315,9 @@ public abstract class AbstractCharacter {
                 * (1 + strengthPercent);
     }
 
-    public double getMeleeDamage(AbstractCharacter attackedCharacter) {
+    public double returnMeleeDamage(AbstractCharacter attackedCharacter) {
         double characterStateDamageMultiplier = attackedCharacter.getCharacterState().getDamageMultiplier();
-        return getAttackBaseDamage(((Enemy) this).getEnemyName().getEnemyCombat().getCombatDamage(), enemyDamageDivider) * (1 + characterStateDamageMultiplier);
+        return returnAttackBaseDamage(((Enemy) this).getEnemyName().getEnemyCombat().getCombatDamage(), enemyDamageDivider) * (1 + characterStateDamageMultiplier);
     }
 
     public double takeDamage(double calculatedDamage) {
@@ -333,7 +333,7 @@ public abstract class AbstractCharacter {
         spell.setSpellReadyIn(spell.getSpellCooldown());
     }
 
-    public List<Spell> getAllSpells() {
+    public List<Spell> returnAllSpells() {
         HashMap<String, Spell> characterSpellHashMap = this.getSpellsHashMap();
         List<Spell> characterSpellList = new ArrayList<>();
 
@@ -341,7 +341,7 @@ public abstract class AbstractCharacter {
         return characterSpellList;
     }
 
-    public List<String> getAllSpellNames() {
+    public List<String> returnAllSpellNames() {
         HashMap<String, Spell> characterSpellHashMap = this.getSpellsHashMap();
         List<String> allSpellNames = new ArrayList<>();
 
@@ -359,14 +359,14 @@ public abstract class AbstractCharacter {
 
     }
 
-    public List<Spell> getTypedSpellsList(MoveType spellType) {
-        return this.getAllSpells().stream().filter(spell -> spell.getSpellType().equals(spellType)).toList();
+    public List<Spell> returnTypedSpellsList(MoveType spellType) {
+        return this.returnAllSpells().stream().filter(spell -> spell.getSpellType().equals(spellType)).toList();
     }
 
 
     public void printTypedSpells(MoveType spellType) {
         int index = 1;
-        List<Spell> typedSpellsList = getTypedSpellsList(spellType);
+        List<Spell> typedSpellsList = returnTypedSpellsList(spellType);
 
         for (Spell spell : typedSpellsList) {
             System.out.printf("%-15s", "("+returnColoredText(String.valueOf(index), ANSI_YELLOW)+")");
@@ -398,20 +398,20 @@ public abstract class AbstractCharacter {
         return 1 - (this.maxDefensePoints / this.maxHealthPoints) * maxDefenseReductionPercent;
     }
 
-    public double getSpellCalculatedDamage(Spell spell, AbstractCharacter attackedCharacter) {
+    public double returnSpellCalculatedDamage(Spell spell, AbstractCharacter attackedCharacter) {
         // CALCULATIONS FOR SPELL DAMAGE
-        return getSpellDamage(spell, attackedCharacter) * defenseReductionRatio();
+        return returnSpellDamage(spell, attackedCharacter) * defenseReductionRatio();
     }
 
-    public double getMeleeCalculatedDamage(AbstractCharacter attackedCharacter) {
+    public double returnMeleeCalculatedDamage(AbstractCharacter attackedCharacter) {
         // CALCULATIONS FOR MELEE DAMAGE
-        return getMeleeDamage(attackedCharacter) * defenseReductionRatio();
+        return returnMeleeDamage(attackedCharacter) * defenseReductionRatio();
     }
 
-    public double getSpellChance(Spell spell) {
+    public double returnSpellChance(Spell spell) {
         double luckPercent = 0;
         if (this.getClass() == Wizard.class) {
-            luckPercent = ((Wizard) this).getWizardSpecsPercent().get("luck");
+            luckPercent = ((Wizard) this).returnWizardSpecsPercent().get("luck");
         }
         return spell.getSpellChance() * (1 + luckPercent);
     }
@@ -499,7 +499,7 @@ public abstract class AbstractCharacter {
         if(this.getClass() == Wizard.class) {
             System.out.println(returnColoredText(spell.getSpellSpecialAttackLine(), ANSI_PURPLE));
         }
-        castAttack(getSpellChance(spell), spell.getCharacterState(), attackedCharacter, calculatedDamage, attackAfterCast);
+        castAttack(returnSpellChance(spell), spell.getCharacterState(), attackedCharacter, calculatedDamage, attackAfterCast);
     }
 
     public boolean dodgeSpell(double dodgeChance, AbstractCharacter attackingCharacter) {
@@ -510,7 +510,7 @@ public abstract class AbstractCharacter {
         if (this.getClass() == Wizard.class) {
             text1 = returnColoredText("You dodged " + returnFormattedEnum(((Enemy) attackingCharacter).getEnemyName()) + "'s attack.", ANSI_YELLOW);
             text2 = returnColoredText("You were unable to dodge " + returnFormattedEnum(((Enemy) attackingCharacter).getEnemyName()) + "'s attack.", ANSI_RED);
-            double charismaPercent =  ((Wizard) this).getWizardSpecsPercent().get("charisma");
+            double charismaPercent =  ((Wizard) this).returnWizardSpecsPercent().get("charisma");
             dodgeChance = (dodgeChance / wizardDodgeDivider) * (1 + charismaPercent);
         } else if (this.getClass() == Enemy.class) {
             text1 = returnColoredText(returnFormattedEnum(((Enemy) this).getEnemyName()) + " dodged your attack.", ANSI_YELLOW);
@@ -537,7 +537,7 @@ public abstract class AbstractCharacter {
         if (this.getClass() == Wizard.class) {
             text1 = returnColoredText("You parried " + parriedAttackName + ".", ANSI_YELLOW);
             text2 = returnColoredText("You were unable to parry " + returnFormattedEnum(((Enemy) attackingCharacter).getEnemyName()) + "'s attack.", ANSI_RED);
-            double intelligencePercent =  ((Wizard) this).getWizardSpecsPercent().get("intelligence");
+            double intelligencePercent =  ((Wizard) this).returnWizardSpecsPercent().get("intelligence");
             parryPoints = (parryPoints / wizardParryDivider) * (1 + intelligencePercent);
         } else if (this.getClass() == Enemy.class) {
             text1 = returnColoredText(returnFormattedEnum(((Enemy) this).getEnemyName()) + " parried your attack and returned", ANSI_YELLOW)

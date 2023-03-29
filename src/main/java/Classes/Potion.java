@@ -185,7 +185,7 @@ public class Potion extends AbstractItem implements Cloneable {
             .potionValue(-1)
             .build();
 
-    public static List<Potion> getAllPotions(){
+    public static List<Potion> returnAllPotions(){
         List<Potion> potionList = new ArrayList<>();
         Field[] declaredFields = Potion.class.getDeclaredFields();
 
@@ -203,10 +203,10 @@ public class Potion extends AbstractItem implements Cloneable {
         return potionList;
     }
 
-    public static List<String> getAllPotionsNamesList() {
+    public static List<String> returnAllPotionsNamesList() {
         List<String> potionNameList = new ArrayList<>();
 
-        for(Potion potion: getAllPotions()) {
+        for(Potion potion: returnAllPotions()) {
             potionNameList.add(potion.getItemName());
         }
         return potionNameList;

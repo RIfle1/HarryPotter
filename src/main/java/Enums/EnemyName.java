@@ -103,19 +103,19 @@ public enum EnemyName {
     }
 
     public static void resetBossVulnerableSpellsList() {
-        getAllBasicEnemyNames().stream().filter(enemyName -> enemyName.getEnemyType().equals(EnemyType.BOSS)).forEach(EnemyName::resetVulnerableSpellsList);
+        returnAllBasicEnemyNames().stream().filter(enemyName -> enemyName.getEnemyType().equals(EnemyType.BOSS)).forEach(EnemyName::resetVulnerableSpellsList);
     }
 
     public static int getEnemyNameMaxLength() {
         return getEnemyNameList().stream().map(String::length).toList().stream().reduce(0, Integer::max);
     }
 
-    public static List<EnemyName> getAllEnemyNames() {
+    public static List<EnemyName> returnAllEnemyNames() {
         EnemyName[] enemyNameValues = EnemyName.values();
         return new ArrayList<>(Arrays.asList(enemyNameValues));
     }
 
-    public static List<EnemyName> getAllBasicEnemyNames() {
+    public static List<EnemyName> returnAllBasicEnemyNames() {
         return Arrays.stream(EnemyName.values()).filter(enemyName -> enemyName.enemyType.equals(EnemyType.BASIC)).toList();
     }
 

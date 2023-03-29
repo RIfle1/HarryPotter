@@ -14,7 +14,7 @@ import static Classes.Color.*;
 import static Classes.Wizard.wizard;
 import static Enums.EnumMethods.returnFormattedEnum;
 import static Functions.ConsoleFunctions.printTitle;
-import static Functions.MechanicsFunctions.generateDoubleBetween;
+import static Functions.GeneralFunctions.generateDoubleBetween;
 
 
 @Getter
@@ -54,7 +54,7 @@ public class Enemy extends AbstractCharacter {
 
     public static EnemyName generateRandomBasicEnemy() {
         List<EnemyName> allEnemyNames;
-        allEnemyNames = EnemyName.getAllBasicEnemyNames();
+        allEnemyNames = EnemyName.returnAllBasicEnemyNames();
         int randomInt = (int) generateDoubleBetween(0, allEnemyNames.toArray().length - 1);
 
         return allEnemyNames.get(randomInt);
@@ -68,9 +68,9 @@ public class Enemy extends AbstractCharacter {
         }
     }
 
-    public static List<AbstractItem> generateRandomPotions(int potionNumber) throws CloneNotSupportedException {
+    public static List<AbstractItem> generateRandomPotions(int potionNumber) {
         // GENERATE 3 RANDOM POTIONS FOR EACH ENEMY
-        List<Potion> allPotionsList = Potion.getAllPotions();
+        List<Potion> allPotionsList = Potion.returnAllPotions();
         List<AbstractItem> randomPotions = new ArrayList<>();
 
         for (int y = 0; y < potionNumber; y++) {
@@ -79,7 +79,11 @@ public class Enemy extends AbstractCharacter {
             Potion chosenPotion = allPotionsList.get(potionIndex - 1);
 
             if (potionChance <= chosenPotion.getItemDropChance()) {
-                randomPotions.add(chosenPotion.clone());
+                try {
+                    randomPotions.add(chosenPotion.clone());
+                } catch (CloneNotSupportedException e) {
+                    e.printStackTrace();
+                }
             }
 
         }
@@ -90,7 +94,7 @@ public class Enemy extends AbstractCharacter {
         enemiesHashMap.forEach((key, value) -> enemiesKeyList.add(key));
     }
 
-    public static void generateEnemiesSub(double minLevel, double maxLevel, EnemyName enemyName, Enemy[] enemies, int i) throws CloneNotSupportedException {
+    public static void generateEnemiesSub(double minLevel, double maxLevel, EnemyName enemyName, Enemy[] enemies, int i) {
         int enemyLevel;
         if (minLevel == maxLevel) {
             enemyLevel = (int) minLevel;
@@ -127,7 +131,7 @@ public class Enemy extends AbstractCharacter {
         enemiesHashMap.put(enemies[i].getName(), enemies[i]);
     }
 
-    public static void generateEnemies(double minLevel, double maxLevel, int amount) throws CloneNotSupportedException {
+    public static void generateEnemies(double minLevel, double maxLevel, int amount) {
         // ENEMIES LIST
         Enemy[] enemies = new Enemy[amount];
         for (int i = 0; i < amount; i++) {
@@ -137,7 +141,7 @@ public class Enemy extends AbstractCharacter {
         updateEnemiesKeyList(enemiesHashMap);
     }
 
-    public static void generateEnemies(double minLevel, double maxLevel, int amount, EnemyName enemyName) throws CloneNotSupportedException {
+    public static void generateEnemies(double minLevel, double maxLevel, int amount, EnemyName enemyName) {
         // ENEMIES LIST
         Enemy[] enemies = new Enemy[amount];
         for (int i = 0; i < amount; i++) {
@@ -202,7 +206,7 @@ public class Enemy extends AbstractCharacter {
 
     public void updateBossVulnerableSpellsList() throws CloneNotSupportedException {
         if(this.getEnemyName() == EnemyName.BASILISK) {
-            if(wizard.getHouse().getHouseName() == HouseName.GRYFFINDOR) {
+            if(wizard.getHouseName() == HouseName.GRYFFINDOR) {
                 EnemyName.BASILISK.addVulnerableSpell(Spell.legendarySword.clone());
             }
             else {
@@ -220,19 +224,29 @@ public class Enemy extends AbstractCharacter {
         }
     }
 
-    public void checkHpRatio() throws CloneNotSupportedException {
+    public void checkHpRatio() {
         double hpLimit = this.getMaxHealthPoints() * this.getEnemyName().getEnemyHpLimitRatio();
 
         if(this.getEnemyName().getEnemyType() == EnemyType.BOSS && this.getHealthPoints() <= hpLimit && this.getEnemyName().getVulnerableSpellList().size() == 0) {
-            this.updateBossVulnerableSpellsList();
+            try {
+                this.updateBossVulnerableSpellsList();
+            }
+            catch (CloneNotSupportedException e) {
+                e.printStackTrace();
+            }
+
             String text = returnFormattedEnum(this.getEnemyName()) + " is only " +  returnColoredText("vulnerable ", ANSI_YELLOW) + "to: \n" + getVulnerableSpellsList();
             printTitle(text);
 
-            if(this.getEnemyName() == EnemyName.BASILISK && wizard.getHouse().getHouseName() == HouseName.GRYFFINDOR) {
+            if(this.getEnemyName() == EnemyName.BASILISK && wizard.getHouseName() == HouseName.GRYFFINDOR) {
                 printTitle(returnColoredText("You see a shiny object in the distance... You pick it up and realize it's Godric Gryffindor's legendary sword.", ANSI_GREEN));
                 printTitle(returnColoredText("You can now use this legendary sword to defeat the Basilisk", ANSI_BLUE));
-
-                wizard.putSpellsHashMap(Spell.legendarySword.clone());
+                try {
+                    wizard.putSpellsHashMap(Spell.legendarySword.clone());
+                }
+                catch (CloneNotSupportedException e) {
+                    e.printStackTrace();
+                }
                 updateSpellsKeyList(this.getSpellsHashMap());
             }
         }
@@ -241,11 +255,7 @@ public class Enemy extends AbstractCharacter {
     public static void checkEnemiesHpRatio() {
         // TELL THE PLAYER THE CHANGES IN THE ENEMY
         enemiesHashMap.forEach((key, value) -> {
-            try {
-                value.checkHpRatio();
-            } catch (CloneNotSupportedException e) {
-                throw new RuntimeException(e);
-            }
+            value.checkHpRatio();
         });
     }
 

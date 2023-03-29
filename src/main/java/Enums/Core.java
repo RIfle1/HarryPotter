@@ -5,7 +5,7 @@ import java.util.List;
 import static Enums.EnumMethods.returnFormattedEnum;
 
 public enum Core {
-    PHEONIX_FEATHER,
+    PHOENIX_FEATHER,
     DRAGON_HEARTSTRING,
     TEST;
 
