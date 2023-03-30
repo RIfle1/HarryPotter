@@ -27,14 +27,14 @@ public enum EnemyName {
         }
     }.evaluate()),
     DEMENTOR(EnemyCombat.MELEE, EnemyType.BOSS, new ArrayList<>(), 100, 0, 0.3, 110, 30, null),
-    PETER_PETTIGREW(EnemyCombat.SPELL, EnemyType.BOSS, new ArrayList<>(), 300, 0.2, 0.2, 80, 40, new Object() {
+    PETER_PETTIGREW(EnemyCombat.SPELL, EnemyType.BOSS, new ArrayList<>(), 300, 0.2, 0, 80, 40, new Object() {
         List<String> evaluate() {
             List<String> strings = new ArrayList<>();
             strings.add(peterPettigrewDeathLine);
             return strings;
         }
     }.evaluate()),
-    DOLORES_UMBRIDGE(EnemyCombat.SPELL, EnemyType.BOSS, new ArrayList<>(), 10000, 0, 0.2, 80, 40, new Object() {
+    DOLORES_UMBRIDGE(EnemyCombat.SPELL, EnemyType.BOSS, new ArrayList<>(), 10000, 0, 0, 80, 40, new Object() {
         List<String> evaluate() {
             List<String> strings = new ArrayList<>();
             strings.add(doloresUmbridgeDeathLine1);
@@ -43,14 +43,14 @@ public enum EnemyName {
         }
     }.evaluate()),
     DEATH_EATER(EnemyCombat.MELEE, EnemyType.BOSS, new ArrayList<>(), 150, 0, 0.4, 120, 40, null),
-    VOLDEMORT(EnemyCombat.SPELL, EnemyType.BOSS, new ArrayList<>(), 300, 0, 1, 120, 40, new Object() {
+    VOLDEMORT(EnemyCombat.SPELL, EnemyType.BOSS, new ArrayList<>(), 300, 0, 0, 120, 40, new Object() {
         List<String> evaluate() {
             List<String> strings = new ArrayList<>();
             strings.add(voldemortDeathLine);
             return strings;
         }
     }.evaluate()),
-    BELLATRIX_LESTRANGE(EnemyCombat.SPELL, EnemyType.BOSS, new ArrayList<>(), 200, 0, 1, 120, 40, new Object() {
+    BELLATRIX_LESTRANGE(EnemyCombat.SPELL, EnemyType.BOSS, new ArrayList<>(), 200, 0, 0, 120, 40, new Object() {
         List<String> evaluate() {
             List<String> strings = new ArrayList<>();
             strings.add(bellatrixLestrangeDeathLine);

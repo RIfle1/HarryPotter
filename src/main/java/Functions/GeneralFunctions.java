@@ -1,8 +1,9 @@
 package Functions;
 
-import AbstractClasses.AbstractItem;
 import Classes.Potion;
-import Enums.Pet;
+import Classes.Spell;
+import Classes.Wand;
+import Enums.Level;
 import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -103,66 +104,129 @@ public class GeneralFunctions {
 
     public static void runSetterMethod(Class<?> c, Object object, String methodString, Object value) {
         Method method = Objects.requireNonNull(getMethod(c, methodString));
-        Object methodParameterType = method.getParameterTypes()[0];
-        Object methodParameter = method.getParameters()[0];
+        Class<?> methodParameterType = method.getParameterTypes()[0];
 
-        if(methodParameterType.equals(double.class)
-                || methodParameterType.equals(int.class)
-                || methodParameterType.equals(String.class)) {
-//            System.out.println(method.getName() + "-" + methodParameterType + "-up");
+        if(methodParameterType.equals(String.class)) {
             runSetter(c, object, methodString, value);
         }
-        else if (methodParameterType.equals(List.class)) {
-            ParameterizedType pType = (ParameterizedType) method.getGenericParameterTypes()[0];
-            Class<?> listParameterClass = (Class<?>) pType.getActualTypeArguments()[0];
+        else if(methodParameterType.equals(double.class)) {
+            runSetter(c, object, methodString, value);
+        }
+        else if(methodParameterType.equals(int.class)) {
+            Long valueLong = (Long) value;
+            int valueInt = valueLong.intValue();
 
+            runSetter(c, object, methodString, valueInt);
+        }
+        else if(methodParameterType.equals(double[].class)) {
             JSONArray jsonArray = (JSONArray) value;
-            List<?> newList = jsonArray.stream().toList();
+            double[] doubleArray = jsonArray.stream().mapToDouble(o -> (double) o).toArray();
+            runSetter(c, object, methodString, doubleArray);
+        }
+        else if (methodParameterType.equals(List.class)) {
+            Class<?> listParameterClass = returnParametersClass(method).get(0);
+
+            List<?> objectsList = new ArrayList<>();
+            JSONArray jsonArray = (JSONArray) value;
+
+
+            if(jsonArray != null) {
+                objectsList = jsonArray.stream().toList();
+            }
 
             if(listParameterClass.equals(String.class)) {
-
-                runSetter(c, object, methodString, newList);
+                runSetter(c, object, methodString, objectsList);
             }
-            else if(findAllClasses("AbstractClasses").contains(listParameterClass)) {
-                AbstractItem[] abstractItems = new AbstractItem[newList.size()];
-
-
-                for (int i = 0; i < newList.size(); i++) {
-                    JSONObject item = (JSONObject) newList.get(i);
-
-                    item.forEach((k, v) -> {
-
-                    });
-
-
-                }
-
-
-
-
+            else if(findAllClasses("Classes").contains(listParameterClass)) {
+                List<Object> objectList = returnSetterObject(listParameterClass, objectsList);
+                runSetter(c, object, methodString, objectList);
             }
-
-
         }
         else if (methodParameterType.equals(HashMap.class)) {
-//            runSetter(c, object, methodString, returnSerializableHashMap(value));
+            List<Class<?>> hashMapParameterClasses = returnParametersClass(method);
+            Class<?> firstParameterClass = hashMapParameterClasses.get(0);
+            Class<?> secondParameterClass = hashMapParameterClasses.get(1);
+
+            if(firstParameterClass.equals(String.class) && secondParameterClass.equals(Spell.class)) {
+                List<Object> objectsList = new ArrayList<>();
+                HashMap<String, Object> spellsHashMap = new HashMap<>();
+
+                JSONObject jsonObject = (JSONObject) value;
+                jsonObject.forEach((k, v) -> {
+                    objectsList.add(v);
+                });
+
+                List<Object> objectList = returnSetterObject(secondParameterClass, objectsList);
+                objectList.forEach(o -> {
+                    spellsHashMap.put(((Spell) o).getSpellName(), o);
+                });
+                runSetter(c, object, methodString, spellsHashMap);
+            }
+
         }
         else if (findAllClasses("Classes").contains(methodParameterType)) {
-//            runSetter(c, object, methodString, getJSONObject(methodParameterType.getClass(), value));
+            List<Object> objectsList = new ArrayList<>(Collections.singletonList((JSONObject) value));
+            runSetter(c, object, methodString, returnSetterObject(methodParameterType, objectsList).get(0));
+        }
+        else if(findAllClasses("Enums").contains(c)) {
+            if(c.equals(Level.class)) {
+                ((JSONObject) value).forEach((k, v) -> {
+                    Enum<?> level = Enum.valueOf((Class<Enum>) c, k.toString());
+                    ((JSONObject) v).forEach((field, val) -> {
+                        runSetter(Level.class, level, methodString, val);
+                    });
+                });
+            }
         }
         else {
             Enum<?> e = Enum.valueOf((Class<Enum>) methodParameterType, value.toString());
             runSetter(c, object, methodString, e);
         }
+    }
 
+    private static List<Class<?>> returnParametersClass(Method method) {
+        ParameterizedType pType = (ParameterizedType) method.getGenericParameterTypes()[0];
+        return Arrays.stream(pType.getActualTypeArguments()).map(type -> (Class<?>) type).collect(Collectors.toList());
+    }
 
+    @NotNull
+    private static List<Object> returnSetterObject(Class<?> objectClass, List<?> objectsList) {
+        List<Object> objectList = new ArrayList<>();
+
+        for (Object o : objectsList) {
+
+            Object obj = null;
+            if(objectClass.equals(Potion.class))
+                obj = Potion.builder().build();
+            else if(objectClass.equals(Spell.class)) {
+                obj = Spell.builder().build();
+            }
+            else if(objectClass.equals(Wand.class)) {
+                obj = Wand.builder().build();
+            }
+            else {
+                System.out.println("Error: " + objectClass + "has to be added");
+            }
+            JSONObject jsonObject = (JSONObject) o;
+
+            Object finalObj = obj;
+            returnStringSettersList(objectClass).forEach(ms -> {
+                String fieldString1 = ms.replace("set", "");
+                String fieldString2 = fieldString1.replaceFirst(fieldString1.substring(0, 1), fieldString1.substring(0, 1).toLowerCase());
+
+                runSetterMethod(objectClass, finalObj, ms, jsonObject.get(fieldString2));
+            });
+            objectList.add(obj);
+        }
+        return objectList;
     }
 
     private static void runSetter(Class<?> c, Object object, String methodString, Object value) {
         try {
             Objects.requireNonNull(getMethod(c, methodString)).invoke(object, value);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+        } catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException e) {
+            System.out.println("Error: " + methodString + " " + value);
+//            e.printStackTrace();
         }
     }
 
@@ -176,14 +240,19 @@ public class GeneralFunctions {
             e.printStackTrace();
         }
 
-        return returnObject(method, objectValue);
+        return returnGetterObject(method, objectValue);
     }
 
-    private static Object returnObject(Method method, Object objectValue) {
+    private static Object returnGetterObject(Method method, Object objectValue) {
         if (method.getReturnType().equals(double.class) ||
                 method.getReturnType().equals(int.class) ||
-                method.getReturnType().equals(String.class)) {
+                method.getReturnType().equals(String.class) ||
+                method.getReturnType().equals(boolean.class)) {
             return objectValue;
+        } else if(method.getReturnType().equals(double[].class)) {
+            List<Object> doubleList = new ArrayList<>();
+            Arrays.stream((double[]) objectValue).forEach(doubleList::add);
+            return doubleList;
         } else if (method.getReturnType().equals(List.class)) {
             return returnSerializableList(objectValue);
         } else if (method.getReturnType().equals(HashMap.class)) {
@@ -195,8 +264,6 @@ public class GeneralFunctions {
             return objectValue.toString();
         }
     }
-
-
 
     private static Serializable returnSerializableHashMap(Object objectValue) {
         List<Object> objectList = new ArrayList<>();
@@ -227,7 +294,6 @@ public class GeneralFunctions {
             objectList.forEach(o -> newList.add(getJSONObject(o.getClass(), o)));
 //            objectList.forEach(o -> newList.add(o.toString()));
 
-//            System.out.println(newList);
 
             return newList;
         } else {

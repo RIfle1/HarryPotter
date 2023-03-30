@@ -253,11 +253,12 @@ public abstract class AbstractCharacter {
     }
 
     public void updateSpellsKeyList(HashMap<String, Spell> spellsHashMap) {
-        spellsKeyList.clear();
-        spellsHashMap.forEach((key, value) -> spellsKeyList.add(key));
+        this.spellsKeyList = new ArrayList<>();
+        spellsHashMap.forEach((key, value) -> this.spellsKeyList.add(key));
     }
 
     public void updateSpellsHashMap() {
+        this.spellsHashMap = new HashMap<>();
         for (Spell spell : Spell.returnAllSpells()) {
             if (spell.getSpellLevelRequirement() >= 0 && spell.getSpellLevelRequirement() <= this.getLevel() && !this.getSpellsHashMap().containsKey(spell.getSpellName())) {
                 try {
@@ -340,7 +341,7 @@ public abstract class AbstractCharacter {
         return spell.getSpellReadyIn() == 0;
     }
 
-    public void setSpellReadyIn(Spell spell) {
+    public void resetSpellReadyIn(Spell spell) {
         spell.setSpellReadyIn(spell.getSpellCooldown());
     }
 
@@ -503,7 +504,7 @@ public abstract class AbstractCharacter {
 
         // SPELL GETS USED AND PUT ON A COOLDOWN
         this.reduceSpellsCooldown(1);
-        this.setSpellReadyIn(spell);
+        this.resetSpellReadyIn(spell);
 
         // CONSOLE STUFF
         System.out.println(returnColoredText(spellName + "!", spell.getSpellColor()));

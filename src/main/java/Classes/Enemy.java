@@ -63,7 +63,7 @@ public class Enemy extends AbstractCharacter {
 
     public static EnemyName generateRandomBasicEnemy() {
         List<EnemyName> allEnemyNames;
-        allEnemyNames = EnemyName.returnAllBasicEnemyNames();
+        allEnemyNames = EnemyName.returnAllEnemyNames();
         int randomInt = (int) generateDoubleBetween(0, allEnemyNames.toArray().length - 1);
 
         return allEnemyNames.get(randomInt);
@@ -100,6 +100,7 @@ public class Enemy extends AbstractCharacter {
     }
 
     public static void updateEnemiesKeyList(HashMap<String, Enemy> enemiesHashMap) {
+        enemiesKeyList.clear();
         enemiesHashMap.forEach((key, value) -> enemiesKeyList.add(key));
     }
 
@@ -110,6 +111,8 @@ public class Enemy extends AbstractCharacter {
         } else {
             enemyLevel = (int) generateDoubleBetween(minLevel, maxLevel);
         }
+
+        System.out.println(enemyLevel);
 
         int enemyHp = (int) Math.round(Math.exp(enemyLevel * wizard.getDifficulty().getEnemyDiffMultiplier()) * enemyName.getEnemyBaseHp());
         int enemyDp = (int) Math.round((Math.exp(enemyLevel * wizard.getDifficulty().getEnemyDiffMultiplier()) * enemyName.getEnemyBaseDp()) / 3);

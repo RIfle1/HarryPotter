@@ -289,6 +289,7 @@ public class LevelFunctions {
         if((enemiesHashMap.isEmpty() || supposedTimeout) && wizard.getHealthPoints() > 0) {
             printTitle(returnColoredText(graduationLine, ANSI_YELLOW));
             wizard.setSpecPoints(wizard.getSpecPoints() + Wizard.wizardSpecs);
+            wizard.reduceSpellsCooldown();
             unlockNextLevel(level);
         }
     }
@@ -418,6 +419,9 @@ public class LevelFunctions {
 
         generateEnemies(enemyMinLevel, enemyMaxLevel, enemyAmount, enemyName1);
         generateEnemies(enemyMinLevel, enemyMaxLevel, enemyAmount, enemyName2);
+
+        System.out.println(enemiesHashMap);
+        System.out.println(enemiesKeyList);
 
         levelRepetition(level, objective, enemyDeathLine, graduationLine, 100, false);
     }

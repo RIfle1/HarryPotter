@@ -26,7 +26,7 @@ public enum Level {
     }
 
 
-    public void setLevelStatus(boolean unlocked) {
+    public void setUnlocked(boolean unlocked) {
         this.unlocked = unlocked;
     }
 
@@ -50,7 +50,7 @@ public enum Level {
 
     public static void unlockNextLevel(Level previousLevel) {
         Level nextLevel = setLevel(returnLevelList().get(returnLevelList().indexOf(returnFormattedEnum(previousLevel)) + 1));
-        nextLevel.setLevelStatus(true);
+        nextLevel.setUnlocked(true);
     }
 
     public static Level setLevel(String level) {

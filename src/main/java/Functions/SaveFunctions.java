@@ -51,8 +51,7 @@ public class SaveFunctions {
     private static JSONObject getJSONObjectSub(Class<?> c, Object object) {
         JSONObject jsonObject = new JSONObject();
         returnStringGettersList(c).forEach(string -> {
-            String string1 = string.replace("get", "");
-            String string2 = string1.replaceFirst(string1.substring(0, 1), string1.substring(0, 1).toLowerCase());
+            String string2 = returnFieldFromMethod(string, "get");
             jsonObject.put(string2, runGetterMethod(c, object, string));
         });
         return jsonObject;
@@ -61,15 +60,13 @@ public class SaveFunctions {
 
     public static JSONObject getJSONEnum(Object enumList) {
         JSONObject jsonObject = new JSONObject();
-        Class<?> e = ((List<?>) enumList).get(0).getClass();
-        AtomicInteger counter = new AtomicInteger();
+        Class<?> enuM = ((List<?>) enumList).get(0).getClass();
 
         ((List<?>) enumList).forEach(o -> {
             JSONObject jsonObject1 = new JSONObject();
-            returnStringGettersList(e).forEach(string -> {
-                String string1 = string.replace("get", "");
-                String string2 = string1.replaceFirst(string1.substring(0, 1), string1.substring(0, 1).toLowerCase());
-                jsonObject1.put(string2, runGetterMethod(e, o, string));
+            returnStringGettersList(enuM).stream().filter(string -> !string.equals("getRequiredSpellList")).forEach(string -> {
+                String string2 = returnFieldFromMethod(string, "is");
+                jsonObject1.put(string2, runGetterMethod(enuM, o, string));
             });
             jsonObject.put(o.toString(), jsonObject1);
         });
@@ -100,6 +97,14 @@ public class SaveFunctions {
                 .collect(Collectors.toList());
     }
 
+    public static List<String> returnFormattedSaveFiles(String dir) {
+        return returnSaveFiles("saves").stream()
+                .map(s -> s.replace("level", "")
+                        .replace("wizard","")
+                        .replace(".json", ""))
+                .distinct().toList();
+    }
+
     public static void loadProgress(String filename) {
         List<String> saves = returnSaveFiles("saves").stream().filter(s -> s.contains(filename)).toList();
         JSONParser parser = new JSONParser();
@@ -115,19 +120,57 @@ public class SaveFunctions {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-//        System.out.println(returnStringSettersList(Wizard.class));
-
         loadClass(Wizard.class, wizard, (JSONObject) wizardJSONObject);
-//        JSONObject jsonObject = (JSONObject) jsonObj;
+        loadEnum(Level.class, (JSONObject) levelJSONObject);
     }
 
     public static void loadClass(Class<?> c, Object object, JSONObject jsonObject) {
         returnStringSettersList(c).forEach(methodString -> {
-            String fieldString1 = methodString.replace("set", "");
-            String fieldString2 = fieldString1.replaceFirst(fieldString1.substring(0, 1), fieldString1.substring(0, 1).toLowerCase());
+            String fieldString = returnFieldFromMethod(methodString, "set");
 
-            runSetterMethod(c, object, methodString, jsonObject.get(fieldString2));
+            runSetterMethod(c, object, methodString, jsonObject.get(fieldString));
         });
+    }
+
+    public static void loadEnum(Class<?> c, JSONObject jsonObject) {
+        returnStringSettersList(c).forEach(methodString -> {
+            runSetterMethod(c, c, methodString, jsonObject);
+        });
+    }
+
+    private static String returnFieldFromMethod(String methodString, String set) {
+        String fieldString1 = methodString.replace(set, "");
+        return fieldString1.replaceFirst(fieldString1.substring(0, 1), fieldString1.substring(0, 1).toLowerCase());
+    }
+
+    public static void saveGame() {
+        List<String> saves = returnFormattedSaveFiles("saves");
+
+        printTitle("Current Save Games: ");
+        printChoices(saves);
+
+        printTitle("Enter the name of the save file you wish to save to: ");
+        String filename = returnChoiceString();
+
+        if(saves.contains(filename)) {
+            printTitle("This save file already exists, do you wish to overwrite it? (y/n)");
+            if(returnYesOrNo()) {
+                saveProgress(filename);
+            }
+        } else {
+            saveProgress(filename);
+        }
+        printTitle("Save file " + filename + " has been saved.");
+    }
+
+    public static void loadGame() {
+        List<String> saves = returnFormattedSaveFiles("saves");
+
+        printTitle("Select a game to load: ");
+        printChoices(saves);
+
+        String filename = saves.get(returnChoiceInt(1, saves.size(), false, null) - 1);
+        loadProgress(filename);
+        printTitle("Game " + filename + " has been loaded.");
     }
 }

@@ -243,43 +243,11 @@ public class Wizard extends AbstractCharacter {
             .spellsKeyList(new ArrayList<>())
             .potionList(new ArrayList<>())
             .activePotionsList(new ArrayList<>())
-            .experience(0)
+            .experience(10000)
             .charisma(0)
             .strength(0)
             .intelligence(0)
             .luck(0)
             .specPoints(0)
             .build();
-
-    public static Wizard testWizard = Wizard.builder()
-            .healthPoints(wizardBaseHp)
-            .defensePoints(wizardBaseDp)
-            .maxDefensePoints(wizardBaseDp)
-            .maxHealthPoints(wizardBaseHp)
-            .difficulty(Difficulty.DEATH_WISH)
-            .characterState(CharacterState.STANDING)
-            .level(0)
-            .firstName("Test")
-            .lastName("Wizard")
-            .name("Test Wizard")
-            .gender(Gender.MALE)
-            .pet(Pet.CAT)
-            .wand(new Wand(Core.PHOENIX_FEATHER, 12))
-            .houseName(HouseName.RAVENCLAW)
-            .spellsHashMap(new HashMap<>())
-            .spellsKeyList(new ArrayList<>())
-            .potionList(new ArrayList<>())
-            .activePotionsList(new ArrayList<>())
-            .experience(580)
-            .charisma(0)
-            .strength(0)
-            .specPoints(0)
-            .intelligence(0)
-            .luck(0)
-            .build();
-
-
-
-
-
 }

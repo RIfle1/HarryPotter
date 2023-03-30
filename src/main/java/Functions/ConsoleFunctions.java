@@ -12,6 +12,8 @@ import static Classes.Spell.returnAllSpells;
 import static Functions.LevelFunctions.levelHashMap;
 import static Classes.Wizard.wizard;
 import static Enums.Level.*;
+import static Functions.SaveFunctions.loadGame;
+import static Functions.SaveFunctions.saveGame;
 import static java.lang.System.exit;
 
 public class ConsoleFunctions {
@@ -167,24 +169,28 @@ public class ConsoleFunctions {
     }
 
     public static void chooseAction() {
+        wizard.updateStats();
+        wizard.restoreWizardHpDf();
+
         String[] actionList = {
                 "Choose Level (" + Level.returnUnlockedLevelsList().size() + "/" + returnAllLevels().size() + " unlocked)",
                 "Upgrade Specs" + (wizard.getSpecPoints() > 0 ? " (" + (int) wizard.getSpecPoints() + " points available)" : " (No points available)"),
                 "Check Stats",
-                "Check Available Spells (" + wizard.getSpellsKeyList().size() + "/" + returnAllSpells().size() + " available)"
+                "Check Available Spells (" + wizard.getSpellsKeyList().size() + "/" + returnAllSpells().size() + " available)",
+                "Save Game",
+                "Load Game"
         };
 
         printColoredHeader("Choose your action: ");
         printChoices(actionList);
-
-        wizard.updateStats();
-        wizard.restoreWizardHpDf();
 
         switch (returnChoiceInt(1, actionList.length, false, null)) {
             case 1 -> chooseLevel();
             case 2 -> wizard.upgradeSpec(ConsoleFunctions::chooseAction);
             case 3 -> System.out.println(wizard.returnAllStringStats(0));
             case 4 -> wizard.printAllCharacterSpells();
+            case 5 -> saveGame();
+            case 6 -> loadGame();
         }
         continuePromptExtra();
         chooseAction();
