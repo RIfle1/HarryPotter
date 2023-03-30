@@ -288,19 +288,19 @@ public class Spell implements Cloneable{
             .spellColor(ANSI_RED)
             .build();
 
-    public static Spell oneClap = Spell.builder()
-            .spellName("One Clap")
-            .spellType(MoveType.ATTACK)
-            .spellDescription("enemy insta ded")
-            .spellSpecialAttackLine("The enemy got one clapped")
-            .spellLevelRequirement(0)
-            .spellDamage(new double[]{20000000, 20000000})
-            .characterState(CharacterState.STUNNED)
-            .spellChance(1)
-            .spellCooldown(1)
-            .spellReadyIn(0)
-            .spellColor(ANSI_RED)
-            .build();
+//    public static Spell oneClap = Spell.builder()
+//            .spellName("One Clap")
+//            .spellType(MoveType.ATTACK)
+//            .spellDescription("enemy insta ded")
+//            .spellSpecialAttackLine("The enemy got one clapped")
+//            .spellLevelRequirement(0)
+//            .spellDamage(new double[]{20000000, 20000000})
+//            .characterState(CharacterState.STUNNED)
+//            .spellChance(1)
+//            .spellCooldown(1)
+//            .spellReadyIn(0)
+//            .spellColor(ANSI_RED)
+//            .build();
 
 
     public static int getSpellNameMaxLength() {

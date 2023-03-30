@@ -33,11 +33,11 @@ public class CharacterCreation {
 
         printColoredHeader("Select your character's gender:");
         printChoices(Gender.getGenderList());
-        gender = Gender.setGender(Gender.getGenderList().get(returnChoiceInt(Gender.getGenderList().size(), false) - 1));
+        gender = Gender.setGender(Gender.getGenderList().get(returnChoiceInt(1, Gender.getGenderList().size(), false, null) - 1));
 
         printColoredHeader("Select your pet");
         printChoices(Pet.getPetList());
-        pet = Pet.setPet(Pet.getPetList().get(returnChoiceInt(Pet.getPetList().size(), false) - 1));
+        pet = Pet.setPet(Pet.getPetList().get(returnChoiceInt(1, Pet.getPetList().size(), false, null) - 1));
 
         wand = wandCreation();
         houseName = sortingHat();
@@ -45,14 +45,14 @@ public class CharacterCreation {
         printColoredHeader("The sorting hat thinks you should be in the house of " + EnumMethods.returnFormattedEnum(houseName)+". Do you accept?");
 
         boolean answer = returnYesOrNo();
-        if(answer) {
+        if(!answer) {
             houseName = houseChoice();
         }
         printColoredHeader("Congratulations!, You are now part of the " + EnumMethods.returnFormattedEnum(houseName) + " House.");
 
         printColoredHeader("Choose the difficulty of your game: ");
         printChoices(Difficulty.getDifficultyList());
-        difficulty = Difficulty.setDifficulty(Difficulty.getDifficultyList().get(returnChoiceInt(Difficulty.getDifficultyList().size(), false) - 1));
+        difficulty = Difficulty.setDifficulty(Difficulty.getDifficultyList().get(returnChoiceInt(1, Difficulty.getDifficultyList().size(), false, null) - 1));
 
 
         System.out.println(
@@ -83,7 +83,7 @@ public class CharacterCreation {
                 .houseName(houseName)
                 .spellsHashMap(new HashMap<>())
                 .spellsKeyList(new ArrayList<>())
-                .itemList(new ArrayList<>())
+                .potionList(new ArrayList<>())
                 .activePotionsList(new ArrayList<>())
                 .experience(0)
                 .charisma(0)
@@ -103,10 +103,10 @@ public class CharacterCreation {
 
         printColoredHeader("Select your wand's Core:");
         printChoices(Core.getCoreList());
-        core = Core.setCore(Core.getCoreList().get(returnChoiceInt(Core.getCoreList().size(), false) - 1));
+        core = Core.setCore(Core.getCoreList().get(returnChoiceInt(1, Core.getCoreList().size(), false, null) - 1));
 
         printColoredHeader("Select your wand's Size (10-27):");
-        size = returnChoiceInt(10, 27, false);
+        size = returnChoiceInt(10, 27, false, null);
 
         return new Wand(core, size);
     }
@@ -114,7 +114,7 @@ public class CharacterCreation {
     public static HouseName houseChoice() {
         printColoredHeader("Select your House:");
         printChoices(HouseName.getHouseNameList());
-        return HouseName.setHouseName(HouseName.getHouseNameList().get(returnChoiceInt(HouseName.getHouseNameList().size(), false) - 1));
+        return HouseName.setHouseName(HouseName.getHouseNameList().get(returnChoiceInt(1, HouseName.getHouseNameList().size(), false, null) - 1));
 
     }
 
@@ -125,7 +125,7 @@ public class CharacterCreation {
         questionList1.add("I can’t wait to start classes.");
         questionList1.add("I can’t wait to explore.");
         printChoices(questionList1);
-        returnChoiceInt(questionList1.size(), false);
+        returnChoiceInt(1, questionList1.size(), false, null);
 
         printColoredHeader("Hmm. I wonder. Hmm. I detect something in you. A certain sense of — hmm — what is it?");
         HashMap<String, HouseName> questionMap2 = new HashMap<>();
@@ -138,7 +138,7 @@ public class CharacterCreation {
         questionMap2.forEach((key, value) -> questionList2.add(key));
 
         printChoices(questionList2);
-        return questionMap2.get(questionList2.get(returnChoiceInt(questionList2.size(), false) - 1));
+        return questionMap2.get(questionList2.get(returnChoiceInt(1, questionList2.size(), false, null) - 1));
 
     }
 

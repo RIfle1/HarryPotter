@@ -4,6 +4,7 @@ import AbstractClasses.AbstractItem;
 import Classes.Potion;
 import Enums.Pet;
 import org.jetbrains.annotations.NotNull;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.io.BufferedReader;
@@ -113,9 +114,33 @@ public class GeneralFunctions {
         }
         else if (methodParameterType.equals(List.class)) {
             ParameterizedType pType = (ParameterizedType) method.getGenericParameterTypes()[0];
-            Class<?> clazz = (Class<?>) pType.getActualTypeArguments()[0];
+            Class<?> listParameterClass = (Class<?>) pType.getActualTypeArguments()[0];
 
-            // todo- here
+            JSONArray jsonArray = (JSONArray) value;
+            List<?> newList = jsonArray.stream().toList();
+
+            if(listParameterClass.equals(String.class)) {
+
+                runSetter(c, object, methodString, newList);
+            }
+            else if(findAllClasses("AbstractClasses").contains(listParameterClass)) {
+                AbstractItem[] abstractItems = new AbstractItem[newList.size()];
+
+
+                for (int i = 0; i < newList.size(); i++) {
+                    JSONObject item = (JSONObject) newList.get(i);
+
+                    item.forEach((k, v) -> {
+
+                    });
+
+
+                }
+
+
+
+
+            }
 
 
         }
@@ -197,8 +222,13 @@ public class GeneralFunctions {
         boolean containsClass = objectList.stream().anyMatch(o -> findAllClasses("Classes").contains(o.getClass()));
 
         if (containsClass) {
-            List<JSONObject> newList = new ArrayList<>();
+            List<Object> newList = new ArrayList<>();
+
             objectList.forEach(o -> newList.add(getJSONObject(o.getClass(), o)));
+//            objectList.forEach(o -> newList.add(o.toString()));
+
+//            System.out.println(newList);
+
             return newList;
         } else {
             return objectValue;

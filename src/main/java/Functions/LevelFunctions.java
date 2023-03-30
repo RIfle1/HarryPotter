@@ -3,6 +3,7 @@ package Functions;
 import AbstractClasses.AbstractCharacter;
 import Classes.Enemy;
 import Classes.Spell;
+import Classes.Wizard;
 import Enums.*;
 
 import java.util.*;
@@ -35,12 +36,12 @@ public class LevelFunctions {
         int enemyAmount;
 
         printColoredHeader("Select enemy minimum level (1-" + AbstractCharacter.maxLevel + "): ");
-        minLevel = returnChoiceInt(1, AbstractCharacter.maxLevel, false);
+        minLevel = returnChoiceInt(1, AbstractCharacter.maxLevel, false, null);
         printColoredHeader("Select enemy maximum level (1-" + AbstractCharacter.maxLevel + "): ");
-        maxLevel = returnChoiceInt(minLevel, AbstractCharacter.maxLevel, false);
+        maxLevel = returnChoiceInt(minLevel, AbstractCharacter.maxLevel, false, null);
 
         printColoredHeader("Select enemy amount: ");
-        enemyAmount = returnChoiceInt(0, 100, false);
+        enemyAmount = returnChoiceInt(0, 100, false, null);
 
         generateEnemies(minLevel, maxLevel, enemyAmount);
     }
@@ -100,7 +101,7 @@ public class LevelFunctions {
             // ASK THE PLAYER HIS ACTION
             printTitle("What will you do?");
             printChoices(moveTypeList);
-            wizardMoveType = MoveType.setMoveType(moveTypeList.get(returnChoiceInt(moveTypeList.size(), false) - 1));
+            wizardMoveType = MoveType.setMoveType(moveTypeList.get(returnChoiceInt(1, moveTypeList.size(), false, null) - 1));
 
             // EXECUTE ACTION BASED ON PLAYER'S CHOICE
             if (wizardMoveType == MoveType.DODGE) {
@@ -141,7 +142,7 @@ public class LevelFunctions {
 
             printTitle("Choose an enemy.");
             printEnemies();
-            enemyVictim = enemiesHashMap.get(enemiesKeyList.get(returnChoiceInt(enemiesKeyList.size(), false) - 1));
+            enemyVictim = enemiesHashMap.get(enemiesKeyList.get(returnChoiceInt(1, enemiesKeyList.size(), false, null) - 1));
         }
         else {
             // PRINT WIZARD STATS
@@ -157,13 +158,13 @@ public class LevelFunctions {
         // CHOOSE THE SPELL
         printTitle("Choose the spell you want to use.");
         wizard.printTypedSpells(attackMoveType);
-        wizardChosenSpell = wizard.returnTypedSpellsFromInt(attackMoveType, returnChoiceInt(wizard.returnTypedSpellsList(attackMoveType).size(), false) - 1);
+        wizardChosenSpell = wizard.returnTypedSpellsFromInt(attackMoveType, returnChoiceInt(1, wizard.returnTypedSpellsList(attackMoveType).size(), false, null) - 1);
 
         // IF THE SPELL IS READY IT WILL BE USED, OTHERWISE IT WILL PROMPT FOR ANOTHER SPELL
         while (!wizard.checkSpellReady(wizardChosenSpell)) {
             System.out.println(returnColoredText(wizardChosenSpell.getSpellName() + " will be ready in " + wizardChosenSpell.getSpellReadyIn() + " turn(s).", ANSI_RED));
             System.out.println(returnColoredText("Choose another spell.", ANSI_BLUE));
-            wizardChosenSpell = wizard.returnTypedSpellsFromInt(attackMoveType, returnChoiceInt(wizard.returnTypedSpellsList(attackMoveType).size(), false) - 1);
+            wizardChosenSpell = wizard.returnTypedSpellsFromInt(attackMoveType, returnChoiceInt(1, wizard.returnTypedSpellsList(attackMoveType).size(), false, null) - 1);
         }
 
         // CALCULATE THE SPELL DAMAGE BASED ON OTHER BUFFS AND THEN ATTACK THE CHOSEN ENEMY
@@ -191,7 +192,7 @@ public class LevelFunctions {
         continuePromptExtra();
     }
 
-    public static void chooseAction(boolean switchTeams) {
+    public static void chooseLevelAction(boolean switchTeams) {
         List<String> actionList = new ArrayList<>(Arrays.asList("Fight!", "Check Stats", "Use Potion"));
         printColoredHeader("What would you like to do?");
         if(switchTeams && wizard.getHouseName() == HouseName.SLYTHERIN) {
@@ -199,12 +200,13 @@ public class LevelFunctions {
             actionList.add("Switch Teams");
         }
         printChoices(actionList);
-        int choice = returnChoiceInt(1, actionList.size(), false);
+
+        int choice = returnChoiceInt(1, actionList.size(), false, null);
 
         switch (choice) {
             case 1 -> fight();
-            case 2 -> wizard.usePotion();
-            case 3 -> wizard.returnStringStats(0);
+            case 2 -> wizard.printAllStringStats(0);
+            case 3 -> wizard.usePotion();
             case 4 -> switchTeams();
         }
     }
@@ -232,7 +234,7 @@ public class LevelFunctions {
 
     public static void levelRepetition(Level level, String objective,
                                        List<String> enemyDeathLine, String graduationLine,
-                                       Level nextLevel, int combatTimeout, boolean switchTeams) {
+                                       int combatTimeout, boolean switchTeams) {
 
         boolean supposedTimeout = true;
         List<String> enemyDeathLineCopy = new ArrayList<>(enemyDeathLine);
@@ -252,12 +254,12 @@ public class LevelFunctions {
             boolean answer = returnYesOrNo();
             if(answer) {
                 while (!enemiesHashMap.isEmpty() && wizard.getHealthPoints() > 0 && combatTimeout > 0) {
-                    chooseAction(switchTeams);
+                    chooseLevelAction(switchTeams);
                     clearConsole();
                     combatTimeout--;
                 }
 
-                levelOutcome(enemyDeathLineCopy, graduationLine, nextLevel,
+                levelOutcome(enemyDeathLineCopy, graduationLine, level,
                         combatTimeout, supposedTimeout);
             }
             else {
@@ -275,7 +277,7 @@ public class LevelFunctions {
     }
 
     private static void levelOutcome(List<String> enemyDeathLine, String graduationLine,
-                                     Level nextLevel, int combatTimeout, boolean supposedTimeout) {
+                                     Level level, int combatTimeout, boolean supposedTimeout) {
         if(combatTimeout == 0) {
             printTitle(enemyDeathLine.get(1));
         }
@@ -286,7 +288,8 @@ public class LevelFunctions {
         }
         if((enemiesHashMap.isEmpty() || supposedTimeout) && wizard.getHealthPoints() > 0) {
             printTitle(returnColoredText(graduationLine, ANSI_YELLOW));
-            unlockNextLevel(nextLevel);
+            wizard.setSpecPoints(wizard.getSpecPoints() + Wizard.wizardSpecs);
+            unlockNextLevel(level);
         }
     }
 
@@ -299,7 +302,7 @@ public class LevelFunctions {
         spawnEnemies();
         wizard.updateStats();
 
-        levelRepetition(level, objective, enemyDeathLine, graduationLine, null, 100, false);
+        levelRepetition(level, objective, enemyDeathLine, graduationLine, 100, false);
     }
 
     public static void level1() {
@@ -311,10 +314,9 @@ public class LevelFunctions {
         int enemyAmount = 1;
         List<String> enemyDeathLine = Collections.singletonList(enemyName.getEnemyDeathLine().get(0));
         String graduationLine = "You graduated Hogwarts's first year, you are now a second year student.";
-        Level nextLevel = Level.The_Chamber_of_Secrets;
 
         generateEnemies(enemyMinLevel, enemyMaxLevel, enemyAmount, enemyName);
-        levelRepetition(level, objective, enemyDeathLine, graduationLine, nextLevel, 100, false);
+        levelRepetition(level, objective, enemyDeathLine, graduationLine, 100, false);
 
     }
 
@@ -336,10 +338,9 @@ public class LevelFunctions {
         int enemyMaxLevel = (int) wizard.getLevel();
         int enemyAmount = 1;
         String graduationLine = "You graduated Hogwarts's second year, you are now a third year student.";
-        Level nextLevel = Level.The_Prisoner_of_Azkaban;
 
         generateEnemies(enemyMinLevel, enemyMaxLevel, enemyAmount, enemyName);
-        levelRepetition(level, objective, enemyDeathLine, graduationLine, nextLevel, 100, false);
+        levelRepetition(level, objective, enemyDeathLine, graduationLine, 100, false);
     }
 
     public static void level3() {
@@ -351,10 +352,9 @@ public class LevelFunctions {
         int enemyMaxLevel = (int) wizard.getLevel();
         int enemyAmount = 5;
         String graduationLine = "You graduated Hogwarts's third year, you are now a fourth year student.";
-        Level nextLevel = Level.The_Goblet_of_Fire;
 
         generateEnemies(enemyMinLevel, enemyMaxLevel, enemyAmount, enemyName);
-        levelRepetition(level, objective, enemyDeathLine, graduationLine, nextLevel, 100, false);
+        levelRepetition(level, objective, enemyDeathLine, graduationLine, 100, false);
 
     }
     public static void level4() {
@@ -367,10 +367,9 @@ public class LevelFunctions {
         int enemyMaxLevel = (int) wizard.getLevel();
         int enemyAmount = 1;
         String graduationLine = "You graduated Hogwarts's fourth year, you are now a fifth year student.";
-        Level nextLevel = Level.The_Order_of_the_Phoenix;
 
         generateEnemies(enemyMinLevel, enemyMaxLevel, enemyAmount, enemyName);
-        levelRepetition(level, objective, enemyDeathLine, graduationLine, nextLevel, 100, false);
+        levelRepetition(level, objective, enemyDeathLine, graduationLine, 100, false);
     }
     public static void level5() {
         Level level = Level.The_Order_of_the_Phoenix;
@@ -382,10 +381,9 @@ public class LevelFunctions {
         int enemyMaxLevel = (int) wizard.getLevel();
         int enemyAmount = 1;
         String graduationLine = "You graduated Hogwarts's fifth year, you are now a sixth year student.";
-        Level nextLevel = Level.The_Half_Blooded_Prince;
 
         generateEnemies(enemyMinLevel, enemyMaxLevel, enemyAmount, enemyName);
-        levelRepetition(level, objective, enemyDeathLine, graduationLine, nextLevel, 6, false);
+        levelRepetition(level, objective, enemyDeathLine, graduationLine, 6, false);
     }
     public static void level6() {
         Level level = Level.The_Half_Blooded_Prince;
@@ -396,10 +394,9 @@ public class LevelFunctions {
         int enemyMaxLevel = (int) wizard.getLevel();
         int enemyAmount = 5;
         String graduationLine = "You graduated Hogwarts's sixth year, you are now a seventh year student.";
-        Level nextLevel = Level.The_Deathly_Hallows;
 
         generateEnemies(enemyMinLevel, enemyMaxLevel, enemyAmount, enemyName);
-        levelRepetition(level, objective, enemyDeathLine, graduationLine, nextLevel, 100, true);
+        levelRepetition(level, objective, enemyDeathLine, graduationLine, 100, true);
     }
     public static void level7() {
         Level level = Level.The_Deathly_Hallows;
@@ -422,6 +419,6 @@ public class LevelFunctions {
         generateEnemies(enemyMinLevel, enemyMaxLevel, enemyAmount, enemyName1);
         generateEnemies(enemyMinLevel, enemyMaxLevel, enemyAmount, enemyName2);
 
-        levelRepetition(level, objective, enemyDeathLine, graduationLine, null, 100, false);
+        levelRepetition(level, objective, enemyDeathLine, graduationLine, 100, false);
     }
 }

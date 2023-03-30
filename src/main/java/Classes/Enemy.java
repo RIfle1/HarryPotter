@@ -5,10 +5,7 @@ import AbstractClasses.AbstractItem;
 import Enums.*;
 import lombok.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static Classes.Color.*;
 import static Classes.Wizard.wizard;
@@ -21,12 +18,13 @@ import static Functions.GeneralFunctions.generateDoubleBetween;
 @Setter
 public class Enemy extends AbstractCharacter {
     @Builder
-    public Enemy(String name, double healthPoints, double defensePoints, double maxHealthPoints, double maxDefensePoints, Difficulty difficulty, CharacterState characterState, List<AbstractItem> itemList, List<Potion> activePotionsList, HashMap<String, Spell> spellsHashMap, List<String> spellsKeyList, double level, EnemyName enemyName, EnemyCombat enemyCombat, double experiencePoints) {
-        super(name, healthPoints, defensePoints, maxHealthPoints, maxDefensePoints, difficulty, characterState, itemList, activePotionsList, spellsHashMap, spellsKeyList, level);
+    public Enemy(String name, double healthPoints, double defensePoints, double maxHealthPoints, double maxDefensePoints, Difficulty difficulty, CharacterState characterState, List<Potion> potionList, List<Potion> activePotionsList, HashMap<String, Spell> spellsHashMap, List<String> spellsKeyList, double level, EnemyName enemyName, EnemyCombat enemyCombat, double experiencePoints) {
+        super(name, healthPoints, defensePoints, maxHealthPoints, maxDefensePoints, difficulty, characterState, potionList, activePotionsList, spellsHashMap, spellsKeyList, level);
         this.enemyName = enemyName;
         this.enemyCombat = enemyCombat;
         this.experiencePoints = experiencePoints;
     }
+
 
     private EnemyName enemyName;
     private EnemyCombat enemyCombat;
@@ -40,11 +38,22 @@ public class Enemy extends AbstractCharacter {
         enemiesKeyList.clear();
     }
 
-    public void giveItems(Wizard wizard) {
-        List<AbstractItem> enemyItemList = this.getItemList();
-        for (AbstractItem item : enemyItemList) {
-            wizard.getItemList().add(item);
+    public void givePotion(Wizard wizard) {
+        List<Potion> enemyItemList = this.getPotionList();
+        List<Potion> newPotionList = new ArrayList<>(wizard.getPotionList()) ;
+
+        for (Potion potion : enemyItemList) {
+
+
+            try {
+                newPotionList.add(potion.clone());
+            } catch (CloneNotSupportedException e) {
+                e.printStackTrace();
+            }
+
         }
+
+        wizard.setPotionList(newPotionList);
     }
 
     public void killEnemy() {
@@ -64,14 +73,14 @@ public class Enemy extends AbstractCharacter {
         if (this.getHealthPoints() <= 0) {
             this.killEnemy();
             wizard.addExperience(this.getExperiencePoints());
-            this.giveItems(wizard);
+            this.givePotion(wizard);
         }
     }
 
-    public static List<AbstractItem> generateRandomPotions(int potionNumber) {
+    public static List<Potion> generateRandomPotions(int potionNumber) {
         // GENERATE 3 RANDOM POTIONS FOR EACH ENEMY
         List<Potion> allPotionsList = Potion.returnAllPotions();
-        List<AbstractItem> randomPotions = new ArrayList<>();
+        List<Potion> randomPotions = new ArrayList<>();
 
         for (int y = 0; y < potionNumber; y++) {
             double potionChance = Math.random();
@@ -104,7 +113,7 @@ public class Enemy extends AbstractCharacter {
 
         int enemyHp = (int) Math.round(Math.exp(enemyLevel * wizard.getDifficulty().getEnemyDiffMultiplier()) * enemyName.getEnemyBaseHp());
         int enemyDp = (int) Math.round((Math.exp(enemyLevel * wizard.getDifficulty().getEnemyDiffMultiplier()) * enemyName.getEnemyBaseDp()) / 3);
-        int enemyXp = (int) Math.round(enemyName.getEnemyXp() * (1 + enemyXpIncrement) * enemyLevel);
+        int enemyXp = (int) Math.round(enemyName.getEnemyXp() * (1 + enemyXpIncrement) * enemyLevel + enemyName.getEnemyXp());
 
         enemies[i] = Enemy.builder()
                 .healthPoints(enemyHp)
@@ -113,7 +122,7 @@ public class Enemy extends AbstractCharacter {
                 .maxDefensePoints(enemyDp)
                 .difficulty(wizard.getDifficulty())
                 .characterState(CharacterState.STANDING)
-                .itemList(generateRandomPotions(3))
+                .potionList(generateRandomPotions(3))
                 .activePotionsList(new ArrayList<>())
                 .spellsHashMap(new HashMap<>())
                 .spellsKeyList(new ArrayList<>())

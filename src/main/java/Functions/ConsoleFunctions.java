@@ -8,6 +8,7 @@ import java.util.*;
 import static Classes.Color.*;
 import static Classes.Color.returnColoredText;
 import static Classes.Enemy.clearEnemies;
+import static Classes.Spell.returnAllSpells;
 import static Functions.LevelFunctions.levelHashMap;
 import static Classes.Wizard.wizard;
 import static Enums.Level.*;
@@ -26,58 +27,48 @@ public class ConsoleFunctions {
 
     public static boolean returnYesOrNo() {
         printChoices(yesOrNo);
-        int answer = returnChoiceInt(yesOrNo.length, false) - 1;
+        int answer = returnChoiceInt(1, yesOrNo.length, false, null) - 1;
         return answer == 0;
     }
 
-    public static int returnChoiceInt(int max, boolean backSupport) {
+    public static int returnChoiceInt(int min, int max, boolean backSupport, Runnable runnable) {
         int input = -1;
 
-        do{
-            input = getInput(input, backSupport);
-            if(input > max && input != -2) {
-                input = -1;
-                System.out.println(Color.returnColoredText("Input must be between 1 and " + max, ANSI_RED));
-            }
+        do {
+            input = checkInput(min, max, backSupport, runnable);
         }
         while(input == -1);
         return input;
     }
 
-    public static int returnChoiceInt(int min, int max, boolean backSupport) {
-        int input = -1;
-
-        do{
-            input = getInput(input, backSupport);
-            if((input < min || input > max) && input != -2) {
-                input = -1;
-                System.out.println(Color.returnColoredText("Input must be between " + min + " and " + max, ANSI_RED));
-            }
-        }
-        while(input == -1);
-        return input;
-    }
-
-    public static int getInput(int input, boolean backSupport) {
+    public static int checkInput(int min, int max, boolean backSupport, Runnable runnable) {
         String input2;
+        int input = -1;
         System.out.println(Color.returnColoredText("-> ", ANSI_YELLOW));
         try{
             input2 = scanner.next();
+            // EXIT - BACK - STRING CHECK
             if(Objects.equals(input2, "exit")) {
                 exit(0);
-
             }
             else if(Objects.equals(input2, "back") && backSupport) {
+                runnable.run();
                 return -2;
             }
             else {
                 input = Integer.parseInt(input2);
             }
+
+            // INPUT CHECK
+            if(input < min || input > max) {
+                input = -1;
+                System.out.println(Color.returnColoredText("Input must be between " + min + " and " + max, ANSI_RED));
+            }
         }
         catch(Exception e) {
-            input = -1;
             System.out.println(Color.returnColoredText("Input must be an integer", ANSI_RED));
         }
+
         return input;
     }
 
@@ -167,7 +158,7 @@ public class ConsoleFunctions {
         printColoredHeader("Choose your level: ");
         printChoices(returnUnlockedLevelsList());
 
-        String chosenLevelString = returnUnlockedLevelsList().get(returnChoiceInt(returnUnlockedLevelsList().size(), true) - 1);
+        String chosenLevelString = returnUnlockedLevelsList().get(returnChoiceInt(1, returnUnlockedLevelsList().size(), true, ConsoleFunctions::chooseAction) - 1);
         Level chosenLevel = setLevel(chosenLevelString);
         levelHashMap.get(chosenLevel).run();
 
@@ -177,10 +168,10 @@ public class ConsoleFunctions {
 
     public static void chooseAction() {
         String[] actionList = {
-                "Choose Level",
-                "Upgrade Specs",
+                "Choose Level (" + Level.returnUnlockedLevelsList().size() + "/" + returnAllLevels().size() + " unlocked)",
+                "Upgrade Specs" + (wizard.getSpecPoints() > 0 ? " (" + (int) wizard.getSpecPoints() + " points available)" : " (No points available)"),
                 "Check Stats",
-                "Check Available Spells"
+                "Check Available Spells (" + wizard.getSpellsKeyList().size() + "/" + returnAllSpells().size() + " available)"
         };
 
         printColoredHeader("Choose your action: ");
@@ -189,7 +180,7 @@ public class ConsoleFunctions {
         wizard.updateStats();
         wizard.restoreWizardHpDf();
 
-        switch (returnChoiceInt(actionList.length, false)) {
+        switch (returnChoiceInt(1, actionList.length, false, null)) {
             case 1 -> chooseLevel();
             case 2 -> wizard.upgradeSpec(ConsoleFunctions::chooseAction);
             case 3 -> System.out.println(wizard.returnAllStringStats(0));

@@ -18,7 +18,7 @@ import static java.lang.Math.max;
 @Getter
 @Setter
 public abstract class AbstractCharacter {
-    public AbstractCharacter(String name, double healthPoints, double defensePoints, double maxHealthPoints, double maxDefensePoints, Difficulty difficulty, CharacterState characterState, List<AbstractItem> itemList, List<Potion> activePotionsList, HashMap<String, Spell> spellsHashMap, List<String> spellsKeyList, double level) {
+    public AbstractCharacter(String name, double healthPoints, double defensePoints, double maxHealthPoints, double maxDefensePoints, Difficulty difficulty, CharacterState characterState, List<Potion> potionList, List<Potion> activePotionsList, HashMap<String, Spell> spellsHashMap, List<String> spellsKeyList, double level) {
         this.name = name;
         this.healthPoints = healthPoints;
         this.defensePoints = defensePoints;
@@ -26,7 +26,7 @@ public abstract class AbstractCharacter {
         this.maxDefensePoints = maxDefensePoints;
         this.difficulty = difficulty;
         this.characterState = characterState;
-        this.itemList = itemList;
+        this.potionList = potionList;
         this.activePotionsList = activePotionsList;
         this.spellsHashMap = spellsHashMap;
         this.spellsKeyList = spellsKeyList;
@@ -40,7 +40,7 @@ public abstract class AbstractCharacter {
     private double maxDefensePoints;
     private Difficulty difficulty;
     private CharacterState characterState;
-    private List<AbstractItem> itemList;
+    private List<Potion> potionList;
     private List<Potion> activePotionsList;
     private HashMap<String, Spell> spellsHashMap;
     private List<String> spellsKeyList;
@@ -113,7 +113,7 @@ public abstract class AbstractCharacter {
     }
 
     public List<String> returnItemNameList() {
-        List<AbstractItem> currentItemList = this.getItemList();
+        List<Potion> currentItemList = this.getPotionList();
         List<String> currentItemNameList = new ArrayList<>();
         for (AbstractItem currentItem : currentItemList) {
             currentItemNameList.add(currentItem.getItemName());
@@ -129,8 +129,8 @@ public abstract class AbstractCharacter {
                 .orElse(null);
     }
 
-    public List<AbstractItem> returnPotionsList() {
-            return this.getItemList().stream().filter(AbstractItem -> AbstractItem.getClass() == Potion.class).toList();
+    public List<Potion> returnPotionsList() {
+            return this.getPotionList().stream().filter(AbstractItem -> AbstractItem.getClass() == Potion.class).toList();
     }
 
     public List<String> returnPotionNamesList() {
@@ -154,6 +154,9 @@ public abstract class AbstractCharacter {
             this.setDefensePoints(this.getDefensePoints() + potion.getPotionValue());
             activePotionsList.add(potion);
         }
+        else if(potion.getPotionType() == PotionType.DAMAGE) {
+            activePotionsList.add(potion);
+        }
         else if(potion.getPotionType() == PotionType.REGENERATION) {
             activePotionsList.add(potion);
         }
@@ -165,11 +168,17 @@ public abstract class AbstractCharacter {
             this.reduceSpellsCooldown((int) potion.getPotionValue());
         }
 
-        this.getItemList().remove(potion);
+        deletePotion(potion);
+    }
+
+    private void deletePotion(Potion potion) {
+        if(potion != null) {
+            List<Potion> newList = this.getPotionList().stream().filter(pot -> !pot.toString().equals(potion.toString())).toList();
+            this.setPotionList(newList);
+        }
     }
 
     public void applyPotionEffect() {
-        // TODO - IDK CHECK THIS
 
         List<Potion> activePotionsList = this.getActivePotionsList();
         Potion potionToRemove = null;
@@ -177,6 +186,9 @@ public abstract class AbstractCharacter {
         for(Potion potion:activePotionsList) {
             if(potion.getPotionType() == PotionType.DEFENSE && potion.getPotionDuration() == 0) {
                 this.setDefensePoints(this.getDefensePoints() - potion.getPotionValue());
+                potionToRemove = potion;
+            }
+            else if(potion.getPotionType() == PotionType.DAMAGE && potion.getPotionDuration() == 0) {
                 potionToRemove = potion;
             }
             else if(potion.getPotionType() == PotionType.REGENERATION) {
@@ -188,7 +200,7 @@ public abstract class AbstractCharacter {
             }
             potion.setPotionDuration(potion.getPotionDuration() - 1);
         }
-        activePotionsList.remove(potionToRemove);
+        deletePotion(potionToRemove);
     }
 
 
@@ -198,7 +210,7 @@ public abstract class AbstractCharacter {
         final int maxPotionOfOneType = 1;
         String text ="";
 
-        List<AbstractItem> currentItemList = this.getItemList();
+        List<Potion> currentItemList = this.getPotionList();
         boolean potionIsInInventory = currentItemList.stream().anyMatch(currentItem -> currentItem.equals(potion));
 
         List<Potion> activePotionList = this.getActivePotionsList();
@@ -230,7 +242,6 @@ public abstract class AbstractCharacter {
         }
 
         printTitle(text);
-        continuePromptExtra();
     }
 
     public Spell returnTypedSpellsFromInt(MoveType spellType, int number) {
@@ -468,7 +479,7 @@ public abstract class AbstractCharacter {
                     .append(".\nYou received ")
                     .append(returnColoredText((int) ((Enemy) attackedCharacter).getExperiencePoints() + " XP.", ANSI_BLUE));
 
-            List<AbstractItem> enemyItemList = attackedCharacter.getItemList();
+            List<Potion> enemyItemList = attackedCharacter.getPotionList();
 
             if(enemyItemList.size() > 0) {
                 text4.append("\nYou found:\n");

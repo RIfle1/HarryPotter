@@ -11,13 +11,14 @@ import static Classes.Color.*;
 import static Enums.EnumMethods.returnFormattedEnum;
 import static Enums.HouseName.getHouseNameMaxLength;
 import static Functions.ConsoleFunctions.*;
+import static Functions.LevelFunctions.chooseLevelAction;
 
 @Getter
 @Setter
 public class Wizard extends AbstractCharacter {
     @Builder
-    public Wizard(String name, double healthPoints, double defensePoints, double maxHealthPoints, double maxDefensePoints, Difficulty difficulty, CharacterState characterState, List<AbstractItem> itemList, List<Potion> activePotionsList, HashMap<String, Spell> spellsHashMap, List<String> spellsKeyList, double level, String firstName, String lastName, Gender gender, Pet pet, Wand wand, HouseName houseName, double experience, double specPoints, double charisma, double strength, double intelligence, double luck) {
-        super(name, healthPoints, defensePoints, maxHealthPoints, maxDefensePoints, difficulty, characterState, itemList, activePotionsList, spellsHashMap, spellsKeyList, level);
+    public Wizard(String name, double healthPoints, double defensePoints, double maxHealthPoints, double maxDefensePoints, Difficulty difficulty, CharacterState characterState, List<Potion> potionList, List<Potion> activePotionsList, HashMap<String, Spell> spellsHashMap, List<String> spellsKeyList, double level, String firstName, String lastName, Gender gender, Pet pet, Wand wand, HouseName houseName, double experience, double specPoints, double charisma, double strength, double intelligence, double luck) {
+        super(name, healthPoints, defensePoints, maxHealthPoints, maxDefensePoints, difficulty, characterState, potionList, activePotionsList, spellsHashMap, spellsKeyList, level);
         this.firstName = firstName;
         this.lastName = lastName;
         this.gender = gender;
@@ -49,7 +50,7 @@ public class Wizard extends AbstractCharacter {
     public static final int wizardBaseDp = 40;
     private static final double baseLevelExperience = 100;
     private static final double levelIncrement = 20;
-    private static final int wizardSpecs = 4;
+    public static final int wizardSpecs = 4;
     private static final int dungeonLevels = 7;
     private static final double maxPercent = 0.25;
 
@@ -78,6 +79,11 @@ public class Wizard extends AbstractCharacter {
     public String returnAllStringStats(int extraNameLength) {
         this.updateStats();
         return this.returnStringStats(extraNameLength) + this.returnStringSpecs();
+    }
+
+    public void printAllStringStats(int extraNameLength) {
+        System.out.println(this.returnAllStringStats(extraNameLength));
+        continuePromptExtra();
     }
 
     public HashMap<String, Double> returnWizardSpecsPercent() {
@@ -110,19 +116,13 @@ public class Wizard extends AbstractCharacter {
         List<String> specsList = new ArrayList<>(Arrays.asList("Strength", "Luck", "Intelligence", "Charisma"));
 
         if(this.getSpecPoints() > 0) {
-            printTitle("What spec would you like to upgrade?");
+            printTitle("You have " + this.getSpecPoints() + " spec points. What spec would you like to upgrade?");
             printChoices(specsList);
-            int choiceInt = returnChoiceInt(1, specsList.size(), true);
-            if(choiceInt == -2) {
-                func.run();
-            }
+            int choiceInt = returnChoiceInt(1, specsList.size(), true, func);
             String spec = specsList.get(choiceInt - 1).toLowerCase();
 
             printTitle("You have " + (int) this.getSpecPoints() + " points, how many would you like to add?");
-            int specPoints =  returnChoiceInt(0, (int) this.getSpecPoints(), true);
-            if(specPoints == -2) {
-                func.run();
-            }
+            int specPoints =  returnChoiceInt(1, (int) this.getSpecPoints(), true, func);
 
             setWizardSpec(spec, specPoints);
             this.setSpecPoints(this.getSpecPoints() - specPoints);
@@ -194,20 +194,32 @@ public class Wizard extends AbstractCharacter {
         this.updateSpellsHashMap();
     }
 
+
+
     public void usePotion() {
         List<String> potionNamesList = this.returnPotionNamesList();
-
+        int choiceInt = 1;
 
         if(potionNamesList.size() > 0) {
             printTitle("Choose a potion you want to use.");
             printChoices(potionNamesList);
+            choiceInt = returnChoiceInt(1, potionNamesList.size(), true, () -> chooseLevelAction(false));
+
+            if(choiceInt != -2) {
+                Potion chosenPotion = returnPotion(potionNamesList.get(choiceInt - 1));
+                this.drinkPotion(chosenPotion);
+            }
+
         }
         else {
             printTitle("You don't have any potions in your inventory.");
         }
 
-        Potion chosenPotion = returnPotion(potionNamesList.get(returnChoiceInt(0, potionNamesList.size(), false) - 1));
-        this.drinkPotion(chosenPotion);
+        if(choiceInt != -2) {
+            continuePromptExtra();
+            chooseLevelAction(false);
+        }
+
     }
 
 
@@ -229,9 +241,9 @@ public class Wizard extends AbstractCharacter {
             .houseName(HouseName.SLYTHERIN)
             .spellsHashMap(new HashMap<>())
             .spellsKeyList(new ArrayList<>())
-            .itemList(new ArrayList<>())
+            .potionList(new ArrayList<>())
             .activePotionsList(new ArrayList<>())
-            .experience(10000)
+            .experience(0)
             .charisma(0)
             .strength(0)
             .intelligence(0)
@@ -256,7 +268,7 @@ public class Wizard extends AbstractCharacter {
             .houseName(HouseName.RAVENCLAW)
             .spellsHashMap(new HashMap<>())
             .spellsKeyList(new ArrayList<>())
-            .itemList(new ArrayList<>())
+            .potionList(new ArrayList<>())
             .activePotionsList(new ArrayList<>())
             .experience(580)
             .charisma(0)
