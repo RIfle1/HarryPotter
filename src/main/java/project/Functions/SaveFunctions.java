@@ -1,12 +1,17 @@
 package project.Functions;
 
-import project.Classes.Wizard;
-import project.Enums.Level;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.security.AnyTypePermission;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import project.Classes.Wizard;
+import project.Enums.Level;
 
 import java.io.*;
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -94,6 +99,39 @@ public class SaveFunctions {
     }
 
     public static void saveWizard(String filename) {
+        ObjectMapper om = new ObjectMapper();
+        om.configure(SerializationFeature.INDENT_OUTPUT, true);
+        try {
+            om.writeValue(new File("saves/" + filename+".2.json"), Wizard.wizard);
+        } catch (IOException e) {
+            System.err.println("Failed to write using jackson");
+            e.printStackTrace();
+        }
+//        try {
+//            Wizard reloaded = om.readValue(new File("saves/" + filename + ".2.json"), Wizard.class);
+//            System.out.println("Wizard is back from file ... magic? ");
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+
+        XStream xstream = new XStream();
+        xstream.addPermission(AnyTypePermission.ANY); // should rather allow class by class
+        // xstream.
+        File xmlFile = new File("saves/" + filename + ".2.xml");
+        try (OutputStream out = new FileOutputStream(xmlFile)) {
+            xstream.toXML(Wizard.wizard, out);
+        } catch (IOException e) {
+            System.err.println("Failed to write using xstream");
+            e.printStackTrace();
+        }
+        try {
+            Wizard wizard2 = (Wizard) xstream.fromXML(xmlFile);
+            System.out.println("Hello again Mr wizard");
+        } catch(Exception ex) {
+            System.err.println("Failed to read using xstream");
+            ex.printStackTrace();
+        }
+
         JSONObject wizardJSONObject =  getJSONObject(Wizard.class, Wizard.wizard);
         saveObject(wizardJSONObject.toJSONString(), "wizard" + filename);
     }
