@@ -7,9 +7,7 @@ import static Enums.EnumMethods.returnFormattedEnum;
 
 public enum Gender {
     MALE,
-    FEMALE,
-    SDFIJSDJKFSDHJFK,
-    NONE;
+    FEMALE;
 
     public static List<String> getGenderList() {
         Gender[] genderValues = Gender.values();

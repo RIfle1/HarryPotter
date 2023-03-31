@@ -3,6 +3,10 @@ package Functions;
 import Classes.Color;
 import Enums.Level;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.*;
 
 import static Classes.Color.*;
@@ -195,4 +199,25 @@ public class ConsoleFunctions {
         continuePromptExtra();
         chooseAction();
     }
+
+    public static String getTxtString(String filename) {
+        StringBuilder sb = new StringBuilder();
+
+        File file = new File(filename);
+        try {
+            Scanner sc = new Scanner(file);
+            while (sc.hasNextLine())
+                sb.append(sc.nextLine()).append("\n");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return sb.toString();
+    }
+
+    public static void printMainScreen() {
+        System.out.println(returnColoredText(getTxtString("ascii/harryPotterV1.txt"), ANSI_RED));
+        continuePrompt();
+    }
+
 }

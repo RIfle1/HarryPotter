@@ -8,6 +8,8 @@ import java.util.List;
 
 import static Classes.Wizard.*;
 import static Functions.ConsoleFunctions.*;
+import static Functions.GeneralFunctions.generateRandomString;
+import static Functions.SaveFunctions.saveProgress;
 
 public class CharacterCreation {
     public static void characterInit() {
@@ -20,11 +22,6 @@ public class CharacterCreation {
 
         Wand wand;
         Difficulty difficulty;
-
-        double charisma; // for dodging
-        double strength; // for more attack damage
-        double intelligence; // for parrying
-        double luck; // for more attackChance
 
         printColoredHeader("Select your character's first name:");
         firstName = returnChoiceString();
@@ -53,18 +50,6 @@ public class CharacterCreation {
         printColoredHeader("Choose the difficulty of your game: ");
         printChoices(Difficulty.getDifficultyList());
         difficulty = Difficulty.setDifficulty(Difficulty.getDifficultyList().get(returnChoiceInt(1, Difficulty.getDifficultyList().size(), false, null) - 1));
-
-
-        System.out.println(
-                firstName +
-                        lastName +
-                        gender +
-                        pet +
-                        wand.getSize() +
-                        EnumMethods.returnFormattedEnum(wand.getCore()) + " " +
-                        houseName
-
-        );
 
         Wizard.wizard = Wizard.builder()
                 .healthPoints(wizardBaseHp)
@@ -95,6 +80,8 @@ public class CharacterCreation {
 
         wizard.updateHouseSpec();
         wizard.updateStats();
+
+        saveProgress("autoSave" + generateRandomString(5));
     }
 
     public static Wand wandCreation() {

@@ -17,14 +17,27 @@ import static Functions.GeneralFunctions.*;
 
 public class SaveFunctions {
     public static void checkSaves() {
-        // Check if there are any previous characters
-        String newCharacterText = "No saved characters have been found, new character creation will now proceed.";
-        printColoredHeader(newCharacterText);
-        continuePrompt();
+        List<String> saveFiles = returnFormattedSaveFiles("saves");
+
+        if(saveFiles.size() > 0) {
+            printColoredHeader("Saved games have been found, would you like to load one?");
+            if(returnYesOrNo()) {
+                loadGame();
+            }
+            else {
+                gameCredits();
+                CharacterCreation.characterInit();
+            }
+        }
+        else {
+            gameCredits();
+            printColoredHeader("No saved characters have been found, new character creation will now proceed.");
+            continuePrompt();
+            CharacterCreation.characterInit();
+        }
     }
 
     public static void saveObject(String JSONString, String fileName) {
-
         try {
             FileWriter file = new FileWriter("saves/" + fileName + ".json");
             file.write(JSONString);
@@ -169,8 +182,14 @@ public class SaveFunctions {
         printTitle("Select a game to load: ");
         printChoices(saves);
 
-        String filename = saves.get(returnChoiceInt(1, saves.size(), false, null) - 1);
-        loadProgress(filename);
-        printTitle("Game " + filename + " has been loaded.");
+        int choiceInt = returnChoiceInt(1, saves.size(), true, ConsoleFunctions::chooseAction);
+        String filename = saves.get(choiceInt - 1);
+        if(choiceInt != -2) {
+        printTitle("Are you sure you wish to load game " + filename + "? All unsaved progress will be lost.");
+            if(returnYesOrNo()) {
+                loadProgress(filename);
+                printTitle("Game " + filename + " has been loaded.");
+            }
+        }
     }
 }

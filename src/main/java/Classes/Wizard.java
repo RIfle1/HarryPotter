@@ -194,8 +194,6 @@ public class Wizard extends AbstractCharacter {
         this.updateSpellsHashMap();
     }
 
-
-
     public void usePotion() {
         List<String> potionNamesList = this.returnPotionNamesList();
         int choiceInt = 1;
@@ -221,33 +219,5 @@ public class Wizard extends AbstractCharacter {
         }
 
     }
-
-
-
-    public static Wizard wizard = Wizard.builder()
-            .healthPoints(wizardBaseHp)
-            .defensePoints(wizardBaseDp)
-            .maxDefensePoints(wizardBaseDp)
-            .maxHealthPoints(wizardBaseHp)
-            .difficulty(Difficulty.EASY)
-            .characterState(CharacterState.STANDING)
-            .level(0)
-            .firstName("null")
-            .lastName("null")
-            .name("null null")
-            .gender(Gender.MALE)
-            .pet(Pet.TOAD)
-            .wand(new Wand(Core.PHOENIX_FEATHER, 12))
-            .houseName(HouseName.SLYTHERIN)
-            .spellsHashMap(new HashMap<>())
-            .spellsKeyList(new ArrayList<>())
-            .potionList(new ArrayList<>())
-            .activePotionsList(new ArrayList<>())
-            .experience(10000)
-            .charisma(0)
-            .strength(0)
-            .intelligence(0)
-            .luck(0)
-            .specPoints(0)
-            .build();
+    public static Wizard wizard = Wizard.builder().build();
 }

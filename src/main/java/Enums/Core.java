@@ -6,8 +6,7 @@ import static Enums.EnumMethods.returnFormattedEnum;
 
 public enum Core {
     PHOENIX_FEATHER,
-    DRAGON_HEARTSTRING,
-    TEST;
+    DRAGON_HEARTSTRING;
 
     public static List<String> getCoreList() {
         Core[] coreValues = Core.values();

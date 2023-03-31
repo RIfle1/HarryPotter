@@ -178,7 +178,7 @@ public class Potion extends AbstractItem implements Cloneable {
     public static Potion invincibilityPotion = Potion.builder()
             .itemName("Invincibility Potion")
             .itemDescription("An invincibility potion which makes you invincible to all attacks.")
-            .itemDropChance(0.1)
+            .itemDropChance(0)
             .itemColor(Color.ANSI_PURPLE)
             .potionType(PotionType.INVINCIBILITY)
             .potionDuration(1)

@@ -112,8 +112,6 @@ public class Enemy extends AbstractCharacter {
             enemyLevel = (int) generateDoubleBetween(minLevel, maxLevel);
         }
 
-        System.out.println(enemyLevel);
-
         int enemyHp = (int) Math.round(Math.exp(enemyLevel * wizard.getDifficulty().getEnemyDiffMultiplier()) * enemyName.getEnemyBaseHp());
         int enemyDp = (int) Math.round((Math.exp(enemyLevel * wizard.getDifficulty().getEnemyDiffMultiplier()) * enemyName.getEnemyBaseDp()) / 3);
         int enemyXp = (int) Math.round(enemyName.getEnemyXp() * (1 + enemyXpIncrement) * enemyLevel + enemyName.getEnemyXp());

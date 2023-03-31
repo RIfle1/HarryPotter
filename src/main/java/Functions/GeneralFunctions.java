@@ -33,9 +33,8 @@ public class GeneralFunctions {
     }
 
     public static String generateRandomString(int length) {
-        byte[] array = new byte[length];
-        new Random().nextBytes(array);
-        return new String(array, StandardCharsets.UTF_8);
+        UUID randomUUID = UUID.randomUUID();
+        return randomUUID.toString().replaceAll("_", "").substring(0,length);
     }
 
     public static boolean isGetter(Method method) {
