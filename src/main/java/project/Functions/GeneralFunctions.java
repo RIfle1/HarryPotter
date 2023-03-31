@@ -177,6 +177,8 @@ public class GeneralFunctions {
             }
         }
         else {
+
+
             Enum<?> e = Enum.valueOf((Class<Enum>) methodParameterType, value.toString());
             runSetter(c, object, methodString, e);
         }
@@ -304,12 +306,14 @@ public class GeneralFunctions {
         InputStream stream = ClassLoader.getSystemClassLoader()
                 .getResourceAsStream(packageName.replaceAll("[.]", "/"));
 
+        String packageNameMod = packageName.replace("/", ".");
+
         assert stream != null;
         BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
 
         return reader.lines()
                 .filter(line -> line.endsWith(".class"))
-                .map(line -> getClass(line, packageName))
+                .map(line -> getClass(line, packageNameMod))
                 .collect(Collectors.toList());
     }
 
