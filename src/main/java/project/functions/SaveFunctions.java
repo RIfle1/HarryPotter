@@ -98,9 +98,10 @@ public class SaveFunctions {
         return jsonObject;
     }
 
+    // OTHER METHOD OF SAVING OBJECT
     public static void saveObject(String filename, Object object) {
         XStream xstream = new XStream();
-        xstream.addPermission(AnyTypePermission.ANY); // should rather allow class by class
+        xstream.addPermission(AnyTypePermission.ANY);
 
         File xmlFile = new File("saves/" + filename + ".xml");
         try (OutputStream out = new FileOutputStream(xmlFile)) {
@@ -111,7 +112,8 @@ public class SaveFunctions {
         }
     }
 
-    public static void loadObject(String filename, Object object) {
+    // OTHER METHOD OF LOADING OBJECT
+    public static void loadWizard(String filename) {
         XStream xstream = new XStream();
         xstream.addPermission(AnyTypePermission.ANY);
 
