@@ -1,19 +1,17 @@
 package project.classes;
 
-import project.enums.CharacterState;
-import project.enums.MoveType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import project.enums.CharacterState;
+import project.enums.MoveType;
 import project.functions.ConsoleFunctions;
 import project.functions.GeneralFunctions;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-
-import static project.classes.Color.returnColoredText;
 
 @Getter
 @Setter

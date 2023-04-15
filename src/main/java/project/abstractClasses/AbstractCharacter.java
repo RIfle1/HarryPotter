@@ -1,22 +1,27 @@
 package project.abstractClasses;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 import project.classes.Enemy;
 import project.classes.Potion;
 import project.classes.Spell;
 import project.classes.Wizard;
 import project.enums.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+import static java.lang.Math.max;
 import static project.classes.Color.*;
 import static project.classes.Enemy.getEnemyNameMaxLength;
 import static project.classes.Spell.*;
 import static project.classes.Wizard.wizard;
 import static project.enums.EnumMethods.returnFormattedEnum;
-import static project.functions.ConsoleFunctions.*;
+import static project.functions.ConsoleFunctions.printColumnSeparator;
+import static project.functions.ConsoleFunctions.printTitle;
 import static project.functions.GeneralFunctions.generateDoubleBetween;
-import static java.lang.Math.max;
 
 @Getter
 @Setter

@@ -1,10 +1,10 @@
 package project.classes;
 
-import project.abstractClasses.AbstractItem;
-import project.enums.PotionType;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import project.abstractClasses.AbstractItem;
+import project.enums.PotionType;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;

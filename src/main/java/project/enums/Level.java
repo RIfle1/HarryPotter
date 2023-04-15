@@ -1,7 +1,7 @@
 package project.enums;
 
-import project.classes.Spell;
 import lombok.Getter;
+import project.classes.Spell;
 
 import java.util.*;
 

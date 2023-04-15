@@ -1,22 +1,23 @@
 package project.functions;
 
 import project.classes.Color;
-import project.enums.Level;
 import project.classes.Enemy;
 import project.classes.Wizard;
+import project.enums.Level;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
+import java.util.Scanner;
 
+import static java.lang.System.exit;
 import static project.classes.Color.*;
-import static project.classes.Color.returnColoredText;
 import static project.classes.Spell.returnAllSpells;
-import static project.functions.LevelFunctions.levelHashMap;
 import static project.enums.Level.*;
+import static project.functions.LevelFunctions.levelHashMap;
 import static project.functions.SaveFunctions.loadGame;
 import static project.functions.SaveFunctions.saveGame;
-import static java.lang.System.exit;
 
 public class ConsoleFunctions {
     static Scanner scanner = new Scanner(System.in);

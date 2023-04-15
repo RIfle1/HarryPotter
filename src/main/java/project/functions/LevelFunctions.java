@@ -8,9 +8,9 @@ import project.enums.*;
 
 import java.util.*;
 
+import static java.lang.System.exit;
 import static project.classes.Color.*;
 import static project.enums.EnumMethods.returnFormattedEnum;
-import static java.lang.System.exit;
 
 
 public class LevelFunctions {

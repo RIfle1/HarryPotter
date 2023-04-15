@@ -1,11 +1,15 @@
 package project.classes;
 
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 import project.abstractClasses.AbstractCharacter;
-
-import lombok.*;
 import project.enums.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static project.classes.Color.*;
 import static project.classes.Wizard.wizard;

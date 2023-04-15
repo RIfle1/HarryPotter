@@ -1,9 +1,12 @@
 package project.enums;
 
-import project.classes.Spell;
 import lombok.Getter;
+import project.classes.Spell;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 
 import static project.enums.EnumMethods.returnFormattedEnum;
 
