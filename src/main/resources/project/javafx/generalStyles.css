@@ -1,7 +1,19 @@
-.itemText {
-    transition: 1.5s ease;
+.mainWindow {
+    -fx-pref-height: 1010;
+    -fx-pref-width: 1920;
+
+
+    -fx-background-color: grey;
 }
 
-.itemText:hover {
+.menuItemText {
+    -fx-transition: 1.5s ease;
+    -fx-font-family: "Bell MT", sans-serif;
+    -fx-font-size: 43;
+}
+
+.menuItemText:hover {
     -fx-fill: lightblue;
+    -fx-font-family: "Bell MT", sans-serif;
+    -fx-font-size: 43;
 }

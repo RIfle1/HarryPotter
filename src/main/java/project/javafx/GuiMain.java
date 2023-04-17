@@ -12,25 +12,16 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.util.Objects;
 
+import static project.javafx.controllers.MainMenuController.mainMenuScene;
+
 public class GuiMain extends Application {
     @Override
     public void start(Stage stage){
         stage.setTitle("Harry Potter: The Text RPG");
-        mainScene(stage);
+        mainMenuScene(stage);
     }
 
-    public static void mainScene(Stage stage) {
-        try {
-            Parent root = FXMLLoader.load(Objects.requireNonNull(GuiMain.class.getResource("MainMenu.fxml")));
-            Scene mainMenuScene = new Scene(root);
-            stage.setScene(mainMenuScene);
-            String generalStyles = Objects.requireNonNull(GuiMain.class.getResource("generalStyles.css")).toExternalForm();
-            mainMenuScene.getStylesheets().add(generalStyles);
-            stage.show();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
+
 
     public static void createScene(ActionEvent event, FXMLLoader FXMLLoader, String cssStylesheet) {
         createSceneSub(FXMLLoader, cssStylesheet, (Node) event.getSource());

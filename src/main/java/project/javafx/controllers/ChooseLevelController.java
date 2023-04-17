@@ -18,6 +18,7 @@ import java.net.URL;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
+import static project.enums.EnumMethods.returnFormattedEnum;
 import static project.javafx.GuiMain.createScene;
 
 public class ChooseLevelController implements Initializable {
@@ -32,8 +33,8 @@ public class ChooseLevelController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         Level.returnAllUnlockedLevelsList().forEach(level -> {
-            Text levelText = new Text(level.toString());
-            levelText.getStyleClass().add(".itemText");
+            Text levelText = new Text(returnFormattedEnum(level));
+            levelText.getStyleClass().add("menuItemText");
             chooseLevelGrid.add(levelText, 0, level.ordinal() + 1);
         });
     }

@@ -5,7 +5,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
@@ -20,13 +19,13 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.ResourceBundle;
 
 import static project.functions.CharacterCreation.characterInit;
 import static project.functions.GeneralFunctions.checkInput;
-import static project.javafx.GuiMain.mainScene;
+import static project.javafx.GuiMain.createScene;
 import static project.javafx.controllers.GameMenuController.gameMenuScene;
+import static project.javafx.controllers.MainMenuController.mainMenuScene;
 
 public class CharacterCreationController implements Initializable {
     @FXML
@@ -69,22 +68,12 @@ public class CharacterCreationController implements Initializable {
 
     public void backOnClick(ActionEvent actionEvent) {
         Stage stage = (Stage)((Node) actionEvent.getSource()).getScene().getWindow();
-        mainScene(stage);
+        mainMenuScene(stage);
     }
 
     public static void characterCreationScene(MouseEvent event) {
         FXMLLoader characterCreationFxmlLoader = new FXMLLoader(GuiMain.class.getResource("CharacterCreation.fxml"));
-        Scene characterCreationScene;
-
-        try {
-            characterCreationScene = new Scene(characterCreationFxmlLoader.load());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        Stage stage = (Stage)((Node) event.getSource()).getScene().getWindow();
-        stage.setScene(characterCreationScene);
-        stage.show();
+        createScene(event, characterCreationFxmlLoader, "generalStyles.css");
     }
 
     @Override
