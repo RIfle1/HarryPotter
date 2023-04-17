@@ -89,7 +89,7 @@
                         <!-- Default configuration for running with: mvn clean javafx:run -->
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>project.javafx.harrypotter/project.javafx.guiMain
+                            <mainClass>project.javafx.harrypotter/project.javafx.GuiMain
                             </mainClass>
                             <launcher>app</launcher>
                             <jlinkZipName>app</jlinkZipName>

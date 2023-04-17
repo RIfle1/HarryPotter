@@ -329,4 +329,8 @@ public class GeneralFunctions {
         }
         return null;
     }
+
+    public static boolean checkInput(String input) {
+        return input.length() != 0;
+    }
 }

@@ -1,0 +1,7 @@
+.itemText {
+    transition: 1.5s ease;
+}
+
+.itemText:hover {
+    -fx-fill: lightblue;
+}

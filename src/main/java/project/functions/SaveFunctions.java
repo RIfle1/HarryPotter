@@ -37,14 +37,14 @@ public class SaveFunctions {
             }
             else {
                 ConsoleFunctions.gameCredits();
-                CharacterCreation.characterInit();
+                CharacterCreation.characterInitPrompts();
             }
         }
         else {
             ConsoleFunctions.gameCredits();
             ConsoleFunctions.printColoredHeader("No saved characters have been found, new character creation will now proceed.");
             ConsoleFunctions.continuePrompt();
-            CharacterCreation.characterInit();
+            CharacterCreation.characterInitPrompts();
         }
     }
 

@@ -13,7 +13,7 @@ import static project.functions.GeneralFunctions.generateRandomString;
 import static project.functions.SaveFunctions.saveProgress;
 
 public class CharacterCreation {
-    public static void characterInit() {
+    public static void characterInitPrompts() {
         String firstName;
         String lastName;
 
@@ -52,6 +52,10 @@ public class CharacterCreation {
         printChoices(Difficulty.getDifficultyList());
         difficulty = Difficulty.setDifficulty(Difficulty.getDifficultyList().get(returnChoiceInt(1, Difficulty.getDifficultyList().size(), false, null) - 1));
 
+        characterInit(firstName, lastName, gender, pet, houseName, wand, difficulty);
+    }
+
+    public static void characterInit(String firstName, String lastName, Gender gender, Pet pet, HouseName houseName, Wand wand, Difficulty difficulty) {
         Wizard.wizard = Wizard.builder()
                 .healthPoints(Wizard.wizardBaseHp)
                 .defensePoints(Wizard.wizardBaseDp)
@@ -84,6 +88,7 @@ public class CharacterCreation {
 
         saveProgress("autoSave" + generateRandomString(5));
     }
+
 
     public static Wand wandCreation() {
         Core core;
