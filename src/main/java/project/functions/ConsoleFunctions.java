@@ -16,7 +16,7 @@ import static project.classes.Color.*;
 import static project.classes.Spell.returnAllSpells;
 import static project.enums.Level.*;
 import static project.functions.LevelFunctions.levelHashMap;
-import static project.functions.SaveFunctions.loadGame;
+import static project.functions.SaveFunctions.loadGamePrompt;
 import static project.functions.SaveFunctions.saveGame;
 
 public class ConsoleFunctions {
@@ -193,7 +193,7 @@ public class ConsoleFunctions {
             case 3 -> System.out.println(Wizard.wizard.returnAllStringStats(0));
             case 4 -> Wizard.wizard.printAllCharacterSpells();
             case 5 -> saveGame();
-            case 6 -> loadGame();
+            case 6 -> loadGamePrompt();
         }
         continuePromptExtra();
         chooseAction();

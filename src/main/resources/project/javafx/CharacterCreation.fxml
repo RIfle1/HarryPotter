@@ -1,18 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
 
-<AnchorPane prefHeight="1080.0" prefWidth="1920.0" styleClass="mainWindow" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="project.javafx.controllers.CharacterCreationController">
+<AnchorPane onKeyPressed="#onKeyPressed" styleClass="mainWindow" stylesheets="@generalStyles.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="project.javafx.controllers.CharacterCreationController">
    <children>
-      <Text layoutX="409.0" layoutY="77.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Character Creation" textAlignment="CENTER" wrappingWidth="1121.75146484375">
+      <Text layoutY="61.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Character Creation" textAlignment="CENTER" wrappingWidth="1920.0">
          <font>
             <Font name="Bell MT" size="73.0" />
          </font>
       </Text>
-      <GridPane alignment="CENTER" layoutX="777.0" layoutY="355.0" prefHeight="428.0" prefWidth="385.0">
+      <GridPane alignment="CENTER" layoutX="728.0" layoutY="234.0" prefHeight="542.0" prefWidth="484.0">
          <columnConstraints>
             <ColumnConstraints hgrow="SOMETIMES" maxWidth="457.0" minWidth="10.0" prefWidth="161.0" />
             <ColumnConstraints hgrow="SOMETIMES" maxWidth="540.0" minWidth="10.0" prefWidth="224.0" />
@@ -28,7 +34,7 @@
             <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
          </rowConstraints>
          <children>
-            <Text strokeType="INSIDE" strokeWidth="0.0" text="First Name:">
+            <Text strokeType="INSIDE" strokeWidth="0.0" styleClass="infoItemText" text="First Name:">
                <font>
                   <Font name="Bell MT" size="29.0" />
                </font>
@@ -36,7 +42,7 @@
                   <Insets bottom="10.0" right="20.0" top="10.0" />
                </GridPane.margin>
             </Text>
-            <Text strokeType="INSIDE" strokeWidth="0.0" text="Gender:" GridPane.rowIndex="2">
+            <Text strokeType="INSIDE" strokeWidth="0.0" styleClass="infoItemText" text="Gender:" GridPane.rowIndex="2">
                <font>
                   <Font name="Bell MT" size="29.0" />
                </font>
@@ -44,7 +50,7 @@
                   <Insets bottom="10.0" right="20.0" top="10.0" />
                </GridPane.margin>
             </Text>
-            <Text strokeType="INSIDE" strokeWidth="0.0" text="Pet:" GridPane.rowIndex="3">
+            <Text strokeType="INSIDE" strokeWidth="0.0" styleClass="infoItemText" text="Pet:" GridPane.rowIndex="3">
                <font>
                   <Font name="Bell MT" size="29.0" />
                </font>
@@ -52,7 +58,7 @@
                   <Insets bottom="10.0" right="20.0" top="10.0" />
                </GridPane.margin>
             </Text>
-            <Text strokeType="INSIDE" strokeWidth="0.0" text="Last Name:" GridPane.rowIndex="1">
+            <Text strokeType="INSIDE" strokeWidth="0.0" styleClass="infoItemText" text="Last Name:" GridPane.rowIndex="1">
                <font>
                   <Font name="Bell MT" size="29.0" />
                </font>
@@ -60,7 +66,7 @@
                   <Insets bottom="10.0" right="20.0" top="10.0" />
                </GridPane.margin>
             </Text>
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Wand Core:" GridPane.rowIndex="4">
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="infoItemText" text="Wand Core:" GridPane.rowIndex="4">
                <font>
                   <Font name="Bell MT" size="29.0" />
                </font>
@@ -68,7 +74,7 @@
                   <Insets bottom="10.0" right="20.0" top="10.0" />
                </GridPane.margin>
             </Text>
-            <Text strokeType="INSIDE" strokeWidth="0.0" text="Wand Size:" GridPane.rowIndex="5">
+            <Text strokeType="INSIDE" strokeWidth="0.0" styleClass="infoItemText" text="Wand Size:" GridPane.rowIndex="5">
                <font>
                   <Font name="Bell MT" size="29.0" />
                </font>
@@ -76,7 +82,7 @@
                   <Insets bottom="10.0" right="20.0" top="10.0" />
                </GridPane.margin>
             </Text>
-            <Text strokeType="INSIDE" strokeWidth="0.0" text="Difficulty:" GridPane.rowIndex="7">
+            <Text strokeType="INSIDE" strokeWidth="0.0" styleClass="infoItemText" text="Difficulty:" GridPane.rowIndex="7">
                <font>
                   <Font name="Bell MT" size="29.0" />
                </font>
@@ -84,14 +90,17 @@
                   <Insets bottom="10.0" right="20.0" top="10.0" />
                </GridPane.margin>
             </Text>
-            <TextField fx:id="firstNameTf" GridPane.columnIndex="1" />
-            <TextField fx:id="lastNameTf" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-            <ChoiceBox fx:id="genderCb" prefHeight="25.0" prefWidth="621.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-            <ChoiceBox fx:id="petCb" prefHeight="25.0" prefWidth="621.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-            <ChoiceBox fx:id="wandCoreCb" prefHeight="25.0" prefWidth="621.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-            <ChoiceBox fx:id="wandSizeCb" prefHeight="25.0" prefWidth="621.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-            <ChoiceBox fx:id="difficultyCb" prefHeight="25.0" prefWidth="621.0" GridPane.columnIndex="1" GridPane.rowIndex="7" />
-            <Text strokeType="INSIDE" strokeWidth="0.0" text="House:" GridPane.rowIndex="6">
+            <TextField fx:id="firstNameTf" prefHeight="35.0" prefWidth="224.0" styleClass="bellMTText" GridPane.columnIndex="1">
+               <font>
+                  <Font name="Bell MT" size="12.0" />
+               </font></TextField>
+            <TextField fx:id="lastNameTf" prefHeight="35.0" styleClass="bellMTText" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <ChoiceBox fx:id="genderCb" prefHeight="35.0" prefWidth="621.0" styleClass="bellMTText" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <ChoiceBox fx:id="petCb" prefHeight="35.0" prefWidth="621.0" styleClass="bellMTText" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <ChoiceBox fx:id="wandCoreCb" prefHeight="35.0" prefWidth="621.0" styleClass="bellMTText" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+            <ChoiceBox fx:id="wandSizeCb" prefHeight="35.0" prefWidth="621.0" styleClass="bellMTText" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+            <ChoiceBox fx:id="difficultyCb" prefHeight="35.0" prefWidth="621.0" styleClass="bellMTText" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+            <Text strokeType="INSIDE" strokeWidth="0.0" styleClass="infoItemText" text="House:" GridPane.rowIndex="6">
                <font>
                   <Font name="Bell MT" size="29.0" />
                </font>
@@ -99,13 +108,13 @@
                   <Insets bottom="10.0" right="20.0" top="10.0" />
                </GridPane.margin>
             </Text>
-            <ChoiceBox fx:id="houseCb" prefHeight="25.0" prefWidth="621.0" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+            <ChoiceBox fx:id="houseCb" prefHeight="35.0" prefWidth="621.0" styleClass="bellMTText" GridPane.columnIndex="1" GridPane.rowIndex="6" />
          </children>
          <opaqueInsets>
             <Insets />
          </opaqueInsets>
       </GridPane>
-      <Button layoutX="834.0" layoutY="827.0" mnemonicParsing="false" onAction="#createOnClick" prefHeight="32.0" prefWidth="253.0" text="Create">
+      <Button layoutX="834.0" layoutY="845.0" mnemonicParsing="false" onAction="#createOnClick" prefHeight="32.0" prefWidth="253.0" text="Create">
          <font>
             <Font name="Bell MT" size="29.0" />
          </font>
@@ -115,7 +124,7 @@
             <Font name="Bell MT" size="21.0" />
          </font>
       </Text>
-      <Button layoutX="834.0" layoutY="891.0" mnemonicParsing="false" onAction="#backOnClick" prefHeight="32.0" prefWidth="253.0" text="Back">
+      <Button layoutX="834.0" layoutY="918.0" mnemonicParsing="false" onAction="#backOnClick" prefHeight="32.0" prefWidth="253.0" text="Back">
          <font>
             <Font name="Bell MT" size="29.0" />
          </font>

@@ -13,7 +13,9 @@ import project.javafx.GuiMain;
 import java.io.IOException;
 import java.util.Objects;
 
+import static project.functions.SaveFunctions.continueGame;
 import static project.javafx.controllers.CharacterCreationController.characterCreationScene;
+import static project.javafx.controllers.LoadGameController.loadGameScene;
 
 public class MainMenuController {
     @FXML
@@ -25,12 +27,12 @@ public class MainMenuController {
 
     @FXML
     void continueGameOnClicked(MouseEvent event) {
-
+        continueGame(event);
     }
 
     @FXML
     void loadGameOnClicked(MouseEvent event) {
-
+        loadGameScene(event);
     }
     @FXML
     void newGameOnClicked(MouseEvent actionEvent) {
@@ -41,11 +43,13 @@ public class MainMenuController {
         try {
             Parent root = FXMLLoader.load(Objects.requireNonNull(GuiMain.class.getResource("MainMenu.fxml")));
             Scene mainMenuScene = new Scene(root);
+
             stage.setScene(mainMenuScene);
-            String generalStyles = Objects.requireNonNull(GuiMain.class.getResource("generalStyles.css")).toExternalForm();
-            mainMenuScene.getStylesheets().add(generalStyles);
+
             Image icon = new Image("file:src/main/resources/icons/icon.png");
             stage.getIcons().add(icon);
+            stage.setTitle("Harry Potter: The Text RPG");
+
             stage.show();
         } catch (IOException e) {
             throw new RuntimeException(e);

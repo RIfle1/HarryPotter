@@ -2,25 +2,29 @@ package project.functions;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.security.AnyTypePermission;
+import javafx.event.ActionEvent;
+import javafx.scene.control.Alert;
+import javafx.scene.input.MouseEvent;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import project.classes.Wizard;
 import project.enums.Level;
 
 import java.io.*;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static project.javafx.JavaFxFunctions.createPopup;
+import static project.javafx.controllers.GameMenuController.gameMenuScene;
 
 public class SaveFunctions {
     private static void createDir() {
         File f = new File("saves");
         if (f.mkdir()) {
             System.out.println("Directory has been created successfully");
-        }
-        else {
-            System.out.println("Directory cannot be created");
         }
     }
 
@@ -33,7 +37,7 @@ public class SaveFunctions {
         if(saveFiles.size() > 0) {
             ConsoleFunctions.printColoredHeader("Saved games have been found, would you like to load one?");
             if(ConsoleFunctions.returnYesOrNo()) {
-                loadGame();
+                loadGamePrompt();
             }
             else {
                 ConsoleFunctions.gameCredits();
@@ -45,6 +49,21 @@ public class SaveFunctions {
             ConsoleFunctions.printColoredHeader("No saved characters have been found, new character creation will now proceed.");
             ConsoleFunctions.continuePrompt();
             CharacterCreation.characterInitPrompts();
+        }
+    }
+
+    public static void continueGame(MouseEvent event) {
+        createDir();
+        List<String> saveFiles = returnFormattedSaveFiles("saves");
+
+        try {
+            loadProgress(saveFiles.get(0));
+            ActionEvent actionEvent = new ActionEvent(event.getSource(), event.getTarget());
+            gameMenuScene(actionEvent);
+        }
+        catch (IndexOutOfBoundsException e) {
+            ActionEvent actionEvent = new ActionEvent(event.getSource(), event.getTarget());
+            createPopup(actionEvent, Alert.AlertType.WARNING, "No save files found");
         }
     }
 
@@ -129,20 +148,6 @@ public class SaveFunctions {
     }
 
     public static void saveWizard(String filename) {
-//        ObjectMapper om = new ObjectMapper();
-//        om.configure(SerializationFeature.INDENT_OUTPUT, true);
-//        try {
-//            om.writeValue(new File("saves/" + filename+".2.json"), Wizard.wizard);
-//        } catch (IOException e) {
-//            System.err.println("Failed to write using jackson");
-//            e.printStackTrace();
-//        }
-//        try {
-//            Wizard reloaded = om.readValue(new File("saves/" + filename + ".2.json"), Wizard.class);
-//            System.out.println("Wizard is back from file ... magic? ");
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
         JSONObject wizardJSONObject =  getJSONObject(Wizard.class, Wizard.wizard);
         saveObject(wizardJSONObject.toJSONString(), "wizard" + filename);
     }
@@ -159,13 +164,19 @@ public class SaveFunctions {
     }
 
     public static List<String> returnSaveFiles(String dir) {
-        return Stream.of(Objects.requireNonNull(new File(dir).listFiles()))
+        File[] files = new File(dir).listFiles();
+
+        assert files != null;
+        Arrays.sort(files, Comparator.comparingLong(File::lastModified).reversed());
+
+        return Stream.of(files)
                 .filter(file -> !file.isDirectory())
                 .map(File::getName)
                 .collect(Collectors.toList());
     }
 
     public static List<String> returnFormattedSaveFiles(String dir) {
+
         return returnSaveFiles("saves").stream()
                 .map(s -> s.replace("level", "")
                         .replace("wizard","")
@@ -231,7 +242,7 @@ public class SaveFunctions {
         ConsoleFunctions.printTitle("Save file " + filename + " has been saved.");
     }
 
-    public static void loadGame() {
+    public static void loadGamePrompt() {
         List<String> saves = returnFormattedSaveFiles("saves");
 
         ConsoleFunctions.printTitle("Select a game to load: ");

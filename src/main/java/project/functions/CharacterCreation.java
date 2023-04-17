@@ -86,7 +86,7 @@ public class CharacterCreation {
         Wizard.wizard.updateHouseSpec();
         Wizard.wizard.updateStats();
 
-        saveProgress("autoSave" + generateRandomString(5));
+        saveProgress("autoSave-" + generateRandomString(5));
     }
 
 

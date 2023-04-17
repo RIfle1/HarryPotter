@@ -117,6 +117,10 @@ public class Wizard extends AbstractCharacter {
         continuePromptExtra();
     }
 
+    public List<String> returnSpecList() {
+        return Arrays.asList("Charisma", "Strength", "Intelligence", "Luck");
+    }
+
     public HashMap<String, Double> returnWizardSpecsPercent() {
         int maxPoints = wizardSpecs * dungeonLevels;
 
@@ -134,13 +138,21 @@ public class Wizard extends AbstractCharacter {
         return WizardStatsPercent;
     }
 
-    public void setWizardSpec(String spec, int specPoints) {
-        switch (spec) {
-            case "strength" -> this.setStrength(this.getStrength() + specPoints);
-            case "luck" -> this.setLuck(this.getLuck() + specPoints);
-            case "intelligence" -> this.setIntelligence(this.getIntelligence() + specPoints);
-            case "charisma" -> this.setCharisma(this.getCharisma() + specPoints);
+    public boolean setWizardSpec(String spec, int specPoints) {
+        if(this.getSpecPoints() >= specPoints) {
+            switch (spec) {
+                case "strength" -> this.setStrength(this.getStrength() + specPoints);
+                case "luck" -> this.setLuck(this.getLuck() + specPoints);
+                case "intelligence" -> this.setIntelligence(this.getIntelligence() + specPoints);
+                case "charisma" -> this.setCharisma(this.getCharisma() + specPoints);
+            }
+            this.setSpecPoints(this.getSpecPoints() - specPoints);
+            return true;
         }
+        return false;
+
+
+
     }
 
     public void upgradeSpec(Runnable func) {
@@ -156,7 +168,6 @@ public class Wizard extends AbstractCharacter {
             int specPoints =  returnChoiceInt(1, (int) this.getSpecPoints(), true, func);
 
             setWizardSpec(spec, specPoints);
-            this.setSpecPoints(this.getSpecPoints() - specPoints);
         }
         else {
             printTitle("You have no spec points.");

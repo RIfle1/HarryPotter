@@ -1,8 +1,6 @@
 .mainWindow {
-    -fx-pref-height: 1010;
-    -fx-pref-width: 1920;
-
-
+    -fx-pref-height: 1010px;
+    -fx-pref-width: 1920px;
     -fx-background-color: grey;
 }
 
@@ -16,4 +14,44 @@
     -fx-fill: lightblue;
     -fx-font-family: "Bell MT", sans-serif;
     -fx-font-size: 43;
+}
+
+.bellMTText {
+    -fx-font-family: "Bell MT", sans-serif;
+    -fx-font-size: 20;
+}
+
+.infoItemText {
+    -fx-transition: 1.5s ease;
+    -fx-font-family: "Bell MT", sans-serif;
+    -fx-font-size: 29;
+    -fx-text-alignment: center;
+}
+
+.infoItemText2 {
+    -fx-transition: 1.5s ease;
+    -fx-font-family: "Bell MT", sans-serif;
+    -fx-font-size: 35;
+    -fx-text-alignment: center;
+    -fx-font-style: italic;
+    -fx-fill: lightblue;
+}
+
+.infoItemTextHover {
+    -fx-transition: 1.5s ease;
+    -fx-font-family: "Bell MT", sans-serif;
+    -fx-font-size: 29;
+}
+
+.infoItemTextHover:hover {
+    -fx-fill: lightblue;
+    -fx-font-family: "Bell MT", sans-serif;
+    -fx-font-size: 29;
+}
+
+.gridPaneSize {
+    -fx-vgap: 25;
+    -fx-pref-height: 30;
+    -fx-max-height: 30;
+
 }

@@ -5,9 +5,10 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -15,15 +16,14 @@ import project.classes.Wand;
 import project.enums.*;
 import project.javafx.GuiMain;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
 import static project.functions.CharacterCreation.characterInit;
-import static project.functions.GeneralFunctions.checkInput;
-import static project.javafx.GuiMain.createScene;
+import static project.functions.GeneralFunctions.checkString;
+import static project.javafx.JavaFxFunctions.sendToScene;
 import static project.javafx.controllers.GameMenuController.gameMenuScene;
 import static project.javafx.controllers.MainMenuController.mainMenuScene;
 
@@ -47,7 +47,22 @@ public class CharacterCreationController implements Initializable {
     @FXML
     private Text ccErrorT;
 
-    public void createOnClick(ActionEvent actionEvent) {
+
+    @FXML
+    void onKeyPressed(KeyEvent event) {
+        if(event.getCode().equals(KeyCode.ESCAPE)) {
+            backOnClick(new ActionEvent(event.getSource(), event.getTarget()));
+        }
+    }
+
+    @FXML
+    void backOnClick(ActionEvent event) {
+        Stage stage = (Stage)((Node) event.getSource()).getScene().getWindow();
+        mainMenuScene(stage);
+    }
+
+    @FXML
+    void createOnClick(ActionEvent actionEvent) {
         String firstName = firstNameTf.getText();
         String lastName = lastNameTf.getText();
         Gender gender = Gender.setGender(genderCb.getValue());
@@ -56,7 +71,7 @@ public class CharacterCreationController implements Initializable {
         HouseName houseName = HouseName.setHouseName(houseCb.getValue());
         Difficulty difficulty = Difficulty.setDifficulty(difficultyCb.getValue());
 
-        if(checkInput(firstName) && checkInput(lastName)) {
+        if(checkString(firstName) && checkString(lastName)) {
             ccErrorT.setVisible(false);
             characterInit(firstName, lastName, gender, pet, houseName, wand, difficulty);
             gameMenuScene(actionEvent);
@@ -66,14 +81,10 @@ public class CharacterCreationController implements Initializable {
         }
     }
 
-    public void backOnClick(ActionEvent actionEvent) {
-        Stage stage = (Stage)((Node) actionEvent.getSource()).getScene().getWindow();
-        mainMenuScene(stage);
-    }
-
     public static void characterCreationScene(MouseEvent event) {
         FXMLLoader characterCreationFxmlLoader = new FXMLLoader(GuiMain.class.getResource("CharacterCreation.fxml"));
-        createScene(event, characterCreationFxmlLoader, "generalStyles.css");
+        ActionEvent actionEvent = new ActionEvent(event.getSource(), event.getTarget());
+        sendToScene(actionEvent, characterCreationFxmlLoader);
     }
 
     @Override

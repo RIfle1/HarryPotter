@@ -330,7 +330,25 @@ public class GeneralFunctions {
         return null;
     }
 
-    public static boolean checkInput(String input) {
+    public static boolean checkString(String input) {
         return input.length() != 0;
+    }
+
+    public static boolean checkPositiveInt(String input) {
+        if(checkInt(input)) {
+            return Integer.parseInt(input) > 0;
+        }
+        else {
+            return false;
+        }
+    }
+
+    public static boolean checkInt(String input) {
+        try {
+            Integer.parseInt(input);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 }
