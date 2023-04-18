@@ -5,10 +5,12 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.HPos;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -25,11 +27,12 @@ import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static javafx.scene.layout.GridPane.setHalignment;
+import static javafx.scene.layout.Region.USE_COMPUTED_SIZE;
 import static project.enums.EnumMethods.returnFormattedEnum;
 import static project.functions.GeneralFunctions.returnFileDate;
 import static project.functions.SaveFunctions.loadClass;
 import static project.functions.SaveFunctions.returnSaves;
-import static project.javafx.JavaFxFunctions.sendToScene;
+import static project.javafx.JavaFxFunctions.*;
 import static project.javafx.controllers.GameMenuController.gameMenuScene;
 import static project.javafx.controllers.MainMenuController.mainMenuScene;
 
@@ -59,6 +62,7 @@ public class LoadGameController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         List<String> saveFiles = SaveFunctions.returnFormattedSaveFiles();
+        System.out.println(saveFiles);
         AtomicInteger index = new AtomicInteger();
 
         saveFiles.forEach(saveFile -> {
@@ -72,52 +76,6 @@ public class LoadGameController implements Initializable {
 
             loadGameGrid.add(saveInfoGridPane, 0, index.get());
             index.getAndIncrement();
-
-            loadGameGrid.setVgap(40);
         });
-    }
-
-    public static void createWizardInstance(String filename, Wizard saveWizard) {
-        JSONParser parser = new JSONParser();
-        JSONObject wizardJSONObject = null;
-        List<String> saves = returnSaves(filename);
-
-        try {
-            wizardJSONObject = (JSONObject) parser.parse(new FileReader("saves/" + saves.get(0)));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        loadClass(Wizard.class, saveWizard, (JSONObject) wizardJSONObject);
-    }
-
-    public static GridPane returnSaveInfoGridPane(String filename) {
-        GridPane saveInfoGridPane = new GridPane();
-
-
-        Wizard saveWizard = Wizard.builder().build();
-        createWizardInstance(filename, saveWizard);
-
-        String fileDate = returnFileDate("saves", filename);
-        String wizardName = saveWizard.getName();
-        String wizardLevel = String.valueOf(saveWizard.getLevel());
-        String wizardHouse = returnFormattedEnum(saveWizard.getHouseName());
-
-        Text fileDateText = new Text(fileDate);
-        Text wizardNameText = new Text(wizardName);
-        Text wizardLevelText = new Text(wizardLevel);
-        Text wizardHouseText = new Text(wizardHouse);
-
-        saveInfoGridPane.add(fileDateText, 0, 0);
-        saveInfoGridPane.add(wizardNameText, 0, 1);
-        saveInfoGridPane.add(wizardLevelText, 0, 2);
-        saveInfoGridPane.add(wizardHouseText, 0, 3);
-
-        saveInfoGridPane.getStyleClass().add("saveInfoItemText");
-
-        setHalignment(saveInfoGridPane, HPos.CENTER);
-
-        return saveInfoGridPane;
-
     }
 }

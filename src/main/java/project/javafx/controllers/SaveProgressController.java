@@ -15,8 +15,10 @@ import project.functions.SaveFunctions;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static javafx.scene.layout.GridPane.setHalignment;
+import static project.javafx.JavaFxFunctions.returnSaveInfoGridPane;
 import static project.javafx.controllers.GameMenuController.gameMenuScene;
 
 public class SaveProgressController implements Initializable {
@@ -39,23 +41,31 @@ public class SaveProgressController implements Initializable {
 
     @FXML
     void newSaveOnClick(ActionEvent event) {
-        SaveFunctions.saveProgress("test");
+        SaveFunctions.saveProgress();
+        displaySaveFilesInfo();
     }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        displaySaveFilesInfo();
+    }
+
+    public void displaySaveFilesInfo() {
+        saveProgressGrid.getChildren().clear();
+
         List<String> saveFiles = SaveFunctions.returnFormattedSaveFiles();
 
-        saveFiles.forEach(saveFile -> {
-            Text saveFileText = new Text(saveFile);
-            saveFileText.getStyleClass().add("menuItemText");
+        AtomicInteger index = new AtomicInteger();
 
-            saveFileText.onMouseReleasedProperty().set(mouseEvent -> {
-                System.out.println(saveFile);
+        saveFiles.forEach(filename -> {
+            GridPane saveInfoGridPane = returnSaveInfoGridPane(filename);
+
+            saveInfoGridPane.onMouseReleasedProperty().set(mouseEvent -> {
+                System.out.println(filename);
             });
 
-            saveProgressGrid.add(saveFileText, 0, saveFiles.indexOf(saveFile) + 1);
-            setHalignment(saveFileText, HPos.CENTER);
+            saveProgressGrid.add(saveInfoGridPane, 0, index.get());
+            index.getAndIncrement();
         });
     }
 

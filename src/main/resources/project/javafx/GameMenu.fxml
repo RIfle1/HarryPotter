@@ -44,7 +44,7 @@
                   <Font name="Bell MT" size="29.0" />
                </font>
             </Button>
-            <GridPane fx:id="chooseLevelGrid" prefHeight="809.0" prefWidth="749.0" styleClass="gridPaneSize" GridPane.halignment="CENTER" GridPane.valignment="TOP">
+            <GridPane fx:id="chooseLevelGrid" styleClass="gridPaneSize" GridPane.halignment="CENTER" GridPane.valignment="TOP">
                <columnConstraints>
                   <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" />
                </columnConstraints>
@@ -52,40 +52,40 @@
                   <RowConstraints vgrow="SOMETIMES" />
                </rowConstraints>
                <children>
-                  <Text strokeType="INSIDE" strokeWidth="0.0" styleClass="infoItemText2" text="Choose Level" GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.valignment="TOP" GridPane.vgrow="NEVER">
+                  <Text strokeType="INSIDE" strokeWidth="0.0" styleClass="infoItemText2" text="Choose Level" GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.valignment="CENTER" GridPane.vgrow="NEVER">
                      <font>
                         <Font name="Bell MT" size="29.0" />
                      </font>
                   </Text>
                </children>
             </GridPane>
-            <GridPane fx:id="spellGrid" maxHeight="33.0" prefHeight="33.0" prefWidth="887.0" styleClass="gridPaneSize" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="TOP">
+            <GridPane fx:id="spellGrid" prefHeight="33.0" prefWidth="800.0" styleClass="gridPaneSize" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="TOP">
                <columnConstraints>
-                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="455.0" minWidth="0.0" prefWidth="434.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="278.0" minWidth="100.0" prefWidth="100.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="319.0" minWidth="100.0" prefWidth="100.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="248.0" minWidth="100.0" prefWidth="100.0" />
+                  <ColumnConstraints fillWidth="false" hgrow="SOMETIMES" maxWidth="455.0" minWidth="0.0" prefWidth="434.0" />
+                  <ColumnConstraints fillWidth="false" hgrow="SOMETIMES" maxWidth="278.0" minWidth="100.0" prefWidth="100.0" />
+                  <ColumnConstraints fillWidth="false" hgrow="SOMETIMES" maxWidth="319.0" minWidth="100.0" prefWidth="100.0" />
+                  <ColumnConstraints fillWidth="false" hgrow="SOMETIMES" maxWidth="248.0" minWidth="100.0" prefWidth="100.0" />
                </columnConstraints>
                <rowConstraints>
                   <RowConstraints fillHeight="false" valignment="TOP" vgrow="NEVER" />
                </rowConstraints>
                <children>
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="infoItemText2" text="Available Spells" textAlignment="CENTER" wrappingWidth="274.0" GridPane.halignment="CENTER">
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="infoItemText2" text="Available Spells" textAlignment="CENTER" wrappingWidth="274.0" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
                      <font>
                         <Font name="Bell MT" size="43.0" />
                      </font>
                   </Text>
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="infoItemText2" text="Damage" textAlignment="CENTER" GridPane.columnIndex="1" GridPane.halignment="CENTER">
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="infoItemText2" text="Damage" textAlignment="CENTER" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
                      <font>
                         <Font name="Bell MT" size="29.0" />
                      </font>
                   </Text>
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="infoItemText2" text="Chance" textAlignment="CENTER" wrappingWidth="107.0" GridPane.columnIndex="2" GridPane.halignment="CENTER">
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="infoItemText2" text="Chance" textAlignment="CENTER" wrappingWidth="107.0" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
                      <font>
                         <Font name="Bell MT" size="29.0" />
                      </font>
                   </Text>
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="infoItemText2" text="Cooldown" textAlignment="CENTER" wrappingWidth="161.0" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.vgrow="ALWAYS">
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="infoItemText2" text="Cooldown" textAlignment="CENTER" wrappingWidth="161.0" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS">
                      <font>
                         <Font name="Bell MT" size="29.0" />
                      </font>
@@ -272,7 +272,7 @@
                         <Insets right="10.0" />
                      </GridPane.margin>
                   </TextField>
-                  <Text strokeType="INSIDE" strokeWidth="0.0" styleClass="infoItemText2" text="Stats" textAlignment="CENTER" wrappingWidth="490.2177734375">
+                  <Text strokeType="INSIDE" strokeWidth="0.0" styleClass="infoItemText2" text="Stats" textAlignment="CENTER" wrappingWidth="490.2177734375" GridPane.valignment="CENTER">
                      <font>
                         <Font name="Bell MT Italic" size="29.0" />
                      </font>

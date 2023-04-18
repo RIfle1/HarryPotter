@@ -10,6 +10,7 @@ import java.util.List;
 
 import static project.functions.ConsoleFunctions.*;
 import static project.functions.GeneralFunctions.generateRandomString;
+import static project.functions.SaveFunctions.autoSaveProgress;
 import static project.functions.SaveFunctions.saveProgress;
 
 public class CharacterCreation {
@@ -86,7 +87,7 @@ public class CharacterCreation {
         Wizard.wizard.updateHouseSpec();
         Wizard.wizard.updateStats();
 
-        saveProgress("autoSave-" + generateRandomString(5));
+        autoSaveProgress();
     }
 
 

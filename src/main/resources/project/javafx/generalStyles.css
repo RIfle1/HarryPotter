@@ -55,8 +55,25 @@
     -fx-max-height: 30;
 }
 
-.saveInfoItemText {
+.gridPaneSize2 {
+    -fx-vgap: 40;
+    -fx-pref-height: 30;
+    -fx-max-height: 30;
+}
+
+.saveInfoItemText:hover {
+    -fx-font-family: "Bell MT", sans-serif;
+    -fx-font-size: 25;
+}
+
+.saveInfoGridPane {
     -fx-font-family: "Bell MT", sans-serif;
     -fx-font-size: 25;
     -fx-text-alignment: center;
 }
+
+.saveInfoGridPane:hover {
+    -fx-border-color: lightblue;
+    -fx-border-width: 2;
+}
+

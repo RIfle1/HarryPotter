@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static project.functions.GeneralFunctions.generateRandomString;
 import static project.javafx.JavaFxFunctions.createPopup;
 import static project.javafx.controllers.GameMenuController.gameMenuScene;
 
@@ -158,9 +159,18 @@ public class SaveFunctions {
         saveObject(levelJSONObject.toJSONString(), "level-" + filename);
     }
 
+    public static void autoSaveProgress() {
+        saveProgress("autoSave-" + generateRandomString(5));
+    }
+
     public static void saveProgress(String filename) {
         saveWizard(filename);
         saveLevel(filename);
+    }
+
+    public static void saveProgress() {
+        saveWizard("save-" + generateRandomString(5));
+        saveLevel("save-" + generateRandomString(5));
     }
 
     public static List<String> returnSaveFiles() {
@@ -263,5 +273,19 @@ public class SaveFunctions {
                 ConsoleFunctions.printTitle("Game " + filename + " has been loaded.");
             }
         }
+    }
+
+    public static void createWizardInstance(String filename, Wizard saveWizard) {
+        JSONParser parser = new JSONParser();
+        JSONObject wizardJSONObject = null;
+        List<String> saves = returnSaves(filename);
+
+        try {
+            wizardJSONObject = (JSONObject) parser.parse(new FileReader("saves/" + saves.get(0)));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        loadClass(Wizard.class, saveWizard, (JSONObject) wizardJSONObject);
     }
 }
