@@ -7,22 +7,20 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import project.classes.Wizard;
-import project.functions.SaveFunctions;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Optional;
 
 import static project.enums.EnumMethods.returnFormattedEnum;
-import static project.functions.GeneralFunctions.returnFileDate;
+import static project.functions.GeneralFunctions.returnFileAttribute;
 import static project.functions.SaveFunctions.createWizardInstance;
-import static project.javafx.controllers.GameMenuController.gameMenuScene;
 
 public class JavaFxFunctions {
 
@@ -41,7 +39,7 @@ public class JavaFxFunctions {
         stage.show();
     }
 
-    public static void createPopup(ActionEvent event, Alert.AlertType alertType, String popUpMsg) {
+    public static Optional<ButtonType> createPopup(ActionEvent event, Alert.AlertType alertType, String popUpMsg) {
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
 
         Alert alert = new Alert(alertType, "");
@@ -49,43 +47,45 @@ public class JavaFxFunctions {
         alert.initOwner(stage);
 
         alert.getDialogPane().setContentText(popUpMsg);
-        alert.showAndWait();
+        return alert.showAndWait();
     }
 
     public static GridPane returnSaveInfoGridPane(String filename) {
         GridPane saveInfoGridPane = new GridPane();
         saveInfoGridPane.setAlignment(Pos.CENTER);
+        saveInfoGridPane.setId(filename);
 
         ColumnConstraints column1 = new ColumnConstraints();
-        column1.setHalignment(HPos.LEFT);
+        column1.setHalignment(HPos.CENTER);
         column1.setPercentWidth(100);
         saveInfoGridPane.getColumnConstraints().add(column1);
 
 
-        Wizard saveWizard = Wizard.builder().build();
-        createWizardInstance(filename, saveWizard);
+        Wizard wizardInstance = Wizard.builder().build();
+        createWizardInstance(filename, wizardInstance);
 
-        String fileDate = returnFileDate("saves", filename);
-        String wizardName = saveWizard.getName();
-        String wizardLevel = String.valueOf((int) saveWizard.getLevel());
-        String wizardHouse = returnFormattedEnum(saveWizard.getHouseName());
+        String fileCreationTime = returnFileAttribute("saves", filename, "creationTime");
+        String fileModifiedTime = returnFileAttribute("saves", filename, "lastModifiedTime");
+        String wizardName = wizardInstance.getName();
+        String wizardLevel = String.valueOf((int) wizardInstance.getLevel());
+        String wizardHouse = returnFormattedEnum(wizardInstance.getHouseName());
 
         Text wizardNameText = new Text(wizardName);
         Text wizardLevelText = new Text("Level " + wizardLevel);
         Text wizardHouseText = new Text("House of " + wizardHouse);
-        Text fileDateText = new Text(fileDate);
-
+        Text fileCreationTimeText = new Text("Creation Time: " + fileCreationTime);
+        Text fileModifiedTimeText = new Text("Last Modified Time: " + fileModifiedTime);
 
         saveInfoGridPane.add(wizardNameText, 0, 0);
         saveInfoGridPane.add(wizardLevelText, 0, 1);
         saveInfoGridPane.add(wizardHouseText, 0, 2);
-        saveInfoGridPane.add(fileDateText, 0, 3);
+        saveInfoGridPane.add(fileCreationTimeText, 0, 3);
+        saveInfoGridPane.add(fileModifiedTimeText, 0, 4);
 
         saveInfoGridPane.getStyleClass().add("saveInfoGridPane");
         saveInfoGridPane.setGridLinesVisible(true);
 
         return saveInfoGridPane;
-
     }
 
 }

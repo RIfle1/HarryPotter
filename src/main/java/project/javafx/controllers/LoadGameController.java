@@ -26,12 +26,6 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static javafx.scene.layout.GridPane.setHalignment;
-import static javafx.scene.layout.Region.USE_COMPUTED_SIZE;
-import static project.enums.EnumMethods.returnFormattedEnum;
-import static project.functions.GeneralFunctions.returnFileDate;
-import static project.functions.SaveFunctions.loadClass;
-import static project.functions.SaveFunctions.returnSaves;
 import static project.javafx.JavaFxFunctions.*;
 import static project.javafx.controllers.GameMenuController.gameMenuScene;
 import static project.javafx.controllers.MainMenuController.mainMenuScene;

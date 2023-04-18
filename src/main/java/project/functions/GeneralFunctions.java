@@ -353,14 +353,14 @@ public class GeneralFunctions {
         }
     }
 
-    public static String returnFileDate(String dir, String filename) {
-        List<String> saves = returnSaves(filename);
+    public static String returnFileAttribute(String dir, String filenameCompressed, String attribute) {
+        List<String> saves = returnSaves(filenameCompressed);
 
         File file = new File(dir + "/" + saves.get(0));
 
         FileTime fileTime = null;
         try {
-            fileTime = (FileTime) Files.getAttribute(file.toPath(), "creationTime");
+            fileTime = (FileTime) Files.getAttribute(file.toPath(), attribute);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

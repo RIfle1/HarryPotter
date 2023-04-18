@@ -169,8 +169,10 @@ public class SaveFunctions {
     }
 
     public static void saveProgress() {
-        saveWizard("save-" + generateRandomString(5));
-        saveLevel("save-" + generateRandomString(5));
+        String randomString = generateRandomString(5);
+
+        saveWizard("save-" + randomString);
+        saveLevel("save-" + randomString);
     }
 
     public static List<String> returnSaveFiles() {
@@ -194,17 +196,18 @@ public class SaveFunctions {
                 .distinct().toList();
     }
 
-    public static List<String> returnSaves(String filename) {
-        List<String> saves = returnSaveFiles().stream().filter(s -> s.contains(filename)).toList();
+    public static List<String> returnSaves(String filenameCompressed) {
+        List<String> saves = returnSaveFiles().stream().filter(s -> s.contains(filenameCompressed)).toList();
+
         String wizardString = saves.stream().filter(s -> s.contains("wizard")).toList().get(0);
         String levelString = saves.stream().filter(s -> s.contains("level")).toList().get(0);
 
         return Arrays.asList(wizardString, levelString);
     }
 
-    public static void loadProgress(String filename) {
+    public static void loadProgress(String filenameCompressed) {
         JSONParser parser = new JSONParser();
-        List<String> saves = returnSaves(filename);
+        List<String> saves = returnSaves(filenameCompressed);
 
         JSONObject wizardJSONObject = null;
         JSONObject levelJSONObject = null;
@@ -275,10 +278,10 @@ public class SaveFunctions {
         }
     }
 
-    public static void createWizardInstance(String filename, Wizard saveWizard) {
+    public static void createWizardInstance(String filenameCompressed, Wizard wizardInstance) {
         JSONParser parser = new JSONParser();
         JSONObject wizardJSONObject = null;
-        List<String> saves = returnSaves(filename);
+        List<String> saves = returnSaves(filenameCompressed);
 
         try {
             wizardJSONObject = (JSONObject) parser.parse(new FileReader("saves/" + saves.get(0)));
@@ -286,6 +289,20 @@ public class SaveFunctions {
             e.printStackTrace();
         }
 
-        loadClass(Wizard.class, saveWizard, (JSONObject) wizardJSONObject);
+        loadClass(Wizard.class, wizardInstance, (JSONObject) wizardJSONObject);
+    }
+
+    public static void deleteSaveFile(String filenameCompressed) {
+        List<String> saves = returnSaves(filenameCompressed);
+
+        saves.forEach(s -> {
+            File file = new File("saves/" + s);
+            if(file.delete()) {
+                System.out.println("File " + s + " has been deleted.");
+            } else {
+                System.out.println("Failed to delete file " + s);
+            }
+        });
+
     }
 }

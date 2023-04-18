@@ -69,11 +69,12 @@
 .saveInfoGridPane {
     -fx-font-family: "Bell MT", sans-serif;
     -fx-font-size: 25;
-    -fx-text-alignment: center;
+    -fx-column-halignment: center;
 }
 
 .saveInfoGridPane:hover {
     -fx-border-color: lightblue;
     -fx-border-width: 2;
 }
+
 

@@ -5,6 +5,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.HPos;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
@@ -14,10 +16,13 @@ import project.functions.SaveFunctions;
 
 import java.net.URL;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static javafx.scene.layout.GridPane.setHalignment;
+import static project.functions.SaveFunctions.deleteSaveFile;
+import static project.javafx.JavaFxFunctions.createPopup;
 import static project.javafx.JavaFxFunctions.returnSaveInfoGridPane;
 import static project.javafx.controllers.GameMenuController.gameMenuScene;
 
@@ -61,7 +66,17 @@ public class SaveProgressController implements Initializable {
             GridPane saveInfoGridPane = returnSaveInfoGridPane(filename);
 
             saveInfoGridPane.onMouseReleasedProperty().set(mouseEvent -> {
-                System.out.println(filename);
+                ActionEvent actionEvent = new ActionEvent(mouseEvent.getSource(), mouseEvent.getTarget());
+                Optional<ButtonType> option = createPopup(actionEvent, Alert.AlertType.CONFIRMATION,"Are you sure you want to overwrite this save file?");
+
+                if(option.get() == ButtonType.OK) {
+                    String oldFilenameCompressed = saveInfoGridPane.getId();
+                    SaveFunctions.saveProgress(oldFilenameCompressed);
+                    displaySaveFilesInfo();
+                }
+
+
+
             });
 
             saveProgressGrid.add(saveInfoGridPane, 0, index.get());
