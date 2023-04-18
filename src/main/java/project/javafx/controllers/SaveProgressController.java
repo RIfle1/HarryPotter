@@ -39,12 +39,12 @@ public class SaveProgressController implements Initializable {
 
     @FXML
     void newSaveOnClick(ActionEvent event) {
-    //TODO THIS
+        SaveFunctions.saveProgress("test");
     }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        List<String> saveFiles = SaveFunctions.returnFormattedSaveFiles("saves");
+        List<String> saveFiles = SaveFunctions.returnFormattedSaveFiles();
 
         saveFiles.forEach(saveFile -> {
             Text saveFileText = new Text(saveFile);

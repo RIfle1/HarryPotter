@@ -8,19 +8,20 @@ import project.classes.Spell;
 import project.classes.Wand;
 import project.enums.Level;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Serializable;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
+import java.nio.file.Files;
+import java.nio.file.attribute.FileTime;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static project.functions.SaveFunctions.getJSONObject;
+import static project.functions.SaveFunctions.returnSaves;
 
 public class GeneralFunctions {
 
@@ -351,4 +352,23 @@ public class GeneralFunctions {
             return false;
         }
     }
+
+    public static String returnFileDate(String dir, String filename) {
+        List<String> saves = returnSaves(filename);
+
+        File file = new File(dir + "/" + saves.get(0));
+
+        FileTime fileTime = null;
+        try {
+            fileTime = (FileTime) Files.getAttribute(file.toPath(), "creationTime");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        Date fileDate = new Date(fileTime.toMillis());
+        String pattern = "dd-MM-yyyy HH:mm:ss";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+        return simpleDateFormat.format(fileDate);
+    }
+
 }

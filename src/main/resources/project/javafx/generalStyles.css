@@ -53,5 +53,10 @@
     -fx-vgap: 25;
     -fx-pref-height: 30;
     -fx-max-height: 30;
+}
 
+.saveInfoItemText {
+    -fx-font-family: "Bell MT", sans-serif;
+    -fx-font-size: 25;
+    -fx-text-alignment: center;
 }

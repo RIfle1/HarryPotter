@@ -32,7 +32,7 @@ public class SaveFunctions {
 
     public static void checkSaves() {
         createDir();
-        List<String> saveFiles = returnFormattedSaveFiles("saves");
+        List<String> saveFiles = returnFormattedSaveFiles();
 
         if(saveFiles.size() > 0) {
             ConsoleFunctions.printColoredHeader("Saved games have been found, would you like to load one?");
@@ -54,7 +54,7 @@ public class SaveFunctions {
 
     public static void continueGame(MouseEvent event) {
         createDir();
-        List<String> saveFiles = returnFormattedSaveFiles("saves");
+        List<String> saveFiles = returnFormattedSaveFiles();
 
         try {
             loadProgress(saveFiles.get(0));
@@ -149,13 +149,13 @@ public class SaveFunctions {
 
     public static void saveWizard(String filename) {
         JSONObject wizardJSONObject =  getJSONObject(Wizard.class, Wizard.wizard);
-        saveObject(wizardJSONObject.toJSONString(), "wizard" + filename);
+        saveObject(wizardJSONObject.toJSONString(), "wizard-" + filename);
     }
 
     public static void saveLevel(String filename) {
 
         JSONObject levelJSONObject =  getJSONEnum(Level.returnAllLevels());
-        saveObject(levelJSONObject.toJSONString(), "level" + filename);
+        saveObject(levelJSONObject.toJSONString(), "level-" + filename);
     }
 
     public static void saveProgress(String filename) {
@@ -163,8 +163,8 @@ public class SaveFunctions {
         saveLevel(filename);
     }
 
-    public static List<String> returnSaveFiles(String dir) {
-        File[] files = new File(dir).listFiles();
+    public static List<String> returnSaveFiles() {
+        File[] files = new File("saves").listFiles();
 
         assert files != null;
         Arrays.sort(files, Comparator.comparingLong(File::lastModified).reversed());
@@ -175,27 +175,33 @@ public class SaveFunctions {
                 .collect(Collectors.toList());
     }
 
-    public static List<String> returnFormattedSaveFiles(String dir) {
+    public static List<String> returnFormattedSaveFiles() {
 
-        return returnSaveFiles("saves").stream()
-                .map(s -> s.replace("level", "")
-                        .replace("wizard","")
+        return returnSaveFiles().stream()
+                .map(s -> s.replace("level-", "")
+                        .replace("wizard-","")
                         .replace(".json", ""))
                 .distinct().toList();
     }
 
-    public static void loadProgress(String filename) {
-        List<String> saves = returnSaveFiles("saves").stream().filter(s -> s.contains(filename)).toList();
-        JSONParser parser = new JSONParser();
+    public static List<String> returnSaves(String filename) {
+        List<String> saves = returnSaveFiles().stream().filter(s -> s.contains(filename)).toList();
         String wizardString = saves.stream().filter(s -> s.contains("wizard")).toList().get(0);
         String levelString = saves.stream().filter(s -> s.contains("level")).toList().get(0);
+
+        return Arrays.asList(wizardString, levelString);
+    }
+
+    public static void loadProgress(String filename) {
+        JSONParser parser = new JSONParser();
+        List<String> saves = returnSaves(filename);
 
         JSONObject wizardJSONObject = null;
         JSONObject levelJSONObject = null;
 
         try {
-            wizardJSONObject = (JSONObject) parser.parse(new FileReader("saves/" + wizardString));
-            levelJSONObject = (JSONObject) parser.parse(new FileReader("saves/" + levelString));
+            wizardJSONObject = (JSONObject) parser.parse(new FileReader("saves/" + saves.get(0)));
+            levelJSONObject = (JSONObject) parser.parse(new FileReader("saves/" + saves.get(1)));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -223,7 +229,7 @@ public class SaveFunctions {
     }
 
     public static void saveGame() {
-        List<String> saves = returnFormattedSaveFiles("saves");
+        List<String> saves = returnFormattedSaveFiles();
 
         ConsoleFunctions.printTitle("Current Save Games: ");
         ConsoleFunctions.printChoices(saves);
@@ -243,7 +249,7 @@ public class SaveFunctions {
     }
 
     public static void loadGamePrompt() {
-        List<String> saves = returnFormattedSaveFiles("saves");
+        List<String> saves = returnFormattedSaveFiles();
 
         ConsoleFunctions.printTitle("Select a game to load: ");
         ConsoleFunctions.printChoices(saves);

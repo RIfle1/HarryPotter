@@ -15,12 +15,12 @@
             <Font name="Bell MT" size="73.0" />
          </font>
       </Text>
-      <GridPane fx:id="loadGameGrid" layoutX="910.0" layoutY="124.0">
+      <GridPane fx:id="loadGameGrid" alignment="TOP_CENTER" layoutX="910.0" layoutY="124.0">
          <columnConstraints>
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
          </columnConstraints>
          <rowConstraints>
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints fillHeight="false" valignment="TOP" vgrow="SOMETIMES" />
          </rowConstraints>
       </GridPane>
       <Button cache="true" layoutX="834.0" layoutY="918.0" mnemonicParsing="false" onAction="#backOnClick" prefHeight="32.0" prefWidth="253.0" text="Back">

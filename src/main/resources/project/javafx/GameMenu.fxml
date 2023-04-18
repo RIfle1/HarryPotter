@@ -185,47 +185,47 @@
                         <Insets left="10.0" />
                      </GridPane.margin>
                   </Text>
-                  <Text fx:id="nameT" strokeType="INSIDE" strokeWidth="0.0" styleClass="infoItemText" wrappingWidth="140.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1">
+                  <Text fx:id="nameT" strokeType="INSIDE" strokeWidth="0.0" styleClass="infoItemText" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1">
                      <font>
                         <Font name="Bell MT" size="29.0" />
                      </font>
                   </Text>
-                  <Text fx:id="levelT" strokeType="INSIDE" strokeWidth="0.0" styleClass="infoItemText" wrappingWidth="140.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2">
+                  <Text fx:id="levelT" strokeType="INSIDE" strokeWidth="0.0" styleClass="infoItemText" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2">
                      <font>
                         <Font name="Bell MT" size="29.0" />
                      </font>
                   </Text>
-                  <Text fx:id="healthT" strokeType="INSIDE" strokeWidth="0.0" styleClass="infoItemText" wrappingWidth="140.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="3">
+                  <Text fx:id="healthT" strokeType="INSIDE" strokeWidth="0.0" styleClass="infoItemText" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="3">
                      <font>
                         <Font name="Bell MT" size="29.0" />
                      </font>
                   </Text>
-                  <Text fx:id="defenseT" strokeType="INSIDE" strokeWidth="0.0" styleClass="infoItemText" wrappingWidth="140.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="4">
+                  <Text fx:id="defenseT" strokeType="INSIDE" strokeWidth="0.0" styleClass="infoItemText" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="4">
                      <font>
                         <Font name="Bell MT" size="29.0" />
                      </font>
                   </Text>
-                  <Text fx:id="houseT" strokeType="INSIDE" strokeWidth="0.0" styleClass="infoItemText" wrappingWidth="140.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="5">
+                  <Text fx:id="houseT" strokeType="INSIDE" strokeWidth="0.0" styleClass="infoItemText" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="5">
                      <font>
                         <Font name="Bell MT" size="29.0" />
                      </font>
                   </Text>
-                  <Text fx:id="charismaT" strokeType="INSIDE" strokeWidth="0.0" styleClass="infoItemText" wrappingWidth="140.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="6">
+                  <Text fx:id="charismaT" strokeType="INSIDE" strokeWidth="0.0" styleClass="infoItemText" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="6">
                      <font>
                         <Font name="Bell MT" size="29.0" />
                      </font>
                   </Text>
-                  <Text fx:id="strengthT" strokeType="INSIDE" strokeWidth="0.0" styleClass="infoItemText" wrappingWidth="140.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="7">
+                  <Text fx:id="strengthT" strokeType="INSIDE" strokeWidth="0.0" styleClass="infoItemText" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="7">
                      <font>
                         <Font name="Bell MT" size="29.0" />
                      </font>
                   </Text>
-                  <Text fx:id="intelligenceT" strokeType="INSIDE" strokeWidth="0.0" styleClass="infoItemText" wrappingWidth="140.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="8">
+                  <Text fx:id="intelligenceT" strokeType="INSIDE" strokeWidth="0.0" styleClass="infoItemText" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="8">
                      <font>
                         <Font name="Bell MT" size="29.0" />
                      </font>
                   </Text>
-                  <Text fx:id="luckT" strokeType="INSIDE" strokeWidth="0.0" styleClass="infoItemText" wrappingWidth="140.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="9">
+                  <Text fx:id="luckT" strokeType="INSIDE" strokeWidth="0.0" styleClass="infoItemText" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="9">
                      <font>
                         <Font name="Bell MT" size="29.0" />
                      </font>
@@ -238,7 +238,7 @@
                         <Insets left="10.0" />
                      </GridPane.margin>
                   </Text>
-                  <Text fx:id="specPointsT" strokeType="INSIDE" strokeWidth="0.0" styleClass="infoItemText" wrappingWidth="140.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="10">
+                  <Text fx:id="specPointsT" strokeType="INSIDE" strokeWidth="0.0" styleClass="infoItemText" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="10">
                      <font>
                         <Font name="Bell MT" size="29.0" />
                      </font>
