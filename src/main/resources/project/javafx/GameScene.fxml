@@ -58,12 +58,13 @@
                             <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                           </columnConstraints>
                           <rowConstraints>
-                            <RowConstraints maxHeight="121.0" minHeight="10.0" prefHeight="47.0" vgrow="SOMETIMES" />
-                            <RowConstraints maxHeight="210.0" minHeight="10.0" prefHeight="205.0" vgrow="SOMETIMES" />
+                            <RowConstraints maxHeight="47.0" minHeight="47.0" prefHeight="47.0" vgrow="SOMETIMES" />
+                            <RowConstraints maxHeight="10.0" minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
+                              <RowConstraints maxHeight="210.0" minHeight="10.0" prefHeight="205.0" vgrow="SOMETIMES" />
                           </rowConstraints>
                            <children>
                               <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="infoItemText" text="Available Spells" />
-                              <ScrollPane prefHeight="200.0" prefWidth="200.0" styleClass="scrollPane" GridPane.rowIndex="1">
+                              <ScrollPane prefHeight="200.0" prefWidth="200.0" styleClass="scrollPane" GridPane.rowIndex="2">
                                 <content>
                                     <AnchorPane prefHeight="194.0" prefWidth="704.0" styleClass="defaultAnchorPane">
                                        <children>
@@ -84,6 +85,7 @@
                                     <Insets bottom="5.0" />
                                  </GridPane.margin>
                               </ScrollPane>
+                              <Line endX="578.5" startX="-85.0" GridPane.rowIndex="1" />
                            </children>
                         </GridPane>
                         <GridPane GridPane.columnIndex="2">
@@ -91,7 +93,8 @@
                             <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                           </columnConstraints>
                           <rowConstraints>
-                            <RowConstraints maxHeight="95.0" minHeight="28.0" prefHeight="49.0" vgrow="SOMETIMES" />
+                            <RowConstraints maxHeight="47.0" minHeight="47.0" prefHeight="47.0" vgrow="SOMETIMES" />
+                              <RowConstraints maxHeight="10.0" minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
                             <RowConstraints maxHeight="224.0" minHeight="10.0" prefHeight="203.0" valignment="CENTER" vgrow="SOMETIMES" />
                           </rowConstraints>
                            <children>
@@ -102,7 +105,7 @@
                                     <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                                 </columnConstraints>
                                 <rowConstraints>
-                                  <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+                                  <RowConstraints maxHeight="47.0" minHeight="47.0" prefHeight="47.0" valignment="CENTER" vgrow="SOMETIMES" />
                                 </rowConstraints>
                                  <children>
                                     <Button cache="true" maxHeight="-Infinity" mnemonicParsing="false" onAction="#parryOnClick" prefHeight="20.0" text="Parry">
@@ -131,7 +134,7 @@
                                     </Button>
                                  </children>
                               </GridPane>
-                              <Circle radius="94.0" stroke="WHITE" strokeLineCap="ROUND" strokeType="INSIDE" GridPane.rowIndex="1">
+                              <Circle radius="94.0" stroke="WHITE" strokeLineCap="ROUND" strokeType="INSIDE" GridPane.rowIndex="2">
                                  <fill>
                                     <LinearGradient endX="1.0" endY="1.0">
                                        <stops>
@@ -149,7 +152,7 @@
                                     </LinearGradient>
                                  </fill>
                               </Circle>
-                              <Circle fx:id="attackChanceCircle" radius="23.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" GridPane.rowIndex="1">
+                              <Circle fx:id="attackChanceCircle" radius="23.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" GridPane.rowIndex="2">
                                  <fill>
                                     <RadialGradient centerX="0.5" centerY="0.5" radius="0.5">
                                        <stops>
@@ -182,7 +185,8 @@
                                     </RadialGradient>
                                  </fill>
                               </Circle>
-                              <Circle fill="#80808000" radius="54.0" stroke="#ffd000" strokeType="INSIDE" strokeWidth="3.0" GridPane.rowIndex="1" />
+                              <Circle fill="#80808000" radius="54.0" stroke="#ffd000" strokeType="INSIDE" strokeWidth="3.0" GridPane.rowIndex="2" />
+                              <Line endX="260.0" startX="-85.0" GridPane.rowIndex="1" />
                            </children>
                         </GridPane>
                         <Line endX="-100.0" endY="170.0" startX="-100.0" GridPane.columnIndex="1" />
