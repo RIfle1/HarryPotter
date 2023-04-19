@@ -157,7 +157,6 @@ public class GameSceneController implements Initializable {
             column2.setPercentWidth(85);
 
             playerSpellInfoGridPane.getColumnConstraints().addAll(column1, column2);
-            playerSpellInfoGridPane.setVgap(20);
             playerSpellInfoGridPane.setHgap(20);
 
             Text spellText = new Text(spellName);
@@ -168,6 +167,10 @@ public class GameSceneController implements Initializable {
             playerSpellInfoGridPane.add(spellIcon, 0, 0);
             playerSpellInfoGridPane.add(spellText, 1, 0);
             playerSpellInfoGridPane.getStyleClass().add("playerSpellInfoGridPane");
+
+            playerSpellInfoGridPane.setOnMouseReleased(event -> {
+                playerSpellInfoGridPane.getStyleClass().add("playerSpellInfoGridPanePressed");
+            });
 
             playerAvailableSpellsGrid.add(playerSpellInfoGridPane, column.get(), row.get());
 
@@ -186,6 +189,9 @@ public class GameSceneController implements Initializable {
             r.setMinHeight(20);
             r.setPrefHeight(20);
         });
+
+        playerAvailableSpellsGrid.setVgap(0);
+        playerAvailableSpellsGrid.setHgap(0);
 
 
     }

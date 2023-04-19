@@ -106,3 +106,8 @@
     -fx-border-width: 1;
 }
 
+.playerSpellInfoGridPanePressed {
+    -fx-border-color: lightblue;
+    -fx-border-width: 1;
+}
+
