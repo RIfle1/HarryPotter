@@ -50,7 +50,7 @@
 }
 
 .gridPaneSize {
-    -fx-vgap: 25;
+    -fx-vgap: 22;
     -fx-pref-height: 30;
     -fx-max-height: 30;
 }
@@ -69,12 +69,31 @@
 .saveInfoGridPane {
     -fx-font-family: "Bell MT", sans-serif;
     -fx-font-size: 25;
-    -fx-column-halignment: center;
 }
 
 .saveInfoGridPane:hover {
     -fx-border-color: lightblue;
     -fx-border-width: 2;
+}
+
+.healthBar {
+    -fx-background-color: #e08787;
+    -fx-border-color: black;
+    -fx-border-width: 1;
+}
+
+.availableAttacksText {
+    -fx-font-family: "Bell MT", sans-serif;
+    -fx-font-size: 20;
+    -fx-fill: lightblue;
+}
+
+.scrollPane {
+    -fx-background-color: transparent;
+}
+
+.defaultAnchorPane {
+    -fx-background-color: grey;
 }
 
 

@@ -8,6 +8,8 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
@@ -15,6 +17,8 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import project.classes.Wizard;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Optional;
 
@@ -86,6 +90,23 @@ public class JavaFxFunctions {
         saveInfoGridPane.setGridLinesVisible(true);
 
         return saveInfoGridPane;
+    }
+
+    public static ImageView returnSpellImage(String spellName, double height, double width) {
+        FileInputStream imgInputStream;
+        try {
+            imgInputStream = new FileInputStream("src/main/resources/icons/" + spellName + ".png");
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+        Image spellImage = new Image(imgInputStream);
+
+        ImageView spellImageView = new ImageView(spellImage);
+        spellImageView.setFitHeight(height);
+        spellImageView.setFitWidth(width);
+
+        return spellImageView;
     }
 
 }

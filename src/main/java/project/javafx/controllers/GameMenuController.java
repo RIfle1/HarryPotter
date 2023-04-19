@@ -8,9 +8,13 @@ import javafx.geometry.HPos;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -18,6 +22,8 @@ import project.classes.Spell;
 import project.enums.Level;
 import project.javafx.GuiMain;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
@@ -28,8 +34,9 @@ import static javafx.scene.layout.GridPane.setHalignment;
 import static project.classes.Wizard.wizard;
 import static project.enums.EnumMethods.returnFormattedEnum;
 import static project.functions.GeneralFunctions.checkPositiveInt;
-import static project.javafx.JavaFxFunctions.createPopup;
-import static project.javafx.JavaFxFunctions.sendToScene;
+import static project.functions.LevelFunctions.levelHashMap;
+import static project.javafx.JavaFxFunctions.*;
+import static project.javafx.controllers.GameSceneController.gameScene;
 import static project.javafx.controllers.MainMenuController.mainMenuScene;
 
 public class GameMenuController implements Initializable {
@@ -76,6 +83,9 @@ public class GameMenuController implements Initializable {
     private TextField specTf;
 
     @FXML
+    private ScrollPane spellsScrollPane;
+
+    @FXML
     void onKeyPressed(KeyEvent event) {
         if(event.getCode().equals(KeyCode.ESCAPE)) {
             backOnClick(new ActionEvent(event.getSource(), event.getTarget()));
@@ -95,7 +105,7 @@ public class GameMenuController implements Initializable {
 
         if(checkPositiveInt(specPoints)) {
             if(wizard.setWizardSpec(spec.toLowerCase(), Integer.parseInt(specPoints))) {
-                updateWizardStats();
+                displayWizardStats();
                 specTf.clear();
                 createPopup(event, Alert.AlertType.CONFIRMATION, spec + " has been upgraded by " + specPoints + " spec points.");
             }
@@ -120,11 +130,22 @@ public class GameMenuController implements Initializable {
         sendToScene(event, FXMLLoader);
     }
 
-    public void updateWizardStats() {
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        wizard.updateStats();
+        wizard.restoreWizardHpDf();
+
+        displayWizardStats();
+        displayUnlockedLevels();
+        displaySpellsInfo();
+        displaySpecsList();
+    }
+
+    public void displayWizardStats() {
         // WIZARD STATS
         charismaT.setText(String.valueOf((int)wizard.getCharisma()));
-        defenseT.setText(String.valueOf((int) wizard.getMaxDefensePoints()));
-        healthT.setText(String.valueOf((int) wizard.getMaxHealthPoints()));
+        defenseT.setText(String.valueOf((int) wizard.getDefensePoints()));
+        healthT.setText(String.valueOf((int) wizard.getHealthPoints()));
         houseT.setText(returnFormattedEnum(wizard.getHouseName()));
         intelligenceT.setText(String.valueOf((int) wizard.getIntelligence()));
         levelT.setText(String.valueOf((int) wizard.getLevel()));
@@ -134,51 +155,53 @@ public class GameMenuController implements Initializable {
         specPointsT.setText(String.valueOf((int) wizard.getSpecPoints()));
     }
 
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-        updateWizardStats();
-
+    public void displayUnlockedLevels() {
         // UNLOCKED LEVELS
         AtomicInteger index1 = new AtomicInteger();
+
         Level.returnAllUnlockedLevelsList().forEach(level -> {
             Text levelText = new Text(returnFormattedEnum(level));
             levelText.getStyleClass().add("infoItemTextHover");
+            levelText.onMouseReleasedProperty().set(event -> {
+                ActionEvent actionEvent = new ActionEvent(event.getSource(), event.getTarget());
+                gameScene(actionEvent);
+            });
 
             chooseLevelGrid.add(levelText, 0, index1.get() + 1);
-            setHalignment(levelText, HPos.CENTER);
-
             index1.getAndIncrement();
         });
         chooseLevelGrid.setVgap(40);
+    }
 
+    public void displaySpellsInfo() {
         // SPELLS INFO
+
         HashMap<String, Spell> wizardSpells = wizard.getSpellsHashMap();
         AtomicInteger index2 = new AtomicInteger();
+
+        spellsScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        spellsScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+
         wizardSpells.forEach((spellName, spell) -> {
             Text spellText = new Text(spellName);
-            Text spellDamage = new Text( (int) spell.getSpellDamage()[0] +"~"+ (int) spell.getSpellDamage()[1]);
+            Text spellDamage = new Text((int) spell.getSpellDamage()[0] + "~" + (int) spell.getSpellDamage()[1]);
             Text spellChance = new Text(((int) spell.getSpellChance() * 100) + "%");
             Text spellCooldown = new Text(String.valueOf(spell.getSpellCooldown()));
 
-            spellText.getStyleClass().add("infoItemText");
-            spellDamage.getStyleClass().add("infoItemText");
-            spellChance.getStyleClass().add("infoItemText");
-            spellCooldown.getStyleClass().add("infoItemText");
+            ImageView spellImageView = returnSpellImage(spellName, 80, 80);
+            spellGrid.getStyleClass().add("infoItemText");
 
-            spellGrid.add(spellText, 0, index2.get() + 1);
-            spellGrid.add(spellDamage, 1, index2.get() + 1);
-            spellGrid.add(spellChance, 2, index2.get() + 1);
-            spellGrid.add(spellCooldown, 3, index2.get() + 1);
-
-            setHalignment(spellText, HPos.CENTER);
-            setHalignment(spellDamage, HPos.CENTER);
-            setHalignment(spellChance, HPos.CENTER);
-            setHalignment(spellCooldown, HPos.CENTER);
-
+            spellGrid.add(spellImageView, 0, index2.get() + 1);
+            spellGrid.add(spellText, 1, index2.get() + 1);
+            spellGrid.add(spellDamage, 2, index2.get() + 1);
+            spellGrid.add(spellChance, 3, index2.get() + 1);
+            spellGrid.add(spellCooldown, 4, index2.get() + 1);
             index2.getAndIncrement();
         });
         spellGrid.setVgap(40);
+    }
 
+    public void displaySpecsList() {
         //SPECS LIST
         List<String> specsList = wizard.returnSpecList();
         specCb.getItems().addAll(specsList);
