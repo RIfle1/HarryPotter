@@ -5,7 +5,10 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.HPos;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -31,99 +34,70 @@ import static project.classes.Enemy.*;
 import static project.classes.Wizard.wizard;
 import static project.enums.EnumMethods.returnFormattedEnum;
 import static project.functions.ConsoleFunctions.returnLineSeparator;
-import static project.javafx.functions.JavaFxFunctions.*;
 import static project.javafx.controllers.GameMenuController.gameMenuScene;
+import static project.javafx.functions.JavaFxFunctions.*;
 
 public class GameSceneController implements Initializable {
+    private static final Text consoleTStatic = new Text();
+    private static boolean buttonClicked = false;
     @FXML
     private Circle actionCircle;
-
     @FXML
     private Button attackBtn;
-
     @FXML
     private Circle baseActionCircle;
-
     @FXML
     private GridPane buttonsGridPane;
-
     @FXML
     private AnchorPane combatAnchorPane;
-
     @FXML
     private Text consoleT;
-
     @FXML
     private Button dodgeBtn;
-
     @FXML
     private GridPane enemyAvailableAttacksGrid;
-
     @FXML
     private GridPane enemyCombatGridPane;
-
     @FXML
     private Text esDefenseT;
-
     @FXML
     private ProgressBar esHealthPg;
-
     @FXML
     private Text esHealthT;
-
     @FXML
     private ImageView esIconIm;
-
     @FXML
     private Text esLevelT;
-
     @FXML
     private Text esNameT;
-
     @FXML
     private GridPane gameMainGrid;
-
     @FXML
     private TextFlow objectiveTf;
-
     @FXML
     private Button parryBtn;
-
     @FXML
     private GridPane playerAvailableSpellsGrid;
-
     @FXML
     private GridPane playerCombatGridPane;
-
     @FXML
     private GridPane playerPotionsGridPane;
-
     @FXML
     private Text psDefenseT;
-
     @FXML
     private ProgressBar psHealthPg;
-
     @FXML
     private Text psHealthT;
-
     @FXML
     private ImageView psIconIm;
-
     @FXML
     private Text psLevelT;
-
     @FXML
     private Text psNameT;
-
     @FXML
     private Circle successActionCircle;
 
-    private static final Text consoleTStatic = new Text();
-
-    private static boolean buttonClicked = false;
-
-    private static void updateConsoleTaStatic(String text) {
+    public static void updateConsoleTaStatic(String text) {
         HashMap<String, String> colorsHashMap = Color.returnAllColorsHashMap();
 
         for (Map.Entry<String, String> entry : colorsHashMap.entrySet()) {
@@ -136,27 +110,11 @@ public class GameSceneController implements Initializable {
             }
         }
 
-        text = returnLineSeparator(text.length()) +"\n"+ text +"\n"+ returnLineSeparator(text.length()) +"\n";
+        text = text + "\n" + returnLineSeparator(text.length());
         consoleTStatic.setText(text);
     }
 
-    private void clearConsoleTa() {
-        consoleT.setText("");
-    }
-
-    private void updateConsoleTa() {
-        String previousText = consoleT.getText();
-
-        if(previousText.length() > 0) {
-            previousText = previousText + "\n";
-        } else {
-            previousText = "";
-        }
-
-        consoleT.setText(previousText + consoleTStatic.getText());
-    }
-
-    private static void gameScene(ActionEvent event) {
+    public static void gameScene(ActionEvent event) {
         FXMLLoader gameSceneFxmlLoader = new FXMLLoader(GuiMain.class.getResource("GameScene.fxml"));
         sendToScene(event, gameSceneFxmlLoader);
     }
@@ -186,6 +144,70 @@ public class GameSceneController implements Initializable {
         return enemySpellGridPane;
     }
 
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        // TESTS TO DELETE AFTERWARDS
+        generateEnemies(10, 10, 1, EnemyName.BELLATRIX_LESTRANGE);
+        try {
+            wizard.setPotionList(Arrays.asList(Potion.highDefensePotion.clone(), Potion.highDamagePotion.clone(), Potion.highDamagePotion.clone(), Potion.highDamagePotion.clone(), Potion.highHealthPotion.clone(), Potion.highHealthPotion.clone(), Potion.highHealthPotion.clone()));
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
+
+        disableActionButtons();
+
+        displayPlayerStats();
+        displayPlayerSpellsGrid();
+        displayPlayerPotionsGridPane();
+        displayEnemyStats(enemiesHashMap.get(enemiesKeyList.get(0)));
+    }
+
+    @FXML
+    void onKeyPressed(KeyEvent event) {
+        if (event.getCode().equals(KeyCode.ESCAPE)) {
+            ActionEvent actionEvent = new ActionEvent(event.getSource(), event.getTarget());
+
+            Optional<ButtonType> result = createPopup(actionEvent, Alert.AlertType.CONFIRMATION, "Are you sure you want to quit the battle? All progress will be lost.");
+
+            if (result.get() == ButtonType.OK) {
+                gameMenuScene(actionEvent);
+            }
+
+        }
+    }
+
+    @FXML
+    void usePotionOnClick(ActionEvent event) {
+        String potionName = playerPotionsGridPane.getChildren()
+                .stream()
+                .filter(node -> node.getStyleClass().contains("playerObjectInfoGridPanePressed"))
+                .toList().get(0).getId();
+
+        Potion potion = wizard.returnPotion(potionName);
+
+        wizard.drinkPotion(potion);
+
+        updateConsoleTa();
+        displayPlayerStats();
+        displayPlayerPotionsGridPane();
+    }
+
+    private void clearConsoleTa() {
+        consoleT.setText("");
+    }
+
+    private void updateConsoleTa() {
+        String previousText = consoleT.getText();
+
+        if (previousText.length() > 0) {
+            previousText = previousText + "\n";
+        } else {
+            previousText = "";
+        }
+
+        consoleT.setText(previousText + consoleTStatic.getText());
+    }
+
     @FXML
     void attackOnClick(ActionEvent event) {
         actionButtonAction(attackBtn);
@@ -203,7 +225,6 @@ public class GameSceneController implements Initializable {
     }
 
 
-
     void startAction() {
         double baseActionCircleRadius = baseActionCircle.getRadius();
         boolean actionCircleShrink = true;
@@ -211,10 +232,12 @@ public class GameSceneController implements Initializable {
         double actionCircleSpeed = (20 / Math.exp(wizard.getLevel() * wizard.getDifficulty().getWizardDiffMultiplier()));
         System.out.println(actionCircleSpeed);
 
-        while(buttonClicked) {
-            if(actionCircleShrink) {
-                for(double radius = baseActionCircleRadius; radius > 0; radius--) {
-                    if(!buttonClicked) {break;}
+        while (buttonClicked) {
+            if (actionCircleShrink) {
+                for (double radius = baseActionCircleRadius; radius > 0; radius--) {
+                    if (!buttonClicked) {
+                        break;
+                    }
 
                     actionCircle.setRadius(radius);
                     try {
@@ -224,10 +247,11 @@ public class GameSceneController implements Initializable {
                     }
                 }
                 actionCircleShrink = false;
-            }
-            else {
-                for(double radius = 0; radius < baseActionCircleRadius; radius++) {
-                    if(!buttonClicked) {break;}
+            } else {
+                for (double radius = 0; radius < baseActionCircleRadius; radius++) {
+                    if (!buttonClicked) {
+                        break;
+                    }
 
                     actionCircle.setRadius(radius);
                     try {
@@ -245,12 +269,11 @@ public class GameSceneController implements Initializable {
     void actionButtonAction(Button button) {
         Thread playerAction = new Thread(this::startAction);
 
-        if(!buttonClicked) {
+        if (!buttonClicked) {
             buttonClicked = true;
             playerAction.start();
 
-        }
-        else {
+        } else {
             buttonClicked = false;
             playerAction.interrupt();
 
@@ -297,54 +320,6 @@ public class GameSceneController implements Initializable {
         });
     }
 
-    @FXML
-    void onKeyPressed(KeyEvent event) {
-        if (event.getCode().equals(KeyCode.ESCAPE)) {
-            ActionEvent actionEvent = new ActionEvent(event.getSource(), event.getTarget());
-
-            Optional<ButtonType> result = createPopup(actionEvent, Alert.AlertType.CONFIRMATION, "Are you sure you want to quit the battle? All progress will be lost.");
-
-            if (result.get() == ButtonType.OK) {
-                gameMenuScene(actionEvent);
-            }
-
-        }
-    }
-
-
-    @FXML
-    void usePotionOnClick(ActionEvent event) {
-        String potionName = playerPotionsGridPane.getChildren()
-                .stream()
-                .filter(node -> node.getStyleClass().contains("playerObjectInfoGridPanePressed"))
-                .toList().get(0).getId();
-
-        Potion potion = wizard.returnPotion(potionName);
-
-        wizard.drinkPotion(potion);
-
-        updateConsoleTa();
-        displayPlayerStats();
-        displayPlayerPotionsGridPane();
-    }
-
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-        // TESTS TO DELETE AFTERWARDS
-        generateEnemies(10, 10, 1, EnemyName.BELLATRIX_LESTRANGE);
-        try {
-            wizard.setPotionList(Arrays.asList(Potion.highDefensePotion.clone(), Potion.highDamagePotion.clone(), Potion.highHealthPotion.clone()));
-        } catch (CloneNotSupportedException e) {
-            throw new RuntimeException(e);
-        }
-
-        disableActionButtons();
-
-        displayPlayerStats();
-        displayPlayerSpellsGrid();
-        displayPlayerPotionsGridPane();
-        displayEnemyStats(enemiesHashMap.get(enemiesKeyList.get(0)));
-    }
 
     private void displayPlayerStats() {
         psNameT.setText(wizard.getName());
@@ -461,7 +436,6 @@ public class GameSceneController implements Initializable {
         playerPotionsGridPane.setVgap(5);
         playerPotionsGridPane.setHgap(5);
     }
-
 
 
     private void selectPotion(GridPane playerPotionsGridPane, GridPane selectedGridPane) {
