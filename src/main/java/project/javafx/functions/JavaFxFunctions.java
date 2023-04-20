@@ -1,4 +1,4 @@
-package project.javafx;
+package project.javafx.functions;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
@@ -15,6 +15,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.jetbrains.annotations.NotNull;
 import project.classes.Wizard;
 
 import java.io.FileInputStream;
@@ -92,21 +93,24 @@ public class JavaFxFunctions {
         return saveInfoGridPane;
     }
 
-    public static ImageView returnSpellImage(String spellName, double height, double width) {
-        FileInputStream imgInputStream;
-        try {
-            imgInputStream = new FileInputStream("src/main/resources/icons/" + spellName + ".png");
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-
-        Image spellImage = new Image(imgInputStream);
-
+    public static ImageView returnObjectImageView(String objectName, double height, double width) {
+        Image spellImage = returnObjectImage(objectName);
         ImageView spellImageView = new ImageView(spellImage);
         spellImageView.setFitHeight(height);
         spellImageView.setFitWidth(width);
 
+
         return spellImageView;
+    }
+
+    public static Image returnObjectImage(String objectName) {
+        FileInputStream imgInputStream = null;
+        try {
+            imgInputStream = new FileInputStream("src/main/resources/icons/" + objectName + ".png");
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        return new Image(imgInputStream);
     }
 
 }

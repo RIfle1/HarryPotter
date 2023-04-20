@@ -3,15 +3,11 @@ package project.javafx.controllers;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.HPos;
-import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
-import javafx.scene.text.Text;
-import javafx.stage.Stage;
 import project.functions.SaveFunctions;
 
 import java.net.URL;
@@ -20,10 +16,8 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static javafx.scene.layout.GridPane.setHalignment;
-import static project.functions.SaveFunctions.deleteSaveFile;
-import static project.javafx.JavaFxFunctions.createPopup;
-import static project.javafx.JavaFxFunctions.returnSaveInfoGridPane;
+import static project.javafx.functions.JavaFxFunctions.createPopup;
+import static project.javafx.functions.JavaFxFunctions.returnSaveInfoGridPane;
 import static project.javafx.controllers.GameMenuController.gameMenuScene;
 
 public class SaveProgressController implements Initializable {

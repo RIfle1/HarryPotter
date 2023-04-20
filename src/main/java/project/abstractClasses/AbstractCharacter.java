@@ -7,6 +7,7 @@ import project.classes.Potion;
 import project.classes.Spell;
 import project.classes.Wizard;
 import project.enums.*;
+import project.javafx.controllers.GameSceneController;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -233,12 +234,21 @@ public abstract class AbstractCharacter {
             // APPLY THE POTION'S VALUE IF IT'S HEALTH, REGENERATION OR DEFENSE
             this.applyPotion(potion);
 
+            String subText;
+            Double potionValue = potion.getPotionValue();
+
+            if(potionValue > 1) {
+                subText = potionValue.intValue() + " points";
+            }
+            else {
+                subText = ((int) (potionValue * 100)) + "%";
+            }
+
             text = returnColoredText("You just drank " + potion.getItemName(), potion.getItemColor()) +
                     "\nYour " +
                     returnColoredText(returnFormattedEnum(potion.getPotionType()), potion.getItemColor()) +
                     " has been improved by " +
-                    returnColoredText(String.valueOf((int) potion.getPotionValue()), potion.getItemColor()) +
-                    " points.";
+                    returnColoredText(subText, potion.getItemColor());
 
         } else if (potionTypeActiveList.toArray().length >= maxPotionOfOneType) {
             text = returnColoredText(returnFormattedEnum(potion.getPotionType()), potion.getItemColor()) +
@@ -248,8 +258,8 @@ public abstract class AbstractCharacter {
                     returnColoredText(returnFormattedEnum(potion.getPotionType()), potion.getItemColor()) +
                     returnColoredText(" potion, you can only have 3 potions active at once.", ANSI_RED);
         }
-
         printTitle(text);
+        GameSceneController.updateConsoleTaStatic(text);
     }
 
     public Spell returnTypedSpellsFromInt(MoveType spellType, int number) {

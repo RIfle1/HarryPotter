@@ -4,29 +4,21 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.geometry.HPos;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import project.classes.Wizard;
 import project.functions.SaveFunctions;
 import project.javafx.GuiMain;
 
-import java.io.FileReader;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static project.javafx.JavaFxFunctions.*;
+import static project.javafx.functions.JavaFxFunctions.*;
 import static project.javafx.controllers.GameMenuController.gameMenuScene;
 import static project.javafx.controllers.MainMenuController.mainMenuScene;
 

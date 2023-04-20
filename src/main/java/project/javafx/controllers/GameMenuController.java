@@ -4,17 +4,14 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.geometry.HPos;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -22,20 +19,16 @@ import project.classes.Spell;
 import project.enums.Level;
 import project.javafx.GuiMain;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static javafx.scene.layout.GridPane.setHalignment;
 import static project.classes.Wizard.wizard;
 import static project.enums.EnumMethods.returnFormattedEnum;
 import static project.functions.GeneralFunctions.checkPositiveInt;
-import static project.functions.LevelFunctions.levelHashMap;
-import static project.javafx.JavaFxFunctions.*;
+import static project.javafx.functions.JavaFxFunctions.*;
 import static project.javafx.controllers.GameSceneController.gameScene;
 import static project.javafx.controllers.MainMenuController.mainMenuScene;
 
@@ -188,7 +181,7 @@ public class GameMenuController implements Initializable {
             Text spellChance = new Text(((int) spell.getSpellChance() * 100) + "%");
             Text spellCooldown = new Text(String.valueOf(spell.getSpellCooldown()));
 
-            ImageView spellImageView = returnSpellImage(spellName, 80, 80);
+            ImageView spellImageView = returnObjectImageView(spellName, 80, 80);
             spellGrid.getStyleClass().add("infoItemText");
 
             spellGrid.add(spellImageView, 0, index2.get() + 1);

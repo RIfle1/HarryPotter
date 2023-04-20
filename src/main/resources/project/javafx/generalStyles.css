@@ -21,18 +21,20 @@
     -fx-font-size: 20;
 }
 
+.infoItemTextSmall {
+    -fx-font-family: "Bell MT", sans-serif;
+    -fx-font-size: 15;
+}
+
 .infoItemText {
-    -fx-transition: 1.5s ease;
     -fx-font-family: "Bell MT", sans-serif;
     -fx-font-size: 29;
-    -fx-text-alignment: center;
 }
 
 .infoItemText2 {
     -fx-transition: 1.5s ease;
     -fx-font-family: "Bell MT", sans-serif;
     -fx-font-size: 35;
-    -fx-text-alignment: center;
     -fx-font-style: italic;
     -fx-fill: lightblue;
 }
@@ -77,12 +79,11 @@
 }
 
 .healthBar {
-    -fx-background-color: #e08787;
-    -fx-border-color: black;
-    -fx-border-width: 1;
+    -fx-accent: #318a16;
+    -fx-border-radius: 100;
 }
 
-.availableAttacksText {
+.simpleObjectText {
     -fx-font-family: "Bell MT", sans-serif;
     -fx-font-size: 20;
     -fx-fill: lightblue;
@@ -96,18 +97,24 @@
     -fx-background-color: grey;
 }
 
-.playerSpellInfoGridPane {
+.playerObjectInfoGridPane {
     -fx-border-color: grey;
     -fx-border-width: 1;
 }
 
-.playerSpellInfoGridPane:hover {
+.playerObjectInfoGridPane:hover {
     -fx-border-color: lightblue;
     -fx-border-width: 1;
 }
 
-.playerSpellInfoGridPanePressed {
+.playerObjectInfoGridPanePressed {
     -fx-border-color: lightblue;
     -fx-border-width: 1;
+}
+
+.consoleText {
+    -fx-font-family: "Bell MT", sans-serif;
+    -fx-font-size: 13;
+    -fx-text-fill: black;
 }
 

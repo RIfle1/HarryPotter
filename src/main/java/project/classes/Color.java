@@ -1,5 +1,10 @@
 package project.classes;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 public class Color {
     public static final String ANSI_BLACK = "\u001B[30m";
     public static final String ANSI_RED = "\u001B[31m";
@@ -26,6 +31,26 @@ public class Color {
 
     public static String returnColoredText(String text, String textColor, String backgroundColor) {
         return textColor + "" + backgroundColor + text + "" + ANSI_RESET;
+    }
+
+    public static HashMap<String, String> returnAllColorsHashMap(){
+        HashMap<String, String> colorsHashMap = new HashMap<>();
+        Field[] declaredFields = Color.class.getDeclaredFields();
+
+
+        for(Field field:declaredFields) {
+            if (java.lang.reflect.Modifier.isStatic(field.getModifiers())) {
+                try {
+                    String color = field.getName().replace("ANSI_", "").toLowerCase();
+                    colorsHashMap.put(color, (String) field.get(null));
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }
+
+        return colorsHashMap;
     }
 
 }

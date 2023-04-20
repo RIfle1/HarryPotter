@@ -1,7 +1,6 @@
 package project.main;
 
-import project.functions.ConsoleFunctions;
-import project.functions.SaveFunctions;
+import project.classes.Color;
 
 public class Main {
     public static void main(String[] args) {
@@ -9,9 +8,11 @@ public class Main {
     }
 
     public static void playGame() {
-        ConsoleFunctions.printMainScreen();
-        SaveFunctions.checkSaves();
-        ConsoleFunctions.chooseAction();
+        System.out.println(Color.returnAllColorsHashMap());
+
+//        ConsoleFunctions.printMainScreen();
+//        SaveFunctions.checkSaves();
+//        ConsoleFunctions.chooseAction();
     }
 
 

@@ -96,11 +96,8 @@ public class ConsoleFunctions {
         }
     }
 
-    public static void printLineSeparator(int n) {
-        for(int i=0; i<n; i++) {
-            System.out.print("-");
-        }
-        System.out.println();
+    public static String returnLineSeparator(int n) {
+        return "-".repeat(Math.max(0, n));
     }
 
     public static String printColumnSeparator(String separator) {
@@ -109,31 +106,24 @@ public class ConsoleFunctions {
 
     public static void printColoredHeader(String header){
         clearConsole();
-        printLineSeparator(header.length());
+        System.out.println(returnLineSeparator(header.length()));
         System.out.println(Color.returnColoredText(header, ANSI_GREEN));
-        printLineSeparator(header.length());
-    }
-
-    public static void printHeader(String header) {
-        clearConsole();
-        printLineSeparator(header.length());
-        System.out.println(header);
-        printLineSeparator(header.length());
+        System.out.println(returnLineSeparator(header.length()));
     }
 
     public static void printTitle(String title) {
-        printLineSeparator(title.length());
+        System.out.println(returnLineSeparator(title.length()));
         System.out.println(title);
-        printLineSeparator(title.length());
+        System.out.println(returnLineSeparator(title.length()));
     }
 
     // Method to continue
     public static void continuePrompt(){
         String continuePromptText = "Press 'Enter' to continue...";
 
-        printLineSeparator(continuePromptText.length());
+        System.out.println(returnLineSeparator(continuePromptText.length()));
         System.out.println(returnColoredText(continuePromptText, ANSI_BLUE));
-        printLineSeparator(continuePromptText.length());
+        System.out.println(returnLineSeparator(continuePromptText.length()));
         System.out.println(returnColoredText("->", ANSI_YELLOW));
 
         System.out.print(scanner.nextLine());
@@ -142,9 +132,9 @@ public class ConsoleFunctions {
     public static void continuePromptExtra(){
         String continuePromptText = "Press 'Enter' to continue...";
 
-        printLineSeparator(continuePromptText.length());
+        System.out.println(returnLineSeparator(continuePromptText.length()));
         System.out.println(returnColoredText(continuePromptText, ANSI_BLUE));
-        printLineSeparator(continuePromptText.length());
+        System.out.println(returnLineSeparator(continuePromptText.length()));
         System.out.println(returnColoredText("->", ANSI_YELLOW));
 
         System.out.print(scanner.nextLine());

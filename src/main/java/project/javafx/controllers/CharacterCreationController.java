@@ -23,7 +23,7 @@ import java.util.ResourceBundle;
 
 import static project.functions.CharacterCreation.characterInit;
 import static project.functions.GeneralFunctions.checkString;
-import static project.javafx.JavaFxFunctions.sendToScene;
+import static project.javafx.functions.JavaFxFunctions.sendToScene;
 import static project.javafx.controllers.GameMenuController.gameMenuScene;
 import static project.javafx.controllers.MainMenuController.mainMenuScene;
 

@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static project.functions.GeneralFunctions.generateRandomString;
-import static project.javafx.JavaFxFunctions.createPopup;
+import static project.javafx.functions.JavaFxFunctions.createPopup;
 import static project.javafx.controllers.GameMenuController.gameMenuScene;
 
 public class SaveFunctions {
