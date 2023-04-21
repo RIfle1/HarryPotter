@@ -1,5 +1,6 @@
 package project.javafx.controllers;
 
+import javafx.animation.Animation;
 import javafx.animation.ScaleTransition;
 import javafx.animation.TranslateTransition;
 import javafx.event.ActionEvent;
@@ -234,12 +235,23 @@ public class GameSceneController implements Initializable {
         double actionCircleSpeed = (20 / Math.exp(wizard.getLevel() * wizard.getDifficulty().getWizardDiffMultiplier()));
         System.out.println("Button Clicked :" + buttonClicked);
 
-        ScaleTransition transition = new ScaleTransition();
-        transition.setDuration(Duration.seconds(1));
-        transition.setNode(successActionCircle);
-        transition.setToX(100);
-        transition.setToY(100);
-        transition.play();
+        ScaleTransition transition = new ScaleTransition(Duration.seconds(3), actionCircle);
+
+        transition.setFromX(1);
+        transition.setToX(3);
+        transition.setFromY(1);
+        transition.setToY(3);
+
+        transition.setAutoReverse(true);
+        transition.setCycleCount(ScaleTransition.INDEFINITE);
+
+
+        if(buttonClicked) {
+            transition.play();
+        }
+        else {
+            transition.stop();
+        }
 
 
 //        while (buttonClicked) {
@@ -256,6 +268,22 @@ public class GameSceneController implements Initializable {
 //            }
 //        }
 
+    }
+
+    private void animateCircleStart(Circle circle) {
+        ScaleTransition transition = new ScaleTransition(Duration.seconds(3), circle);
+
+        transition.setFromX(1);
+        transition.setToX(3);
+        transition.setFromY(1);
+        transition.setToY(3);
+
+        transition.setAutoReverse(true);
+        transition.setCycleCount(ScaleTransition.INDEFINITE);
+    }
+
+    private void animateCircleStop(Circle circle) {
+        circle.
     }
 
     private boolean startActionSub(int actionCircleSpeed, double radius) {
