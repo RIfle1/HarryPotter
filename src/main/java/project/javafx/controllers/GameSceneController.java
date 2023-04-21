@@ -1,5 +1,7 @@
 package project.javafx.controllers;
 
+import javafx.animation.ScaleTransition;
+import javafx.animation.TranslateTransition;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -18,6 +20,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import javafx.util.Duration;
 import project.classes.Color;
 import project.classes.Enemy;
 import project.classes.Potion;
@@ -210,17 +213,17 @@ public class GameSceneController implements Initializable {
 
     @FXML
     void attackOnClick(ActionEvent event) {
-        actionButtonAction(attackBtn);
+        actionButtonOnClick();
     }
 
     @FXML
     void dodgeOnClick(ActionEvent event) {
-        actionButtonAction(dodgeBtn);
+        actionButtonOnClick();
     }
 
     @FXML
     void parryOnClick(ActionEvent event) {
-        actionButtonAction(parryBtn);
+        actionButtonOnClick();
 
     }
 
@@ -228,54 +231,68 @@ public class GameSceneController implements Initializable {
     void startAction() {
         double baseActionCircleRadius = baseActionCircle.getRadius();
         boolean actionCircleShrink = true;
-
         double actionCircleSpeed = (20 / Math.exp(wizard.getLevel() * wizard.getDifficulty().getWizardDiffMultiplier()));
-        System.out.println(actionCircleSpeed);
+        System.out.println("Button Clicked :" + buttonClicked);
 
-        while (buttonClicked) {
-            if (actionCircleShrink) {
-                for (double radius = baseActionCircleRadius; radius > 0; radius--) {
-                    if (!buttonClicked) {
-                        break;
-                    }
+        ScaleTransition transition = new ScaleTransition();
+        transition.setDuration(Duration.seconds(1));
+        transition.setNode(successActionCircle);
+        transition.setToX(100);
+        transition.setToY(100);
+        transition.play();
 
-                    actionCircle.setRadius(radius);
-                    try {
-                        Thread.sleep((int) actionCircleSpeed);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-                actionCircleShrink = false;
-            } else {
-                for (double radius = 0; radius < baseActionCircleRadius; radius++) {
-                    if (!buttonClicked) {
-                        break;
-                    }
 
-                    actionCircle.setRadius(radius);
-                    try {
-                        Thread.sleep((int) actionCircleSpeed);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-                actionCircleShrink = true;
-            }
-        }
+//        while (buttonClicked) {
+//            if (actionCircleShrink) {
+//                for (double radius = baseActionCircleRadius; radius > 0; radius--) {
+//                    if (startActionSub((int) actionCircleSpeed, radius)) break;
+//                }
+//                actionCircleShrink = false;
+//            } else {
+//                for (double radius = 0; radius < baseActionCircleRadius; radius++) {
+//                    if (startActionSub((int) actionCircleSpeed, radius)) break;
+//                }
+//                actionCircleShrink = true;
+//            }
+//        }
 
     }
 
-    void actionButtonAction(Button button) {
+    private boolean startActionSub(int actionCircleSpeed, double radius) {
+
+
+        try {
+            actionCircle.setRadius(radius);
+            System.out.println(radius);
+        }
+        catch(Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+
+        try {
+            Thread.sleep(actionCircleSpeed);
+        } catch (InterruptedException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return !buttonClicked;
+    }
+
+    void actionButtonOnClick() {
         Thread playerAction = new Thread(this::startAction);
 
         if (!buttonClicked) {
             buttonClicked = true;
             playerAction.start();
+            disableGridPaneButtons(playerAvailableSpellsGrid);
 
         } else {
             buttonClicked = false;
             playerAction.interrupt();
+            enableGridPaneButtons(playerAvailableSpellsGrid);
+            deselectAllSubGridPanes(playerAvailableSpellsGrid);
+            disableActionButtons();
 
             System.out.println("Action circle radius: " + actionCircle.getRadius());
             System.out.println("Chance circle radius: " + successActionCircle.getRadius());
@@ -366,11 +383,7 @@ public class GameSceneController implements Initializable {
             playerSpellInfoGridPane.setOnMouseReleased(event -> {
                 selectSpell(playerAvailableSpellsGrid, playerSpellInfoGridPane);
                 enableActionButtons(attackBtn);
-
-                int successActionCircleRadius = (int) (baseActionCircle.getRadius() * spell.getSpellChance());
-                successActionCircle.setRadius(successActionCircleRadius);
-
-                disableGridPaneButtons(playerAvailableSpellsGrid);
+                defineSuccessActionCircle(spell);
             });
 
             playerAvailableSpellsGrid.add(playerSpellInfoGridPane, columnIndex.get(), rowIndex.get());
@@ -386,6 +399,11 @@ public class GameSceneController implements Initializable {
 
         playerAvailableSpellsGrid.setVgap(5);
         playerAvailableSpellsGrid.setHgap(5);
+    }
+
+    public void defineSuccessActionCircle(Spell spell) {
+        int successActionCircleRadius = (int) (baseActionCircle.getRadius() * spell.getSpellChance());
+        successActionCircle.setRadius(successActionCircleRadius);
     }
 
     private void displayPlayerPotionsGridPane() {
@@ -439,22 +457,28 @@ public class GameSceneController implements Initializable {
 
 
     private void selectPotion(GridPane playerPotionsGridPane, GridPane selectedGridPane) {
-        selectGridPaneVisually(playerPotionsGridPane, selectedGridPane);
+        selectSubGridPane(playerPotionsGridPane, selectedGridPane);
     }
 
     private void selectSpell(GridPane playerAvailableSpellsGrid, GridPane playerSpellInfoGridPane) {
-        selectGridPaneVisually(playerAvailableSpellsGrid, playerSpellInfoGridPane);
-
+        selectSubGridPane(playerAvailableSpellsGrid, playerSpellInfoGridPane);
     }
 
-    private void selectGridPaneVisually(GridPane mainGridPane, GridPane selectedGridPane) {
+    private void selectSubGridPane(GridPane mainGridPane, GridPane selectedGridPane) {
         mainGridPane.getChildren().forEach(node -> {
             if (node instanceof GridPane) {
                 ((GridPane) node).getStyleClass().remove("playerObjectInfoGridPanePressed");
             }
         });
-
         selectedGridPane.getStyleClass().add("playerObjectInfoGridPanePressed");
+    }
+
+    private void deselectAllSubGridPanes(GridPane mainGridPane) {
+        mainGridPane.getChildren().forEach(node -> {
+            if (node instanceof GridPane) {
+                ((GridPane) node).getStyleClass().remove("playerObjectInfoGridPanePressed");
+            }
+        });
     }
 
     private void displayEnemyStats(Enemy enemy) {
