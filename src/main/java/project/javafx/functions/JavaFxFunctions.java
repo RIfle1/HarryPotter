@@ -8,14 +8,18 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.RowConstraints;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.jetbrains.annotations.NotNull;
+import project.abstractClasses.AbstractCharacter;
+import project.classes.Enemy;
 import project.classes.Wizard;
 
 import java.io.FileInputStream;
@@ -111,6 +115,42 @@ public class JavaFxFunctions {
             throw new RuntimeException(e);
         }
         return new Image(imgInputStream);
+    }
+
+    public static GridPane returnCharacterGridPane(AbstractCharacter abstractCharacter) {
+        GridPane horizontalGridPane = new GridPane();
+        horizontalGridPane.setAlignment(Pos.CENTER);
+        ColumnConstraints column1 = new ColumnConstraints();
+        ColumnConstraints column2 = new ColumnConstraints();
+        horizontalGridPane.getColumnConstraints().addAll(column1, column2);
+
+        GridPane verticalGridPane = new GridPane();
+        verticalGridPane.setAlignment(Pos.CENTER);
+        RowConstraints row1 = new RowConstraints();
+        RowConstraints row2 = new RowConstraints();
+        verticalGridPane.getRowConstraints().addAll(row1, row2);
+
+        verticalGridPane.add(horizontalGridPane, 0, 0);
+
+        Text characterNameText = new Text(abstractCharacter.getName());
+        ImageView characterImageView;
+        if(abstractCharacter.getClass().equals(Wizard.class)) {
+            characterImageView = returnObjectImageView("hagrid", 20, 20);
+        }
+        else {
+            characterImageView = returnObjectImageView(returnFormattedEnum(((Enemy) abstractCharacter).getEnemyName()), 20, 20);
+        }
+
+        horizontalGridPane.add(characterImageView, 0, 0);
+        horizontalGridPane.add(characterNameText, 1, 0);
+
+        ProgressBar characterHealthBar = new ProgressBar();
+        characterHealthBar.setProgress(abstractCharacter.getHealthPoints() / abstractCharacter.getMaxHealthPoints());
+
+        verticalGridPane.add(characterHealthBar, 0, 1);
+        verticalGridPane.setId(abstractCharacter.getName());
+
+        return verticalGridPane;
     }
 
 }

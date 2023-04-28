@@ -122,56 +122,60 @@
                                     </Button>
                                  </children>
                               </GridPane>
-                              <Circle fx:id="baseActionCircle" radius="94.0" stroke="WHITE" strokeLineCap="ROUND" strokeType="INSIDE" GridPane.rowIndex="2">
-                                 <fill>
-                                    <RadialGradient centerX="0.5" centerY="0.5" radius="0.5">
-                                       <stops>
-                                          <Stop>
-                                             <color>
-                                                <Color red="0.5618603825569153" green="0.7236841917037964" blue="0.30153509974479675" />
-                                             </color>
-                                          </Stop>
-                                          <Stop offset="0.06375838926174497">
-                                             <color>
-                                                <Color red="0.5618603825569153" green="0.7236841917037964" blue="0.30153509974479675" />
-                                             </color>
-                                          </Stop>
-                                          <Stop offset="0.14390653134719264">
-                                             <color>
-                                                <Color red="0.5668799877166748" green="0.7200000286102295" blue="0.30239999294281006" />
-                                             </color>
-                                          </Stop>
-                                          <Stop offset="0.22655099034211815">
-                                             <color>
-                                                <Color red="0.5668799877166748" green="0.7200000286102295" blue="0.30239999294281006" />
-                                             </color>
-                                          </Stop>
-                                          <Stop offset="0.6160378130626943">
-                                             <color>
-                                                <Color red="0.7200000286102295" green="0.6758400201797485" blue="0.31679999828338623" />
-                                             </color>
-                                          </Stop>
-                                          <Stop offset="0.8030774267474214">
-                                             <color>
-                                                <Color red="0.7200000286102295" green="0.5606400370597839" blue="0.31679999828338623" />
-                                             </color>
-                                          </Stop>
-                                          <Stop offset="0.9966442953020134">
-                                             <color>
-                                                <Color red="0.7200000286102295" green="0.45312002301216125" blue="0.31679999828338623" />
-                                             </color>
-                                          </Stop>
-                                          <Stop offset="1.0">
-                                             <color>
-                                                <Color red="0.7200000286102295" green="0.45312002301216125" blue="0.31679999828338623" />
-                                             </color>
-                                          </Stop>
-                                       </stops>
-                                    </RadialGradient>
-                                 </fill>
-                              </Circle>
-                              <Circle fx:id="successActionCircle" fill="#47571d" radius="23.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" GridPane.rowIndex="2" />
-                              <Circle fx:id="actionCircle" fill="#80808000" radius="54.0" stroke="LIGHTBLUE" strokeType="INSIDE" strokeWidth="3.0" GridPane.rowIndex="2" />
+                              <AnchorPane GridPane.rowIndex="2">
+                                 <children>
+                                    <Circle fx:id="baseActionCircle" layoutX="202.0" layoutY="109.0" radius="94.0" stroke="WHITE" strokeLineCap="ROUND" strokeType="INSIDE">
+                                       <fill>
+                                          <RadialGradient centerX="0.5" centerY="0.5" radius="0.5">
+                                             <stops>
+                                                <Stop>
+                                                   <color>
+                                                      <Color red="0.5618603825569153" green="0.7236841917037964" blue="0.30153509974479675" />
+                                                   </color>
+                                                </Stop>
+                                                <Stop offset="0.06375838926174497">
+                                                   <color>
+                                                      <Color red="0.5618603825569153" green="0.7236841917037964" blue="0.30153509974479675" />
+                                                   </color>
+                                                </Stop>
+                                                <Stop offset="0.14390653134719264">
+                                                   <color>
+                                                      <Color red="0.5668799877166748" green="0.7200000286102295" blue="0.30239999294281006" />
+                                                   </color>
+                                                </Stop>
+                                                <Stop offset="0.22655099034211815">
+                                                   <color>
+                                                      <Color red="0.5668799877166748" green="0.7200000286102295" blue="0.30239999294281006" />
+                                                   </color>
+                                                </Stop>
+                                                <Stop offset="0.6160378130626943">
+                                                   <color>
+                                                      <Color red="0.7200000286102295" green="0.6758400201797485" blue="0.31679999828338623" />
+                                                   </color>
+                                                </Stop>
+                                                <Stop offset="0.8030774267474214">
+                                                   <color>
+                                                      <Color red="0.7200000286102295" green="0.5606400370597839" blue="0.31679999828338623" />
+                                                   </color>
+                                                </Stop>
+                                                <Stop offset="0.9966442953020134">
+                                                   <color>
+                                                      <Color red="0.7200000286102295" green="0.45312002301216125" blue="0.31679999828338623" />
+                                                   </color>
+                                                </Stop>
+                                                <Stop offset="1.0">
+                                                   <color>
+                                                      <Color red="0.7200000286102295" green="0.45312002301216125" blue="0.31679999828338623" />
+                                                   </color>
+                                                </Stop>
+                                             </stops>
+                                          </RadialGradient>
+                                       </fill>
+                                    </Circle>
+                                    <Circle fx:id="successActionCircle" fill="#47571d" layoutX="202.0" layoutY="109.0" radius="23.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" />
+                                    <Circle fx:id="actionCircle" fill="#80808000" layoutX="202.0" layoutY="109.0" radius="1.0" stroke="LIGHTBLUE" strokeType="INSIDE" strokeWidth="3.0" />
+                                 </children>
+                              </AnchorPane>
                               <Line endX="260.0" startX="-85.0" GridPane.rowIndex="1" />
                            </children>
                         </GridPane>

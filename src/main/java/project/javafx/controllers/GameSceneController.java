@@ -1,8 +1,6 @@
 package project.javafx.controllers;
 
-import javafx.animation.Animation;
-import javafx.animation.ScaleTransition;
-import javafx.animation.TranslateTransition;
+import javafx.animation.*;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -101,6 +99,10 @@ public class GameSceneController implements Initializable {
     @FXML
     private Circle successActionCircle;
 
+    private final ScaleTransition actionCircleScaleTransition = new ScaleTransition();
+
+    private final Timeline actionCircleTimeline = new Timeline();
+
     public static void updateConsoleTaStatic(String text) {
         HashMap<String, String> colorsHashMap = Color.returnAllColorsHashMap();
 
@@ -164,6 +166,7 @@ public class GameSceneController implements Initializable {
         displayPlayerSpellsGrid();
         displayPlayerPotionsGridPane();
         displayEnemyStats(enemiesHashMap.get(enemiesKeyList.get(0)));
+        displayCharacters();
     }
 
     @FXML
@@ -194,6 +197,12 @@ public class GameSceneController implements Initializable {
         updateConsoleTa();
         displayPlayerStats();
         displayPlayerPotionsGridPane();
+    }
+
+    private void displayCharacters() {
+
+        playerCombatGridPane.add(returnCharacterGridPane(wizard), 0, 0);
+
     }
 
     private void clearConsoleTa() {
@@ -231,26 +240,42 @@ public class GameSceneController implements Initializable {
 
     void startAction() {
         double baseActionCircleRadius = baseActionCircle.getRadius();
-        boolean actionCircleShrink = true;
-        double actionCircleSpeed = (20 / Math.exp(wizard.getLevel() * wizard.getDifficulty().getWizardDiffMultiplier()));
+        boolean actionCircleGrow = true;
+
+        double actionCircleSpeed = (10 / Math.exp(wizard.getLevel() * wizard.getDifficulty().getWizardDiffMultiplier()));
         System.out.println("Button Clicked :" + buttonClicked);
 
-        ScaleTransition transition = new ScaleTransition(Duration.seconds(3), actionCircle);
 
-        transition.setFromX(1);
-        transition.setToX(3);
-        transition.setFromY(1);
-        transition.setToY(3);
+//        actionCircleScaleTransition.setNode(actionCircle);
+//        System.out.println(actionCircleSpeed);
+//        actionCircleScaleTransition.setDuration(Duration.seconds(actionCircleSpeed));
+//
+//        actionCircleScaleTransition.setFromX(0);
+//        actionCircleScaleTransition.setFromY(0);
+//
+//        actionCircleScaleTransition.setToX(baseActionCircle.getScaleX());
+//        actionCircleScaleTransition.setToY(baseActionCircle.getScaleY());
+//
+//        actionCircleScaleTransition.setAutoReverse(true);
+//        actionCircleScaleTransition.setCycleCount(ScaleTransition.INDEFINITE);
 
-        transition.setAutoReverse(true);
-        transition.setCycleCount(ScaleTransition.INDEFINITE);
+        actionCircle.setRadius(1);
 
+        KeyValue actionCircleKeyValueGrow = new KeyValue(actionCircle.radiusProperty(), baseActionCircleRadius, Interpolator.EASE_IN);
+        KeyFrame actionCircleKeyFrameGrow = new KeyFrame(Duration.seconds(actionCircleSpeed), actionCircleKeyValueGrow);
+
+        actionCircleTimeline.getKeyFrames().add(actionCircleKeyFrameGrow);
+
+        actionCircleTimeline.setAutoReverse(true);
+        actionCircleTimeline.setCycleCount(Timeline.INDEFINITE);
 
         if(buttonClicked) {
-            transition.play();
+//            actionCircleScaleTransition.play();
+            actionCircleTimeline.play();
         }
         else {
-            transition.stop();
+//            actionCircleScaleTransition.stop();
+            actionCircleTimeline.stop();
         }
 
 
@@ -273,17 +298,19 @@ public class GameSceneController implements Initializable {
     private void animateCircleStart(Circle circle) {
         ScaleTransition transition = new ScaleTransition(Duration.seconds(3), circle);
 
-        transition.setFromX(1);
         transition.setToX(3);
-        transition.setFromY(1);
         transition.setToY(3);
 
         transition.setAutoReverse(true);
         transition.setCycleCount(ScaleTransition.INDEFINITE);
+
+        transition.play();
     }
 
     private void animateCircleStop(Circle circle) {
-        circle.
+        ScaleTransition transition = new ScaleTransition(Duration.seconds(3), circle);
+
+        transition.play();
     }
 
     private boolean startActionSub(int actionCircleSpeed, double radius) {
@@ -308,22 +335,28 @@ public class GameSceneController implements Initializable {
     }
 
     void actionButtonOnClick() {
-        Thread playerAction = new Thread(this::startAction);
+//        Thread playerAction = new Thread(this::startAction);
 
         if (!buttonClicked) {
             buttonClicked = true;
-            playerAction.start();
+//            playerAction.start();
+
             disableGridPaneButtons(playerAvailableSpellsGrid);
+
+            startAction();
 
         } else {
             buttonClicked = false;
-            playerAction.interrupt();
+//            playerAction.interrupt();
+
             enableGridPaneButtons(playerAvailableSpellsGrid);
             deselectAllSubGridPanes(playerAvailableSpellsGrid);
             disableActionButtons();
 
             System.out.println("Action circle radius: " + actionCircle.getRadius());
             System.out.println("Chance circle radius: " + successActionCircle.getRadius());
+
+            startAction();
         }
     }
 
