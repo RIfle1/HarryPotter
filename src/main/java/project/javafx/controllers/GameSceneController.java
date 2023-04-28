@@ -145,7 +145,7 @@ public class GameSceneController implements Initializable {
         if (event.getCode().equals(KeyCode.ESCAPE)) {
             ActionEvent actionEvent = new ActionEvent(event.getSource(), event.getTarget());
 
-            Optional<ButtonType> result = createPopup(actionEvent, Alert.AlertType.CONFIRMATION, "Are you sure you want to quit the battle? All progress will be lost.");
+            Optional<ButtonType> result = Objects.requireNonNull(createPopup(actionEvent, Alert.AlertType.CONFIRMATION, "Are you sure you want to quit the battle? All progress will be lost."));
 
             if (result.get() == ButtonType.OK) {
                 gameMenuScene(actionEvent);
@@ -265,13 +265,13 @@ public class GameSceneController implements Initializable {
         List<Object> enemyObjectsList = returnSelectedNodes(gameSceneMainAnchorPane, "enemyCombatGridPane", "clickableNodePressed");
         Enemy selectedEnemy = enemiesHashMap.get((String) enemyObjectsList.get(0));
 
-        // Maybe i'll need this later for optimizations idk like only reloading the grid pane in question and not the whole thing
+        // Maybe I'll need this later for optimizations IDK like only reloading the grid pane in question and not the whole thing
         GridPane enemyGridPane = (GridPane) enemyObjectsList.get(1);
 
         List<Object> spellObjectsList = returnSelectedNodes(playerAvailableSpellsGrid, "clickableNodePressed");
         Spell selectedSpell = wizard.getSpellsHashMap().get((String) spellObjectsList.get(0));
 
-        // Maybe i'll need this later for optimizations idk
+        // Maybe I'll need this later for optimizations IDK
         GridPane spellGridPane = (GridPane) spellObjectsList.get(1);
 
         double wizardCalculatedDamage = Wizard.wizard.returnSpellCalculatedDamage(selectedSpell, selectedEnemy);
@@ -280,7 +280,7 @@ public class GameSceneController implements Initializable {
         wizard.spellAttack(attackSucceeded, selectedSpell, selectedEnemy, wizardCalculatedDamage);
         updateConsoleTa();
 
-        // but i'm kinda lazy right now so this should do for now
+        // but I'm kinda lazy right now so this should do for now
         displayEnemiesGridPanes();
 
         try {
@@ -401,9 +401,7 @@ public class GameSceneController implements Initializable {
             playerPotionInfoGridPane.add(potionIcon, 0, 0);
             playerPotionInfoGridPane.add(potionText, 1, 0);
 
-            playerPotionInfoGridPane.setOnMouseReleased(event -> {
-                selectSubGridPane(playerPotionsGridPane, playerPotionInfoGridPane);
-            });
+            playerPotionInfoGridPane.setOnMouseReleased(event -> selectSubGridPane(playerPotionsGridPane, playerPotionInfoGridPane));
 
             playerPotionsGridPane.add(playerPotionInfoGridPane, 0, index.get());
             index.getAndIncrement();
@@ -437,15 +435,9 @@ public class GameSceneController implements Initializable {
 
             enemyGridPane.getStyleClass().add("clickableNode");
 
-            enemyGridPane.setOnMouseReleased(mouseEvent -> {
-                enemyGridPaneOnClick(enemy, enemyGridPane);
-            });
+            enemyGridPane.setOnMouseReleased(mouseEvent -> enemyGridPaneOnClick(enemy, enemyGridPane));
 
-            enemyGridPane.getChildren().forEach(node -> {
-                node.setOnMouseReleased(mouseEvent -> {
-                    enemyGridPaneOnClick(enemy, enemyGridPane);
-                });
-            });
+            enemyGridPane.getChildren().forEach(node -> node.setOnMouseReleased(mouseEvent -> enemyGridPaneOnClick(enemy, enemyGridPane)));
 
             enemyCombatGridPane.add(enemyGridPane, enemyCombatGridPaneColumn.get(), enemyCombatGridPaneRow.get());
             enemyCombatGridPaneRow.getAndIncrement();
@@ -505,7 +497,7 @@ public class GameSceneController implements Initializable {
         HashMap<String, String> colorsHashMap = Color.returnAllColorsHashMap();
 
         for (Map.Entry<String, String> entry : colorsHashMap.entrySet()) {
-
+            // I can probably make use of the color later if I want to add colored text in the gui console
             String color = entry.getKey();
             String colorCode = entry.getValue();
 
