@@ -18,7 +18,7 @@
 <?import javafx.scene.text.Text?>
 <?import javafx.scene.text.TextFlow?>
 
-<AnchorPane onKeyPressed="#onKeyPressed" prefHeight="400.0" prefWidth="600.0" styleClass="mainWindow" stylesheets="@generalStyles.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="project.javafx.controllers.GameSceneController">
+<AnchorPane fx:id="gameSceneMainAnchorPane" onKeyPressed="#onKeyPressed" prefHeight="400.0" prefWidth="600.0" styleClass="mainWindow" stylesheets="@generalStyles.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="project.javafx.controllers.GameSceneController">
    <children>
       <GridPane fx:id="gameMainGrid" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1010.0" prefWidth="1920.0">
         <columnConstraints>
@@ -62,7 +62,7 @@
                               <RowConstraints minHeight="10.0" prefHeight="205.0" valignment="TOP" vgrow="SOMETIMES" />
                           </rowConstraints>
                            <children>
-                              <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="infoItemText" text="Available Spells" />
+                              <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="infoItemText" text="Spells" />
                               <GridPane fx:id="playerAvailableSpellsGrid" maxHeight="-Infinity" prefWidth="702.0" GridPane.rowIndex="2">
                                  <columnConstraints>
                                     <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
@@ -172,7 +172,43 @@
                                           </RadialGradient>
                                        </fill>
                                     </Circle>
-                                    <Circle fx:id="successActionCircle" fill="#47571d" layoutX="202.0" layoutY="109.0" radius="23.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" />
+                                    <Circle fx:id="successActionCircle" layoutX="202.0" layoutY="109.0" radius="23.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0">
+                                       <fill>
+                                          <RadialGradient centerX="0.5" centerY="0.5" radius="0.5">
+                                             <stops>
+                                                <Stop>
+                                                   <color>
+                                                      <Color red="0.28016000986099243" green="0.3400000035762787" blue="0.11559999734163284" />
+                                                   </color>
+                                                </Stop>
+                                                <Stop offset="0.006711409395973154">
+                                                   <color>
+                                                      <Color red="0.28016000986099243" green="0.3400000035762787" blue="0.11559999734163284" />
+                                                   </color>
+                                                </Stop>
+                                                <Stop offset="0.2953020134228188">
+                                                   <color>
+                                                      <Color red="0.5197368264198303" green="0.6315789222717285" blue="0.18421052396297455" />
+                                                   </color>
+                                                </Stop>
+                                                <Stop offset="0.4648878703552135">
+                                                   <color>
+                                                      <Color red="0.5271000266075134" green="0.6299999952316284" blue="0.1889999955892563" />
+                                                   </color>
+                                                </Stop>
+                                                <Stop offset="0.6552013422818791">
+                                                   <color>
+                                                      <Color red="0.5259666442871094" green="0.6200000047683716" blue="0.1860000044107437" />
+                                                   </color>
+                                                </Stop>
+                                                <Stop offset="1.0">
+                                                   <color>
+                                                      <Color red="0.2838999927043915" green="0.3400000035762787" blue="0.11559999734163284" />
+                                                   </color>
+                                                </Stop>
+                                             </stops>
+                                          </RadialGradient>
+                                       </fill></Circle>
                                     <Circle fx:id="actionCircle" fill="#80808000" layoutX="202.0" layoutY="109.0" radius="1.0" stroke="LIGHTBLUE" strokeType="INSIDE" strokeWidth="3.0" />
                                  </children>
                               </AnchorPane>
@@ -182,33 +218,17 @@
                         <Line endX="-100.0" endY="170.0" startX="-100.0" GridPane.columnIndex="1" />
                      </children>
                   </GridPane>
-                  <GridPane prefHeight="758.0" prefWidth="1158.0">
+                  <GridPane fx:id="combatGridPane" alignment="CENTER" prefHeight="758.0" prefWidth="1158.0">
                     <columnConstraints>
-                      <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" minWidth="10.0" percentWidth="25.0" prefWidth="100.0" />
-                      <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" percentWidth="60.0" prefWidth="100.0" />
-                        <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" percentWidth="25.0" prefWidth="100.0" />
+                      <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" percentWidth="20.0" prefWidth="100.0" />
+                      <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" percentWidth="50.0" prefWidth="100.0" />
+                        <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" percentWidth="30.0" prefWidth="100.0" />
                     </columnConstraints>
                     <rowConstraints>
                       <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
                     </rowConstraints>
                      <children>
-                        <GridPane fx:id="playerCombatGridPane" maxHeight="-Infinity">
-                          <columnConstraints>
-                            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                          </columnConstraints>
-                          <rowConstraints>
-                            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" valignment="CENTER" vgrow="SOMETIMES" />
-                          </rowConstraints>
-                        </GridPane>
-                        <GridPane fx:id="enemyCombatGridPane" maxHeight="-Infinity" GridPane.columnIndex="2">
-                          <columnConstraints>
-                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                          </columnConstraints>
-                          <rowConstraints>
-                            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" vgrow="SOMETIMES" />
-                          </rowConstraints>
-                        </GridPane>
-                        <AnchorPane fx:id="combatAnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1136.0" GridPane.columnIndex="1" />
+                        <AnchorPane fx:id="combatAnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1136.0" translateX="57.0" GridPane.columnIndex="1" />
                      </children>
                   </GridPane>
                   <Line endX="976.5" startX="-100.0" GridPane.rowIndex="1" />

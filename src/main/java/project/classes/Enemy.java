@@ -174,10 +174,11 @@ public class Enemy extends AbstractCharacter {
     }
 
 
-    public void meleeAttack(AbstractCharacter attackedCharacter, double calculatedDamage, boolean attackAfterCast) {
+    public void meleeAttack(boolean attackSucceeded, AbstractCharacter attackedCharacter, double calculatedDamage) {
         // CONSOLE STUFF
         System.out.println(returnColoredText(returnFormattedEnum(this.getEnemyName()) + " melee attack!", ANSI_RED));
-        castAttack(this.getEnemyName().getEnemyCombat().getCombatChance(), CharacterState.STANDING, attackedCharacter, calculatedDamage, attackAfterCast);
+
+        castAttack(attackSucceeded, CharacterState.STANDING, attackedCharacter, calculatedDamage);
     }
 
     public String getVulnerableSpellsList() {

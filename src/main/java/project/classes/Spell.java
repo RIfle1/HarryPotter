@@ -51,7 +51,7 @@ public class Spell implements Cloneable{
             .spellName("Basic Cast")
             .spellType(MoveType.ATTACK)
             .spellDescription("Deals minor damage to enemies and objects.")
-            .spellSpecialAttackLine("Basic Cast!")
+            .spellSpecialAttackLine("A bright light rushes towards the enemy!")
             .spellLevelRequirement(0)
             .spellDamage(new double[]{40, 80})
             .characterState(CharacterState.STANDING)

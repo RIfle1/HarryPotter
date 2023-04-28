@@ -4,16 +4,16 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
+import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.RowConstraints;
+import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -25,8 +25,12 @@ import project.classes.Wizard;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
+import static project.classes.Enemy.enemiesHashMap;
 import static project.enums.EnumMethods.returnFormattedEnum;
 import static project.functions.GeneralFunctions.returnFileAttribute;
 import static project.functions.SaveFunctions.createWizardInstance;
@@ -118,39 +122,219 @@ public class JavaFxFunctions {
     }
 
     public static GridPane returnCharacterGridPane(AbstractCharacter abstractCharacter) {
+
+        // CHARACTER NAME AND PROFILE PIC GRID PANE
         GridPane horizontalGridPane = new GridPane();
         horizontalGridPane.setAlignment(Pos.CENTER);
-        ColumnConstraints column1 = new ColumnConstraints();
-        ColumnConstraints column2 = new ColumnConstraints();
-        horizontalGridPane.getColumnConstraints().addAll(column1, column2);
+        ColumnConstraints horizontalGridPaneColumn1 = new ColumnConstraints();
+        ColumnConstraints horizontalGridPaneColumn2 = new ColumnConstraints();
 
+        horizontalGridPaneColumn1.setHalignment(HPos.CENTER);
+        horizontalGridPaneColumn2.setHalignment(HPos.CENTER);
+
+        horizontalGridPaneColumn1.setMaxWidth(Region.USE_COMPUTED_SIZE);
+        horizontalGridPaneColumn1.setMinWidth(Region.USE_COMPUTED_SIZE);
+        horizontalGridPaneColumn1.setPrefWidth(50);
+
+        horizontalGridPaneColumn2.setMaxWidth(Region.USE_COMPUTED_SIZE);
+        horizontalGridPaneColumn2.setMinWidth(Region.USE_COMPUTED_SIZE);
+        horizontalGridPaneColumn2.setPrefWidth(100);
+
+        horizontalGridPane.getColumnConstraints().addAll(horizontalGridPaneColumn1, horizontalGridPaneColumn2);
+
+
+//        horizontalGridPane.setGridLinesVisible(true);
+
+        // CHARACTER MAIN GRID PANE WITH INFO AT THE TOP AND HEALTH BAR AT THE BOTTOM
         GridPane verticalGridPane = new GridPane();
         verticalGridPane.setAlignment(Pos.CENTER);
-        RowConstraints row1 = new RowConstraints();
-        RowConstraints row2 = new RowConstraints();
-        verticalGridPane.getRowConstraints().addAll(row1, row2);
+        RowConstraints verticalGridPaneRow1 = new RowConstraints();
+        RowConstraints verticalGridPaneRow2 = new RowConstraints();
+        ColumnConstraints verticalGridPaneColumn1 = new ColumnConstraints();
+
+        verticalGridPaneColumn1.setMaxWidth(Region.USE_PREF_SIZE);
+        verticalGridPaneColumn1.setMinWidth(Region.USE_PREF_SIZE);
+        verticalGridPaneColumn1.setPrefWidth(150);
+
+        verticalGridPaneColumn1.setHgrow(Priority.ALWAYS);
+        verticalGridPaneColumn1.setHalignment(HPos.CENTER);
+
+        verticalGridPaneRow2.setMaxHeight(Region.USE_PREF_SIZE);
+        verticalGridPaneRow2.setMinHeight(Region.USE_PREF_SIZE);
+        verticalGridPaneRow2.setPrefHeight(25);
+
+        verticalGridPaneRow2.setVgrow(Priority.ALWAYS);
+        verticalGridPaneRow2.setValignment(VPos.CENTER);
+
+        verticalGridPane.getRowConstraints().addAll(verticalGridPaneRow1, verticalGridPaneRow2);
+        verticalGridPane.getColumnConstraints().addAll(verticalGridPaneColumn1);
 
         verticalGridPane.add(horizontalGridPane, 0, 0);
 
-        Text characterNameText = new Text(abstractCharacter.getName());
-        ImageView characterImageView;
+
+//        verticalGridPane.setGridLinesVisible(true);
+
+
+
+
+        String characterName;
+        String characterNameString;
         if(abstractCharacter.getClass().equals(Wizard.class)) {
-            characterImageView = returnObjectImageView("hagrid", 20, 20);
+            characterName = "hagrid";
+            characterNameString = abstractCharacter.getName();
         }
         else {
-            characterImageView = returnObjectImageView(returnFormattedEnum(((Enemy) abstractCharacter).getEnemyName()), 20, 20);
+            characterNameString = characterName = returnFormattedEnum(((Enemy) abstractCharacter).getEnemyName());
         }
+
+        ImageView characterImageView = returnObjectImageView(characterName, 50, 50);
+
+        Text characterNameText = new Text(characterNameString);
+        characterNameText.setWrappingWidth(100);
+        characterNameText.getStyleClass().add("characterGridPaneText");
 
         horizontalGridPane.add(characterImageView, 0, 0);
         horizontalGridPane.add(characterNameText, 1, 0);
 
-        ProgressBar characterHealthBar = new ProgressBar();
-        characterHealthBar.setProgress(abstractCharacter.getHealthPoints() / abstractCharacter.getMaxHealthPoints());
+        ProgressBar characterHealthBar = returnCharacterProgressBar(abstractCharacter.getHealthPoints() / abstractCharacter.getMaxHealthPoints());
 
         verticalGridPane.add(characterHealthBar, 0, 1);
         verticalGridPane.setId(abstractCharacter.getName());
 
         return verticalGridPane;
+    }
+
+
+    private static ProgressBar returnCharacterProgressBar(double progressBarValue) {
+        ProgressBar characterHealthBar = new ProgressBar();
+        characterHealthBar.setProgress(progressBarValue);
+        characterHealthBar.setPrefHeight(12);
+        characterHealthBar.setPrefWidth(120);
+        characterHealthBar.getStyleClass().add("characterGridPaneHealthBar");
+
+        return characterHealthBar;
+    }
+
+    public static String checkPlayerNameLength(String playerName, int maxLength) {
+
+        StringBuilder stringBuilder = new StringBuilder();
+        playerName = playerName.toLowerCase();
+
+        Arrays.stream(playerName.split(" ")).toList().forEach(word ->
+                stringBuilder.append(word.substring(0, 1).toUpperCase())
+                        .append(word.substring(1))
+                        .append(" ")
+        );
+
+        playerName = stringBuilder.toString();
+
+        if(playerName.length() > maxLength) {
+            playerName = playerName.substring(0, maxLength) + "...";
+        }
+        return playerName;
+    }
+
+    public static void disableGridPaneButtons(GridPane parentGridpane, Button button) {
+        parentGridpane.getChildren().stream()
+                .filter(node -> node instanceof Button)
+                .filter(node -> node.equals(button))
+                .forEach(node -> node.setDisable(true));
+    }
+
+    public static void disableGridPaneButtons(GridPane parentGridpane) {
+        parentGridpane.getChildren().stream()
+                .filter(node -> node instanceof Button)
+                .forEach(node -> node.setDisable(true));
+    }
+
+    public static void disableGridPaneButtons(GridPane parentGridpane, String fxID) {
+        GridPane gridpane = (GridPane) parentGridpane.lookup("#" + fxID);
+
+        gridpane.getChildren().forEach(node -> {
+            node.setDisable(true);
+        });
+    }
+
+
+    public static void enableGridPaneButtons(GridPane parentGridpane, Button button) {
+        parentGridpane.getChildren().stream()
+                .filter(node -> node instanceof Button)
+                .filter(node -> node.equals(button))
+                .forEach(node -> node.setDisable(false));
+    }
+
+    public static void enableGridPaneButtons(GridPane parentgridpane) {
+        parentgridpane.getChildren().stream()
+                .filter(node -> node instanceof Button)
+                .forEach(node -> node.setDisable(false));
+    }
+
+    public static void enableGridPaneButtons(GridPane gridPane, String fxID) {
+        GridPane gridpane = (GridPane) gridPane.lookup("#" + fxID);
+
+        gridpane.getChildren().forEach(node -> {
+            node.setDisable(false);
+        });
+    }
+
+    public static void selectSubGridPane(GridPane mainGridPane, GridPane selectedGridPane) {
+        mainGridPane.getChildren().forEach(node -> {
+            if (node instanceof GridPane) {
+                ((GridPane) node).getStyleClass().remove("clickableNodePressed");
+            }
+        });
+        selectedGridPane.getStyleClass().add("clickableNodePressed");
+    }
+
+    public static void selectSubGridPane(GridPane mainGridPane, String selectedGridPaneFxID) {
+        Objects.requireNonNull(mainGridPane.getChildren().stream()
+                        .filter(node -> node.getId().equals(selectedGridPaneFxID))
+                        .findFirst()
+                        .orElse(null))
+                .getStyleClass().add("clickableNodePressed");
+    }
+
+    public static void deselectAllSubGridPanes(GridPane gridPane) {
+        gridPane.getChildren().forEach(node -> {
+            if (node instanceof GridPane) {
+                ((GridPane) node).getStyleClass().remove("clickableNodePressed");
+            }
+        });
+    }
+
+    public static void deselectAllSubGridPanes(GridPane parentGridPane, String fxID) {
+        GridPane gridPane = (GridPane) parentGridPane.lookup("#" + fxID);
+
+        gridPane.getChildren().forEach(node -> {
+            if (node instanceof GridPane) {
+                ((GridPane) node).getStyleClass().remove("clickableNodePressed");
+            }
+        });
+    }
+
+    public static List<Object> returnSelectedNodes(GridPane parentGridPane, String selectedObjectClass) {
+        return returnSelectedNodesSub(selectedObjectClass, parentGridPane);
+    }
+
+    public static List<Object> returnSelectedNodes(AnchorPane mainAnchorPane, String parentGridPaneFxID, String selectedObjectClass) {
+        GridPane parentGridPane = (GridPane) mainAnchorPane.lookup("#" + parentGridPaneFxID);
+        return returnSelectedNodesSub(selectedObjectClass, parentGridPane);
+    }
+
+    @NotNull
+    public static List<Object> returnSelectedNodesSub(String selectedObjectClass, GridPane parentGridPane) {
+
+        GridPane selectedNode = (GridPane) returnNodeByClass(parentGridPane, selectedObjectClass);
+        String nodeId = selectedNode.getId();
+
+        return Arrays.asList(nodeId, selectedNode);
+    }
+
+    public static Node returnNodeByClass(GridPane parentGridPane, String objectClass) {
+        return parentGridPane.getChildren().stream()
+                .filter(node -> node.getStyleClass().stream().anyMatch(styleClass -> styleClass.equals(objectClass)))
+                .findFirst()
+                .orElse(null);
     }
 
 }

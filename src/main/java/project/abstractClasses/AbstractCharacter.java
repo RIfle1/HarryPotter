@@ -235,10 +235,10 @@ public abstract class AbstractCharacter {
             this.applyPotion(potion);
 
             String subText;
-            Double potionValue = potion.getPotionValue();
+            double potionValue = potion.getPotionValue();
 
             if(potionValue > 1) {
-                subText = potionValue.intValue() + " points";
+                subText = (int) potionValue + " points";
             }
             else {
                 subText = ((int) (potionValue * 100)) + "%";
@@ -258,8 +258,12 @@ public abstract class AbstractCharacter {
                     returnColoredText(returnFormattedEnum(potion.getPotionType()), potion.getItemColor()) +
                     returnColoredText(" potion, you can only have 3 potions active at once.", ANSI_RED);
         }
+
+        // PRINT IN CONSOLE
         printTitle(text);
-        GameSceneController.updateConsoleTaStatic(text);
+
+        // PRINT IN GUI CONSOLE
+        GameSceneController.updateConsoleTaStatic(text, true);
     }
 
     public Spell returnTypedSpellsFromInt(MoveType spellType, int number) {
@@ -446,7 +450,7 @@ public abstract class AbstractCharacter {
         return spell.getSpellChance() * (1 + luckPercent);
     }
 
-    public void castAttack(double attackChance, CharacterState characterState, AbstractCharacter attackedCharacter, double calculatedDamage, boolean attackAfterCast) {
+    public void castAttack(boolean attackSucceeded, CharacterState characterState, AbstractCharacter attackedCharacter, double calculatedDamage) {
         String attackedCharacterName = "";
         String attackingCharacterName = "";
 
@@ -458,8 +462,7 @@ public abstract class AbstractCharacter {
             attackedCharacterName = returnFormattedEnum(((Enemy) attackedCharacter).getEnemyName());
         }
 
-        double spellSuccess = Math.random();
-        if (spellSuccess <= attackChance) {
+        if (attackSucceeded) {
             // TAKE DAMAGE
             double damageTaken = attackedCharacter.takeDamage(calculatedDamage);
 
@@ -469,9 +472,8 @@ public abstract class AbstractCharacter {
             // PRINT AFTER CAST STUFF INTO CONSOLE
             double healthPoints = attackedCharacter.getHealthPoints();
             double maxHealthPoints = attackedCharacter.getMaxHealthPoints();
-            if(attackAfterCast) {
-                attackAfterCast(attackedCharacter, attackedCharacterName, attackingCharacterName, (int) damageTaken, healthPoints, maxHealthPoints);
-            }
+            attackAfterCast(attackedCharacter, attackedCharacterName, attackingCharacterName, (int) damageTaken, healthPoints, maxHealthPoints);
+
 
             // CHECK ENEMY'S CHARACTER AND ACT ACCORDINGLY (ADD XP AND ITEM DROPS)
             if (attackedCharacter.getClass() == Enemy.class) {
@@ -505,31 +507,55 @@ public abstract class AbstractCharacter {
                 enemyItemList.forEach(Item -> text4.append("- ").append(returnColoredText(Item.getItemName(), Item.getItemColor())).append("\n"));
             }
         }
-
+        // PRINT IN CONSOLE
         System.out.println(text1);
+        // PRINT IN GUI
+        GameSceneController.updateConsoleTaStatic(text1, false);
+
         if (healthPoints > 0) {
             if (attackedCharacter.getCharacterState() != CharacterState.STANDING) {
+                // PRINT IN CONSOLE
                 System.out.println(text2);
+                // PRINT IN GUI
+                GameSceneController.updateConsoleTaStatic(text2, false);
             }
+            // PRINT IN CONSOLE
             System.out.println(text3);
+            // PRINT IN GUI
+            GameSceneController.updateConsoleTaStatic(text3, true);
         } else {
             System.out.println(text4);
+            GameSceneController.updateConsoleTaStatic(text4.toString(), true);
         }
     }
 
-    public void spellAttack(Spell spell, AbstractCharacter attackedCharacter, double calculatedDamage, boolean attackAfterCast) {
+    public void spellAttack(boolean attackSucceeded, Spell spell, AbstractCharacter attackedCharacter, double calculatedDamage) {
         String spellName = spell.getSpellName();
 
         // SPELL GETS USED AND PUT ON A COOLDOWN
         this.reduceSpellsCooldown(1);
         this.resetSpellReadyIn(spell);
 
-        // CONSOLE STUFF
-        System.out.println(returnColoredText(spellName + "!", spell.getSpellColor()));
+        String spellNameText = returnColoredText(spellName + "!", spell.getSpellColor());
+
+        // PRINT IN CONSOLE
+        System.out.println(spellNameText);
+
+        // PRINT IN GUI CONSOLE
+        GameSceneController.updateConsoleTaStatic(spellNameText, false);
+
         if(this.getClass() == Wizard.class) {
-            System.out.println(returnColoredText(spell.getSpellSpecialAttackLine(), ANSI_PURPLE));
+            String spellSpecialAttackLine = returnColoredText(spell.getSpellSpecialAttackLine(), ANSI_PURPLE);
+
+            // PRINT IN GUI CONSOLE
+            GameSceneController.updateConsoleTaStatic(spellSpecialAttackLine, false);
+
+            // PRINT IN CONSOLE
+            System.out.println(spellSpecialAttackLine);
         }
-        castAttack(returnSpellChance(spell), spell.getCharacterState(), attackedCharacter, calculatedDamage, attackAfterCast);
+
+        // CAST SPELL
+        castAttack(attackSucceeded, spell.getCharacterState(), attackedCharacter, calculatedDamage);
     }
 
     public boolean dodgeSpell(double dodgeChance, AbstractCharacter attackingCharacter) {
@@ -579,7 +605,10 @@ public abstract class AbstractCharacter {
         // THE ATTACK CAN BE PARRIED ONLY IF THE ATTACKED CHARACTER'S DEFENSE IS HIGHER THAN THE ATTACKING CHARACTER'S CALCULATED SPELL DAMAGE
         if (parryPoints > calculatedDamage) {
             printTitle(text1);
-            this.spellAttack(stupefy, attackingCharacter, newDamage, true);
+
+            boolean attackSucceeded = Math.random() <= stupefy.getSpellChance();
+            this.spellAttack(attackSucceeded, stupefy, attackingCharacter, newDamage);
+
             return true;
         } else {
             printTitle(text2);

@@ -46,7 +46,7 @@ public enum EnemyName {
         }
     }.evaluate()),
     DEATH_EATER(EnemyCombat.MELEE, EnemyType.BOSS, new ArrayList<>(), 150, 0, 0.4, 120, 40, null),
-    VOLDEMORT(EnemyCombat.SPELL, EnemyType.BOSS, new ArrayList<>(), 300, 0, 0, 120, 40, new Object() {
+    VOLDEMORT(EnemyCombat.SPELL, EnemyType.BOSS, new ArrayList<>(), 300, 0, 0, 140, 40, new Object() {
         List<String> evaluate() {
             List<String> strings = new ArrayList<>();
             strings.add(voldemortDeathLine);
@@ -60,10 +60,6 @@ public enum EnemyName {
             return strings;
         }
     }.evaluate());
-
-
-
-
 
     private final EnemyCombat enemyCombat;
     private final EnemyType enemyType;

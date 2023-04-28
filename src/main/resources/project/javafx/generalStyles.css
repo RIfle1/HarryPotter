@@ -97,17 +97,17 @@
     -fx-background-color: grey;
 }
 
-.playerObjectInfoGridPane {
-    -fx-border-color: grey;
+.clickableNode {
+    -fx-border-color: transparent;
     -fx-border-width: 1;
 }
 
-.playerObjectInfoGridPane:hover {
+.clickableNode:hover {
     -fx-border-color: lightblue;
     -fx-border-width: 1;
 }
 
-.playerObjectInfoGridPanePressed {
+.clickableNodePressed {
     -fx-border-color: lightblue;
     -fx-border-width: 1;
 }
@@ -116,5 +116,18 @@
     -fx-font-family: "Bell MT", sans-serif;
     -fx-font-size: 15;
     -fx-text-fill: black;
+}
+
+.characterGridPaneText{
+    -fx-font-family: "Bell MT", sans-serif;
+    -fx-font-size: 16;
+    -fx-text-fill: black;
+    -fx-text-alignment: center;
+    -fx-wrap-text: 100px;
+}
+
+.characterGridPaneHealthBar {
+    -fx-accent: #318a16;
+    -fx-padding: 0px;
 }
 

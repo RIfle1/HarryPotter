@@ -10,6 +10,7 @@ import java.util.*;
 
 import static java.lang.System.exit;
 import static project.classes.Color.*;
+import static project.classes.Spell.stupefy;
 import static project.enums.EnumMethods.returnFormattedEnum;
 
 
@@ -109,10 +110,13 @@ public class LevelFunctions {
             if(!wizardDodgeOrParrySuccess) {
                 if(attackingEnemy.getEnemyName().getEnemyCombat() == EnemyCombat.SPELL) {
                     assert enemyChosenSpell != null;
-                    attackingEnemy.spellAttack(enemyChosenSpell, Wizard.wizard, enemyCalculatedDamage, true);
+
+                    boolean attackSucceeded = Math.random() <= enemyChosenSpell.getSpellChance();
+                    attackingEnemy.spellAttack(attackSucceeded, enemyChosenSpell, Wizard.wizard, enemyCalculatedDamage);
                 }
                 else if(attackingEnemy.getEnemyName().getEnemyCombat() == EnemyCombat.MELEE) {
-                    attackingEnemy.meleeAttack(Wizard.wizard, enemyCalculatedDamage, true);
+                    boolean attackSucceeded = Math.random() <= attackingEnemy.getEnemyName().getEnemyCombat().getCombatChance();
+                    attackingEnemy.meleeAttack(attackSucceeded, Wizard.wizard, enemyCalculatedDamage);
                 }
             }
 
@@ -166,12 +170,15 @@ public class LevelFunctions {
         wizardCalculatedDamage = Wizard.wizard.returnSpellCalculatedDamage(wizardChosenSpell, enemyVictim);
 
         int generateRandomMoveType = (int) GeneralFunctions.generateDoubleBetween(0, moveTypeList.size() - 1);
-        enemyMoveType = MoveType.setMoveType(moveTypeList.get(generateRandomMoveType));
+
 
         // CHECK IF ENEMY IS A BOSS AND HIS HP LIMIT HAS BEEN REACHED AND RETURN IF CHOSEN SPELL CAN AFFECT THE ENEMY OR NOT
         boolean isVulnerableSpell = enemyVictim.vulnerabilityChecker(enemyVictim.getEnemyName().getEnemyHpLimitRatio(), wizardChosenSpell);
 
         if(isVulnerableSpell) {
+            // ENEMY RANDOM MOVE TYPE
+            enemyMoveType = MoveType.setMoveType(moveTypeList.get(generateRandomMoveType));
+
             // EXECUTE ACTION BASED ON RANDOM CHOICE
             if (enemyMoveType == MoveType.DODGE) {
                 enemyDodgeOrParrySuccess = enemyVictim.dodgeSpell(Wizard.wizard.returnSpellChance(wizardChosenSpell), Wizard.wizard);
@@ -181,7 +188,8 @@ public class LevelFunctions {
 
             // IF DODGE OR PARRY FAILED, THE WIZARD WILL ATTACK
             if(!enemyDodgeOrParrySuccess) {
-                Wizard.wizard.spellAttack(wizardChosenSpell, enemyVictim, wizardCalculatedDamage, true);
+                boolean attackSucceeded = Math.random() <= wizardChosenSpell.getSpellChance();
+                Wizard.wizard.spellAttack(attackSucceeded, wizardChosenSpell, enemyVictim, wizardCalculatedDamage);
             }
         }
         ConsoleFunctions.continuePromptExtra();
