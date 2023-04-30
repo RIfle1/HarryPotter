@@ -117,6 +117,16 @@ public class ConsoleFunctions {
         System.out.println(returnLineSeparator(title.length()));
     }
 
+    public static void printTitleTop(String title) {
+        System.out.println(returnLineSeparator(title.length()));
+        System.out.println(title);
+    }
+
+    public static void printTitleBottom(String title) {
+        System.out.println(title);
+        System.out.println(returnLineSeparator(title.length()));
+    }
+
     // Method to continue
     public static void continuePrompt(){
         String continuePromptText = "Press 'Enter' to continue...";

@@ -16,7 +16,7 @@ public enum MoveType {
         return EnumMethods.getEnumList(spellTypeValues);
     }
 
-    public static List<String> getMoveTypeList(List<MoveType> unwantedMoveTypeList) {
+    public static List<String> returnMoveTypeListExcept(List<MoveType> unwantedMoveTypeList) {
         MoveType[] spellTypeValues = MoveType.values();
         List<String> moveTypeList = EnumMethods.getEnumList(spellTypeValues);
 

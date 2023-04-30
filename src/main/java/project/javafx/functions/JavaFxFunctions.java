@@ -8,7 +8,6 @@ import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.image.Image;
@@ -30,7 +29,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import static project.classes.Enemy.enemiesHashMap;
 import static project.enums.EnumMethods.returnFormattedEnum;
 import static project.functions.GeneralFunctions.returnFileAttribute;
 import static project.functions.SaveFunctions.createWizardInstance;
@@ -82,18 +80,21 @@ public class JavaFxFunctions {
         String wizardName = wizardInstance.getName();
         String wizardLevel = String.valueOf((int) wizardInstance.getLevel());
         String wizardHouse = returnFormattedEnum(wizardInstance.getHouseName());
+        String wizardDifficulty = returnFormattedEnum(wizardInstance.getDifficulty());
 
         Text wizardNameText = new Text(wizardName);
         Text wizardLevelText = new Text("Level " + wizardLevel);
         Text wizardHouseText = new Text("House of " + wizardHouse);
+        Text wizardDifficultyText = new Text("Difficulty: " + wizardDifficulty);
         Text fileCreationTimeText = new Text("Creation Time: " + fileCreationTime);
         Text fileModifiedTimeText = new Text("Last Modified Time: " + fileModifiedTime);
 
         saveInfoGridPane.add(wizardNameText, 0, 0);
         saveInfoGridPane.add(wizardLevelText, 0, 1);
         saveInfoGridPane.add(wizardHouseText, 0, 2);
-        saveInfoGridPane.add(fileCreationTimeText, 0, 3);
-        saveInfoGridPane.add(fileModifiedTimeText, 0, 4);
+        saveInfoGridPane.add(wizardDifficultyText, 0, 3);
+        saveInfoGridPane.add(fileCreationTimeText, 0, 4);
+        saveInfoGridPane.add(fileModifiedTimeText, 0, 5);
 
         saveInfoGridPane.getStyleClass().add("saveInfoGridPane");
         saveInfoGridPane.setGridLinesVisible(true);
@@ -116,7 +117,12 @@ public class JavaFxFunctions {
         try {
             imgInputStream = new FileInputStream("src/main/resources/icons/" + objectName + ".png");
         } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
+            System.out.println("Image not found");
+            try {
+                imgInputStream = new FileInputStream("src/main/resources/icons/unknown.png");
+            } catch (FileNotFoundException ex) {
+                throw new RuntimeException(ex);
+            }
         }
         return new Image(imgInputStream);
     }
@@ -173,9 +179,6 @@ public class JavaFxFunctions {
 
 
 //        verticalGridPane.setGridLinesVisible(true);
-
-
-
 
         String characterName;
         String characterNameString;
@@ -234,47 +237,36 @@ public class JavaFxFunctions {
         return playerName;
     }
 
-    public static void disableGridPaneButtons(GridPane parentGridpane, Button button) {
+    public static void disableGridPaneButton(GridPane parentGridpane, Node node) {
         parentGridpane.getChildren().stream()
-                .filter(node -> node instanceof Button)
-                .filter(node -> node.equals(button))
+                .filter(n -> n.equals(node))
+                .forEach(n -> n.setDisable(true));
+    }
+
+    public static void disableAllGridPaneButtons(GridPane parentGridpane) {
+        parentGridpane.getChildren()
                 .forEach(node -> node.setDisable(true));
     }
 
-    public static void disableGridPaneButtons(GridPane parentGridpane) {
+    public static void disableAllGridPaneButtons(GridPane mainGridPane, String buttonFxID) {
+        GridPane parentGridPane = (GridPane) mainGridPane.lookup("#" + buttonFxID);
+        parentGridPane.getChildren().forEach(node -> node.setDisable(true));
+    }
+
+
+    public static void enableGridPaneButton(GridPane parentGridpane, Node node) {
         parentGridpane.getChildren().stream()
-                .filter(node -> node instanceof Button)
-                .forEach(node -> node.setDisable(true));
+                .filter(n -> n.equals(node))
+                .forEach(n -> n.setDisable(false));
     }
 
-    public static void disableGridPaneButtons(GridPane parentGridpane, String fxID) {
-        GridPane gridpane = (GridPane) parentGridpane.lookup("#" + fxID);
-
-        gridpane.getChildren().forEach(node -> {
-            node.setDisable(true);
-        });
+    public static void enableAllGridPaneButtons(GridPane parentgridpane) {
+        parentgridpane.getChildren().forEach(node -> node.setDisable(false));
     }
 
-
-    public static void enableGridPaneButtons(GridPane parentGridpane, Button button) {
-        parentGridpane.getChildren().stream()
-                .filter(node -> node instanceof Button)
-                .filter(node -> node.equals(button))
-                .forEach(node -> node.setDisable(false));
-    }
-
-    public static void enableGridPaneButtons(GridPane parentgridpane) {
-        parentgridpane.getChildren().stream()
-                .filter(node -> node instanceof Button)
-                .forEach(node -> node.setDisable(false));
-    }
-
-    public static void enableGridPaneButtons(GridPane gridPane, String fxID) {
-        GridPane gridpane = (GridPane) gridPane.lookup("#" + fxID);
-
-        gridpane.getChildren().forEach(node -> {
-            node.setDisable(false);
-        });
+    public static void enableAllGridPaneButtons(GridPane mainGridPane, String fxID) {
+        GridPane parentGridPane = (GridPane) mainGridPane.lookup("#" + fxID);
+        parentGridPane.getChildren().forEach(node -> node.setDisable(false));
     }
 
     public static void selectSubGridPane(GridPane mainGridPane, GridPane selectedGridPane) {

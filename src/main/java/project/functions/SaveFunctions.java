@@ -11,13 +11,15 @@ import project.classes.Wizard;
 import project.enums.Level;
 
 import java.io.*;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
+import java.text.DateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static project.functions.GeneralFunctions.generateRandomString;
+import static project.functions.GeneralFunctions.returnFileAttribute;
 import static project.javafx.functions.JavaFxFunctions.createPopup;
 import static project.javafx.controllers.GameMenuController.gameMenuScene;
 
@@ -58,7 +60,8 @@ public class SaveFunctions {
         List<String> saveFiles = returnFormattedSaveFiles();
 
         try {
-            loadProgress(saveFiles.get(0));
+            String lastModifiedSaveFile = returnLastModifiedSaveFile(saveFiles);
+            loadProgress(lastModifiedSaveFile);
             ActionEvent actionEvent = new ActionEvent(event.getSource(), event.getTarget());
             gameMenuScene(actionEvent);
         }
@@ -66,6 +69,21 @@ public class SaveFunctions {
             ActionEvent actionEvent = new ActionEvent(event.getSource(), event.getTarget());
             createPopup(actionEvent, Alert.AlertType.WARNING, "No save files found");
         }
+    }
+
+    private static String returnLastModifiedSaveFile(List<String> saveFiles) {
+        Optional<String> lastModifiedSaveFile = saveFiles.stream().max((a, b) -> {
+            String fileModifiedTimeA = returnFileAttribute("saves", a, "lastModifiedTime");
+            String fileModifiedTimeB = returnFileAttribute("saves", b, "lastModifiedTime");
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+            LocalDate dateTimeA = LocalDate.parse(fileModifiedTimeA, formatter);
+            LocalDate dateTimeB = LocalDate.parse(fileModifiedTimeB, formatter);
+
+            return dateTimeA.compareTo(dateTimeB);
+        });
+
+        return lastModifiedSaveFile.orElseThrow(IndexOutOfBoundsException::new);
     }
 
     public static void saveObject(String JSONString, String fileName) {

@@ -83,10 +83,16 @@
     -fx-border-radius: 100;
 }
 
-.simpleObjectText {
+.simpleEnabledNode {
     -fx-font-family: "Bell MT", sans-serif;
     -fx-font-size: 20;
     -fx-fill: lightblue;
+}
+
+.simpleDisabledNode {
+    -fx-font-family: "Bell MT", sans-serif;
+    -fx-font-size: 20;
+    -fx-fill: #e37b7b;
 }
 
 .scrollPane {
@@ -130,4 +136,6 @@
     -fx-accent: #318a16;
     -fx-padding: 0px;
 }
+
+.
 

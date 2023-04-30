@@ -86,7 +86,7 @@
                             <RowConstraints maxHeight="224.0" minHeight="10.0" prefHeight="203.0" valignment="CENTER" vgrow="SOMETIMES" />
                           </rowConstraints>
                            <children>
-                              <GridPane fx:id="buttonsGridPane" prefHeight="54.0" prefWidth="418.0">
+                              <GridPane fx:id="actionsGridPane" prefHeight="54.0" prefWidth="418.0">
                                 <columnConstraints>
                                   <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                                   <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />

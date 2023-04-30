@@ -14,7 +14,7 @@ import static project.enums.EnumMethods.returnFormattedEnum;
 public enum EnemyName {
     GOBLIN(EnemyCombat.MELEE, EnemyType.BASIC, null, 50, 0, 1, 30, 20, null),
     DARK_WIZARD(EnemyCombat.SPELL, EnemyType.BASIC, null, 70, 0.1, 1, 60, 30, null),
-    TROLL(EnemyCombat.MELEE, EnemyType.BOSS, new ArrayList<>(), 200, 0.2, 0.1, 60, 120, new Object() {
+    TROLL(EnemyCombat.MELEE, EnemyType.BOSS, new ArrayList<>(), 200, 0.2, 0.2, 60, 120, new Object() {
         List<String> evaluate() {
             List<String> strings = new ArrayList<>();
             strings.add(trollDeathLine);

@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 import project.abstractClasses.AbstractCharacter;
 import project.enums.*;
+import project.functions.GeneralFunctions;
+import project.javafx.controllers.GameSceneController;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -88,8 +90,8 @@ public class Enemy extends AbstractCharacter {
 
         for (int y = 0; y < potionNumber; y++) {
             double potionChance = Math.random();
-            int potionIndex = (int) generateDoubleBetween(0, allPotionsList.toArray().length);
-            Potion chosenPotion = allPotionsList.get(potionIndex - 1);
+            int potionIndex = (int) generateDoubleBetween(0, allPotionsList.toArray().length - 1);
+            Potion chosenPotion = allPotionsList.get(potionIndex);
 
             if (potionChance <= chosenPotion.getItemDropChance()) {
                 try {
@@ -188,6 +190,7 @@ public class Enemy extends AbstractCharacter {
                         .append("- ")
                         .append(returnColoredText(vulnerableSpell.getSpellName(), vulnerableSpell.getSpellColor()))
                         .append("\n"));
+        vulnerableSpellsList.replace(vulnerableSpellsList.length() - 1, vulnerableSpellsList.length(), "");
         return vulnerableSpellsList.toString();
     }
 
@@ -204,8 +207,6 @@ public class Enemy extends AbstractCharacter {
             isVulnerableSpell = true;
         }
 
-
-
         if(!isVulnerableSpell) {
             String text = returnFormattedEnum(this.getEnemyName()) +
                     " is not affected by " +
@@ -213,9 +214,8 @@ public class Enemy extends AbstractCharacter {
                     " Try to use:\n" +
                     getVulnerableSpellsList();
             printTitle(text);
+            GameSceneController.updateConsoleTaStatic(text, true);
         }
-
-
         return isVulnerableSpell;
     }
 
@@ -243,6 +243,7 @@ public class Enemy extends AbstractCharacter {
         double hpLimit = this.getMaxHealthPoints() * this.getEnemyName().getEnemyHpLimitRatio();
 
         if(this.getEnemyName().getEnemyType() == EnemyType.BOSS && this.getHealthPoints() <= hpLimit && this.getEnemyName().getVulnerableSpellList().size() == 0) {
+
             try {
                 this.updateBossVulnerableSpellsList();
             }
@@ -282,6 +283,68 @@ public class Enemy extends AbstractCharacter {
             }
         }
         return maxLength;
+    }
+
+    public double returnEnemyCalculatedDamage(Spell enemyChosenSpell) {
+        double enemyCalculatedDamage = 0;
+
+        if(this.getEnemyName().getEnemyCombat() == EnemyCombat.SPELL) {
+            enemyCalculatedDamage = this.returnSpellCalculatedDamage(enemyChosenSpell, wizard);
+        }
+        else if(this.getEnemyName().getEnemyCombat() == EnemyCombat.MELEE) {
+            enemyCalculatedDamage = this.returnMeleeCalculatedDamage(wizard);
+        }
+
+        return enemyCalculatedDamage;
+    }
+
+    public String returnAttackName(Spell enemyChosenSpell) {
+        String attackName = "";
+
+        if(this.getEnemyName().getEnemyCombat() == EnemyCombat.SPELL) {
+            attackName = enemyChosenSpell.getSpellName();
+        }
+        else if(this.getEnemyName().getEnemyCombat() == EnemyCombat.MELEE) {
+            attackName = returnFormattedEnum(this.getEnemyName()) + " melee attack";
+        }
+
+        return attackName;
+    }
+
+    public String returnChosenSpellName(Spell enemyChosenSpell) {
+        String chosenSpellName = "";
+
+        if(this.getEnemyName().getEnemyCombat() == EnemyCombat.SPELL) {
+            chosenSpellName = returnColoredText(enemyChosenSpell.getSpellName(), enemyChosenSpell.getSpellColor());
+        }
+        else if(this.getEnemyName().getEnemyCombat() == EnemyCombat.MELEE) {
+            chosenSpellName = returnColoredText("melee attack", ANSI_RED);
+        }
+
+        return chosenSpellName;
+    }
+
+    public static Spell getEnemyRandomSpell(Enemy attackingEnemy) {
+        // CHOOSE A RANDOM SPELL FROM THE ENEMY'S SPELL LIST
+        MoveType attackMoveType = MoveType.ATTACK;
+
+        int randomEnemySpellIndex = (int) GeneralFunctions.generateDoubleBetween(0, attackingEnemy.returnTypedSpellsList(attackMoveType).size() - 1);
+        return attackingEnemy.returnTypedSpellsFromInt(attackMoveType, randomEnemySpellIndex);
+    }
+
+    public static Enemy getRandomEnemy() {
+        // CHOOSE A RANDOM ENEMY FROM THE ENEMY LIST TO ATTACK BACK
+        int randomEnemyIndex = (int) GeneralFunctions.generateDoubleBetween(0, Enemy.enemiesKeyList.toArray().length - 1);
+        return Enemy.enemiesHashMap.get(Enemy.enemiesKeyList.get(randomEnemyIndex));
+    }
+
+    public static void notifyEnemyChosenSpell(String chosenSpellName, Enemy attackingEnemy) {
+        // NOTIFY THE PLAYER WHAT SPELL THE ENEMY WILL CHOOSE
+        String text = returnColoredText(returnFormattedEnum(attackingEnemy.getEnemyName()), ANSI_PURPLE) +
+                returnColoredText(" Level " + (int) attackingEnemy.getLevel(), ANSI_YELLOW) + " will attack you with " +
+                chosenSpellName;
+        printTitle(text);
+        GameSceneController.updateConsoleTaStatic(text, false);
     }
 
 }

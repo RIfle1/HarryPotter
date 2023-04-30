@@ -178,7 +178,7 @@ public class GameMenuController implements Initializable {
         wizardSpells.forEach((spellName, spell) -> {
             Text spellText = new Text(spellName);
             Text spellDamage = new Text((int) spell.getSpellDamage()[0] + "~" + (int) spell.getSpellDamage()[1]);
-            Text spellChance = new Text(((int) spell.getSpellChance() * 100) + "%");
+            Text spellChance = new Text((int) (spell.getSpellChance() * 100) + "%");
             Text spellCooldown = new Text(String.valueOf(spell.getSpellCooldown()));
 
             ImageView spellImageView = returnObjectImageView(spellName, 80, 80);

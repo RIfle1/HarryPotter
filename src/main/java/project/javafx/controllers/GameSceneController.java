@@ -26,7 +26,9 @@ import javafx.util.Duration;
 import project.classes.*;
 import project.enums.EnemyName;
 import project.enums.MoveType;
+import project.functions.ConsoleFunctions;
 import project.javafx.GuiMain;
+import project.javafx.functions.JavaFxFunctions;
 
 import java.net.URL;
 import java.util.*;
@@ -35,15 +37,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static project.classes.Enemy.*;
 import static project.classes.Wizard.wizard;
 import static project.enums.EnumMethods.returnFormattedEnum;
+import static project.functions.ConsoleFunctions.printTitle;
 import static project.functions.ConsoleFunctions.returnLineSeparator;
+import static project.functions.LevelFunctions.*;
 import static project.javafx.controllers.GameMenuController.gameMenuScene;
 import static project.javafx.functions.JavaFxFunctions.*;
 
-// TODO - CHECK IF SPELL CAN BE USED AGAINST ENEMY
-// TODO - MAKE IT THAT AN ENEMY HAS TO BE CHOSEN FIRST AND AFTERWARDS A SPELL CAN BE CHOSEN
-// TODO - CHECK THAT SELECTED SPELL IS AVAILABLE TO USE OR MAKE IT SO IT CAN'T BE SELECTED IF IT'S NOT AVAILABLE
-// TODO - PRINT SPELL AVAILABILITY IN THE PLAYER SPELLS LIST RED FOR NOT READY AND LIGHT BLUE FOR READY
-// TODO - PROBABLY MAKE A BETTER ENEMY GRID CLEANUP / UPDATE METHOD AFTER ENEMY GOT KILLED OR ATTACKED -> AVOID RELOADING THE WHOLE ENEMY COMBAT GRID PANE
+// TODO - USE applyPotionEffect() before the player's turn
 
 public class GameSceneController implements Initializable {
     private static final Text consoleTStatic = new Text();
@@ -59,7 +59,7 @@ public class GameSceneController implements Initializable {
     @FXML
     private Circle baseActionCircle;
     @FXML
-    private GridPane buttonsGridPane;
+    private GridPane actionsGridPane;
     @FXML
     private AnchorPane combatAnchorPane;
     @FXML
@@ -117,8 +117,7 @@ public class GameSceneController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         // TESTS TO DELETE AFTERWARDS
-        generateEnemies(10, 10, 7, EnemyName.BELLATRIX_LESTRANGE);
-        generateEnemies(10, 10, 7, EnemyName.VOLDEMORT);
+        generateEnemies(10, 10, 14, EnemyName.VOLDEMORT);
         try {
             wizard.setPotionList(Arrays.asList(Potion.highDefensePotion.clone(), Potion.highDamagePotion.clone(), Potion.highDamagePotion.clone(), Potion.highDamagePotion.clone(), Potion.highHealthPotion.clone(), Potion.highHealthPotion.clone(), Potion.highHealthPotion.clone()));
         } catch (CloneNotSupportedException e) {
@@ -130,7 +129,7 @@ public class GameSceneController implements Initializable {
         enemyCombatGridPane.setId("enemyCombatGridPane");
         combatGridPane.add(enemyCombatGridPane, 2, 0);
 
-        disableGridPaneButtons(buttonsGridPane);
+        disableAllGridPaneButtons(actionsGridPane);
         initializeActionCircleTimeline();
 
         displayPlayerStats();
@@ -205,7 +204,7 @@ public class GameSceneController implements Initializable {
 
     private void initializeActionCircleTimeline() {
         double baseActionCircleRadius = baseActionCircle.getRadius();
-        double actionCircleSpeed = (10 / Math.exp(wizard.getLevel() * wizard.getDifficulty().getWizardDiffMultiplier()));
+        double actionCircleSpeed = (4 / Math.exp(wizard.getLevel() * wizard.getDifficulty().getWizardDiffMultiplier()));
 
         KeyValue actionCircleKeyValueGrow = new KeyValue(actionCircle.radiusProperty(), baseActionCircleRadius, Interpolator.EASE_IN);
         KeyFrame actionCircleKeyFrameGrow = new KeyFrame(Duration.seconds(actionCircleSpeed), actionCircleKeyValueGrow);
@@ -222,8 +221,8 @@ public class GameSceneController implements Initializable {
         if (!actionButtonClicked) {
             actionButtonClicked = true;
 
-            disableGridPaneButtons(playerAvailableSpellsGrid);
-            disableGridPaneButtons(combatGridPane, "enemyCombatGridPane");
+            disableAllGridPaneButtons(playerAvailableSpellsGrid);
+            disableAllGridPaneButtons(combatGridPane, "enemyCombatGridPane");
 
             actionCircle.setRadius(1);
             actionCircleTimeline.play();
@@ -240,16 +239,18 @@ public class GameSceneController implements Initializable {
                 parryBtnOnClick();
             }
 
-            enableGridPaneButtons(playerAvailableSpellsGrid);
-            deselectAllSubGridPanes(playerAvailableSpellsGrid);
-
-            enableGridPaneButtons(combatGridPane, "enemyCombatGridPane");
-
-            // Maybe I don't need to deselect currently selected enemy - and this is useless anyway because the whole grid pane is reloaded
-//            deselectAllSubGridPanes(combatGridPane, "enemyCombatGridPane");
-
-            disableGridPaneButtons(buttonsGridPane);
             actionCircleTimeline.stop();
+
+            // these are useless anyway because the whole grid pane is reloaded
+//            deselectAllSubGridPanes(combatGridPane, "enemyCombatGridPane");
+//            deselectAllSubGridPanes(playerAvailableSpellsGrid);
+
+            displayPlayerSpellsGrid();
+            disableAllGridPaneButtons(actionsGridPane);
+
+
+//            disableAllGridPaneButtons(playerAvailableSpellsGrid);
+//            disableAllGridPaneButtons(combatGridPane, "enemyCombatGridPane");
         }
     }
 
@@ -262,35 +263,66 @@ public class GameSceneController implements Initializable {
     }
 
     private void attackBtnOnClick() {
+        // GET THE ENEMY VICTIM
         List<Object> enemyObjectsList = returnSelectedNodes(gameSceneMainAnchorPane, "enemyCombatGridPane", "clickableNodePressed");
-        Enemy selectedEnemy = enemiesHashMap.get((String) enemyObjectsList.get(0));
+        Enemy enemyVictim = enemiesHashMap.get((String) enemyObjectsList.get(0));
 
         // Maybe I'll need this later for optimizations IDK like only reloading the grid pane in question and not the whole thing
         GridPane enemyGridPane = (GridPane) enemyObjectsList.get(1);
 
+        // GET THE WIZARD SPELL
         List<Object> spellObjectsList = returnSelectedNodes(playerAvailableSpellsGrid, "clickableNodePressed");
-        Spell selectedSpell = wizard.getSpellsHashMap().get((String) spellObjectsList.get(0));
+        Spell wizardChosenSpell = wizard.getSpellsHashMap().get((String) spellObjectsList.get(0));
 
         // Maybe I'll need this later for optimizations IDK
         GridPane spellGridPane = (GridPane) spellObjectsList.get(1);
 
-        double wizardCalculatedDamage = Wizard.wizard.returnSpellCalculatedDamage(selectedSpell, selectedEnemy);
+        // ACTIVATE POTIONS ----------------- MIGHT HAVE TO REMOVE THIS AND MOVE IT TO A MORE GENERAL FUNCTION LATER
+        Wizard.wizard.applyPotionEffect();
 
+        // WARN THE PLAYER ABOUT ENEMY CHANGES ----------------- MIGHT HAVE TO REMOVE THIS AND MOVE IT TO A MORE GENERAL FUNCTION LATER
+        Enemy.checkEnemiesHpRatio();
+
+        boolean isVulnerableSpell = enemyVictim.vulnerabilityChecker(enemyVictim.getEnemyName().getEnemyHpLimitRatio(), wizardChosenSpell);
         boolean attackSucceeded = actionCircle.getRadius() <= successActionCircle.getRadius();
-        wizard.spellAttack(attackSucceeded, selectedSpell, selectedEnemy, wizardCalculatedDamage);
-        updateConsoleTa();
+
+        wizardCombatSystem(wizardChosenSpell, enemyVictim, attackSucceeded, isVulnerableSpell);
 
         // but I'm kinda lazy right now so this should do for now
-        displayEnemiesGridPanes();
+        displayCharacters();
+        displayPlayerStats();
 
-        try {
-            displayEnemyStats(enemiesHashMap.get(selectedEnemy.getName()));
-            selectSubGridPane(enemyCombatGridPane, selectedEnemy.getName());
+
+        if(enemiesHashMap.size() > 0) {
+            try {
+                displayEnemyStats(enemiesHashMap.get(enemyVictim.getName()));
+                selectSubGridPane(enemyCombatGridPane, enemyVictim.getName());
+            }
+            catch(Exception e) {
+                displayEnemyStats(enemiesHashMap.get(enemiesKeyList.get(0)));
+                selectSubGridPane(enemyCombatGridPane, enemiesHashMap.get(enemiesKeyList.get(0)).getName());
+            }
         }
-        catch(Exception e) {
-            displayEnemyStats(enemiesHashMap.get(enemiesKeyList.get(0)));
+        else {
+            System.out.println("all enemies died");
             isEnemySelected = false;
         }
+
+        updateConsoleTa();
+    }
+
+    private void enemyTurn() {
+        // IF ENEMY LIST ISN'T EMPTY
+        if(!Enemy.enemiesHashMap.isEmpty()) {
+            Enemy attackingEnemy = getRandomEnemy();
+            Spell enemyChosenSpell = getEnemyRandomSpell(attackingEnemy);
+
+
+            String chosenSpellName = attackingEnemy.returnChosenSpellName(enemyChosenSpell);
+            notifyEnemyChosenSpell(chosenSpellName, attackingEnemy);
+
+        }
+
     }
 
     private void displayPlayerStats() {
@@ -312,6 +344,8 @@ public class GameSceneController implements Initializable {
         AtomicInteger rowIndex = new AtomicInteger();
         AtomicInteger columnIndex = new AtomicInteger();
 
+        playerAvailableSpellsGrid.getChildren().clear();
+
         playerSpellsHashMap.forEach(spell -> {
             String spellName = spell.getSpellName();
             GridPane playerSpellInfoGridPane = new GridPane();
@@ -328,21 +362,26 @@ public class GameSceneController implements Initializable {
 
             Text spellText = new Text(spellName);
             ImageView spellIcon = returnObjectImageView(spellName, 30, 30);
-            spellText.getStyleClass().add("simpleObjectText");
-
 
             playerSpellInfoGridPane.add(spellIcon, 0, 0);
             playerSpellInfoGridPane.add(spellText, 1, 0);
 
             playerSpellInfoGridPane.getStyleClass().addAll("clickableNode");
 
-            playerSpellInfoGridPane.setOnMouseReleased(event -> {
-                selectSubGridPane(playerAvailableSpellsGrid, playerSpellInfoGridPane);
-                defineSuccessActionCircle(spell);
-                isSpellSelected = true;
-                actionCircle.setRadius(1);
-                checkAttackBtnConditions();
-            });
+            if(wizard.checkSpellReady(spell)) {
+                spellText.getStyleClass().add("simpleEnabledNode");
+                playerSpellInfoGridPane.setOnMouseReleased(event -> {
+                    selectSubGridPane(playerAvailableSpellsGrid, playerSpellInfoGridPane);
+                    defineSuccessActionCircle(spell);
+                    isSpellSelected = true;
+                    actionCircle.setRadius(1);
+                    checkAttackBtnConditions();
+                });
+            }
+            else {
+                spellText.getStyleClass().add("simpleDisabledNode");
+            }
+
 
             playerAvailableSpellsGrid.add(playerSpellInfoGridPane, columnIndex.get(), rowIndex.get());
 
@@ -396,7 +435,7 @@ public class GameSceneController implements Initializable {
 
             ImageView potionIcon = returnObjectImageView(formattedPotionName, 45, 45);
             Text potionText = new Text(potionName);
-            potionText.getStyleClass().add("simpleObjectText");
+            potionText.getStyleClass().add("simpleEnabledNode");
 
             playerPotionInfoGridPane.add(potionIcon, 0, 0);
             playerPotionInfoGridPane.add(potionText, 1, 0);
@@ -459,7 +498,7 @@ public class GameSceneController implements Initializable {
 
     public void checkAttackBtnConditions() {
         if(isEnemySelected && isSpellSelected) {
-            enableGridPaneButtons(buttonsGridPane, attackBtn);
+            enableGridPaneButton(actionsGridPane, attackBtn);
         }
     }
 
@@ -532,7 +571,7 @@ public class GameSceneController implements Initializable {
         Text attackText = new Text(spellName);
         ImageView spellIcon = returnObjectImageView(spellName, 30, 30);
 
-        attackText.getStyleClass().add("simpleObjectText");
+        attackText.getStyleClass().add("simpleEnabledNode");
 
         enemySpellGridPane.add(spellIcon, 0, 0);
         enemySpellGridPane.add(attackText, 1, 0);

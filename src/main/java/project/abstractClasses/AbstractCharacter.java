@@ -64,7 +64,7 @@ public abstract class AbstractCharacter {
     public final static double difficultyDifference = 1.3;
 
     private final static int wizardParryDivider = 2;
-    private final static int enemyParryDivider = 3;
+    private final static int enemyParryDivider = 1;
     private final static int enemyDodgeDivider = 5;
     private final static int wizardDodgeDivider = 3;
     private final static double enemyDamageDivider = 1.7;
@@ -505,6 +505,7 @@ public abstract class AbstractCharacter {
             if(enemyItemList.size() > 0) {
                 text4.append("\nYou found:\n");
                 enemyItemList.forEach(Item -> text4.append("- ").append(returnColoredText(Item.getItemName(), Item.getItemColor())).append("\n"));
+                text4.replace(text4.length() - 1, text4.length(), "");
             }
         }
         // PRINT IN CONSOLE
@@ -530,26 +531,11 @@ public abstract class AbstractCharacter {
     }
 
     public void spellAttack(boolean attackSucceeded, Spell spell, AbstractCharacter attackedCharacter, double calculatedDamage) {
-        String spellName = spell.getSpellName();
-
-        // SPELL GETS USED AND PUT ON A COOLDOWN
-        this.reduceSpellsCooldown(1);
-        this.resetSpellReadyIn(spell);
-
-        String spellNameText = returnColoredText(spellName + "!", spell.getSpellColor());
-
-        // PRINT IN CONSOLE
-        System.out.println(spellNameText);
-
-        // PRINT IN GUI CONSOLE
-        GameSceneController.updateConsoleTaStatic(spellNameText, false);
 
         if(this.getClass() == Wizard.class) {
             String spellSpecialAttackLine = returnColoredText(spell.getSpellSpecialAttackLine(), ANSI_PURPLE);
-
             // PRINT IN GUI CONSOLE
             GameSceneController.updateConsoleTaStatic(spellSpecialAttackLine, false);
-
             // PRINT IN CONSOLE
             System.out.println(spellSpecialAttackLine);
         }
@@ -558,61 +544,92 @@ public abstract class AbstractCharacter {
         castAttack(attackSucceeded, spell.getCharacterState(), attackedCharacter, calculatedDamage);
     }
 
-    public boolean dodgeSpell(double dodgeChance, AbstractCharacter attackingCharacter) {
-        double spellSuccess = Math.random();
+    public boolean dodgeSpell(boolean dodgeSuccess, AbstractCharacter attackingCharacter) {
         String text1 = "";
         String text2 = "";
 
         if (this.getClass() == Wizard.class) {
             text1 = returnColoredText("You dodged " + returnFormattedEnum(((Enemy) attackingCharacter).getEnemyName()) + "'s attack.", ANSI_YELLOW);
             text2 = returnColoredText("You were unable to dodge " + returnFormattedEnum(((Enemy) attackingCharacter).getEnemyName()) + "'s attack.", ANSI_RED);
-            double charismaPercent =  ((Wizard) this).returnWizardSpecsPercent().get("charisma");
-            dodgeChance = (dodgeChance / wizardDodgeDivider) * (1 + charismaPercent);
         } else if (this.getClass() == Enemy.class) {
             text1 = returnColoredText(returnFormattedEnum(((Enemy) this).getEnemyName()) + " dodged your attack.", ANSI_YELLOW);
             text2 = returnColoredText(returnFormattedEnum(((Enemy) this).getEnemyName()) + " was unable to dodge your attack.", ANSI_RED);
-            dodgeChance = dodgeChance / enemyDodgeDivider;
         }
 
-        if (spellSuccess <= dodgeChance) {
-            printTitle(text1);
+        if (dodgeSuccess) {
+            System.out.println(text1);
+            GameSceneController.updateConsoleTaStatic(text1, true);
             return true;
         } else {
-            printTitle(text2);
+            System.out.println(text2);
+            GameSceneController.updateConsoleTaStatic(text2, false);
             return false;
         }
 
     }
 
-    public boolean parry(String parriedAttackName, AbstractCharacter attackingCharacter, double calculatedDamage) {
+    public boolean parry(boolean parrySuccess, String parriedAttackName, AbstractCharacter attackingCharacter, double calculatedDamage) {
         String text1 = "";
         String text2 = "";
         double newDamage = calculatedDamage * (1 + parryMultiplier);
-        double parryPoints = this.getDefensePoints();
 
         if (this.getClass() == Wizard.class) {
             text1 = returnColoredText("You parried " + parriedAttackName + ".", ANSI_YELLOW);
             text2 = returnColoredText("You were unable to parry " + returnFormattedEnum(((Enemy) attackingCharacter).getEnemyName()) + "'s attack.", ANSI_RED);
-            double intelligencePercent =  ((Wizard) this).returnWizardSpecsPercent().get("intelligence");
-            parryPoints = (parryPoints / wizardParryDivider) * (1 + intelligencePercent);
         } else if (this.getClass() == Enemy.class) {
-            text1 = returnColoredText(returnFormattedEnum(((Enemy) this).getEnemyName()) + " parried your attack and returned", ANSI_YELLOW)
+            text1 = returnColoredText(returnFormattedEnum(((Enemy) this).getEnemyName()) + " parried your attack and returned ", ANSI_YELLOW)
                     + returnColoredText((int) newDamage + " Damage.", ANSI_RED);
             text2 = returnColoredText(returnFormattedEnum(((Enemy) this).getEnemyName()) + " was unable to parry your attack.", ANSI_RED);
-            parryPoints = parryPoints / enemyParryDivider;
         }
 
         // THE ATTACK CAN BE PARRIED ONLY IF THE ATTACKED CHARACTER'S DEFENSE IS HIGHER THAN THE ATTACKING CHARACTER'S CALCULATED SPELL DAMAGE
-        if (parryPoints > calculatedDamage) {
-            printTitle(text1);
+        if (parrySuccess) {
+            System.out.println(text1);
+            GameSceneController.updateConsoleTaStatic(text1, true);
 
             boolean attackSucceeded = Math.random() <= stupefy.getSpellChance();
             this.spellAttack(attackSucceeded, stupefy, attackingCharacter, newDamage);
 
             return true;
         } else {
-            printTitle(text2);
+            System.out.println(text2);
+            GameSceneController.updateConsoleTaStatic(text2, false);
+
             return false;
         }
+    }
+
+    public boolean returnDodgeSuccess(AbstractCharacter attackingCharacter, Spell attackingSpell) {
+        double spellSuccess = Math.random();
+        double dodgeChance = attackingCharacter.returnSpellChance(attackingSpell);
+
+
+        if (this.getClass() == Wizard.class) {
+            if(((Enemy) attackingCharacter).getEnemyName().getEnemyCombat() == EnemyCombat.MELEE) {
+                dodgeChance = ((Enemy) attackingCharacter).getEnemyName().getEnemyCombat().getCombatChance();
+            }
+
+            double charismaPercent =  ((Wizard) this).returnWizardSpecsPercent().get("charisma");
+            dodgeChance = (dodgeChance / wizardDodgeDivider) * (1 + charismaPercent);
+
+        } else if (this.getClass() == Enemy.class) {
+            dodgeChance = dodgeChance / enemyDodgeDivider;
+        }
+
+        return spellSuccess <= dodgeChance;
+    }
+
+    public boolean returnParrySuccess(double calculatedDamage) {
+        // THE ATTACK CAN BE PARRIED ONLY IF THE ATTACKED CHARACTER'S DEFENSE IS HIGHER THAN THE ATTACKING CHARACTER'S CALCULATED SPELL DAMAGE
+        double defensePoints = this.getDefensePoints();
+
+        if (this.getClass() == Wizard.class) {
+            double intelligencePercent =  ((Wizard) this).returnWizardSpecsPercent().get("intelligence");
+            defensePoints = (defensePoints / wizardParryDivider) * (1 + intelligencePercent);
+        } else if (this.getClass() == Enemy.class) {
+            defensePoints = defensePoints / enemyParryDivider;
+        }
+
+        return defensePoints > calculatedDamage;
     }
 }

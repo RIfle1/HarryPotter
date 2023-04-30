@@ -48,7 +48,6 @@ public class LoadGameController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         List<String> saveFiles = SaveFunctions.returnFormattedSaveFiles();
-        System.out.println(saveFiles);
         AtomicInteger index = new AtomicInteger();
 
         saveFiles.forEach(saveFile -> {
