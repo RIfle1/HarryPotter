@@ -16,7 +16,7 @@ import java.util.Map;
 import static project.classes.Color.*;
 import static project.classes.Wizard.wizard;
 import static project.enums.EnumMethods.returnFormattedEnum;
-import static project.functions.ConsoleFunctions.printTitle;
+import static project.functions.ConsoleFunctions.*;
 import static project.functions.GeneralFunctions.generateDoubleBetween;
 
 
@@ -343,7 +343,7 @@ public class Enemy extends AbstractCharacter {
         String text = returnColoredText(returnFormattedEnum(attackingEnemy.getEnemyName()), ANSI_PURPLE) +
                 returnColoredText(" Level " + (int) attackingEnemy.getLevel(), ANSI_YELLOW) + " will attack you with " +
                 chosenSpellName;
-        printTitle(text);
+        printTitleTop(text);
         GameSceneController.updateConsoleTaStatic(text, false);
     }
 

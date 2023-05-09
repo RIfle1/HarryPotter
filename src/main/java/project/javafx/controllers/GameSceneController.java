@@ -48,6 +48,10 @@ import static project.javafx.functions.JavaFxFunctions.*;
 public class GameSceneController implements Initializable {
     private static final Text consoleTStatic = new Text();
     private static boolean actionButtonClicked = false;
+    private static Spell enemyChosenSpell;
+    private static Spell wizardChosenSpell;
+    private static Enemy attackingEnemy;
+    private static double enemyCalculatedDamage;
     private static boolean isSpellSelected = false;
     private static boolean isEnemySelected = false;
     @FXML
@@ -188,16 +192,22 @@ public class GameSceneController implements Initializable {
 
     @FXML
     private void attackOnClick(ActionEvent event) {
+        defineSuccessActionCircle(wizardChosenSpell);
         actionButtonOnClick(event);
     }
 
     @FXML
     private void dodgeOnClick(ActionEvent event) {
+        defineSuccessActionCircle(wizard.returnDodgeChance(attackingEnemy, enemyChosenSpell));
         actionButtonOnClick(event);
     }
 
     @FXML
     private void parryOnClick(ActionEvent event) {
+        double parrySuccess = wizard.returnParryChance() / enemyCalculatedDamage;
+        if(parrySuccess > 1) parrySuccess = 1;
+
+        defineSuccessActionCircle(parrySuccess);
         actionButtonOnClick(event);
     }
 
@@ -218,10 +228,11 @@ public class GameSceneController implements Initializable {
         Node buttonSource = (Node) event.getSource();
         String buttonId = buttonSource.getId();
 
+
         if (!actionButtonClicked) {
             actionButtonClicked = true;
 
-            disableAllGridPaneButtons(playerAvailableSpellsGrid);
+
             disableAllGridPaneButtons(combatGridPane, "enemyCombatGridPane");
 
             actionCircle.setRadius(1);
@@ -231,12 +242,14 @@ public class GameSceneController implements Initializable {
             actionButtonClicked = false;
             isSpellSelected = false;
 
+            boolean actionSucceeded = actionCircle.getRadius() <= successActionCircle.getRadius();
+
             if(buttonId.equals(attackBtn.getId())) {
-                attackBtnOnClick();
+                attackBtnOnClick(actionSucceeded);
             } else if(buttonId.equals(dodgeBtn.getId())) {
-                dodgeBtnOnClick();
+                dodgeBtnOnClick(actionSucceeded);
             } else if(buttonId.equals(parryBtn.getId())) {
-                parryBtnOnClick();
+                parryBtnOnClick(actionSucceeded);
             }
 
             actionCircleTimeline.stop();
@@ -245,24 +258,28 @@ public class GameSceneController implements Initializable {
 //            deselectAllSubGridPanes(combatGridPane, "enemyCombatGridPane");
 //            deselectAllSubGridPanes(playerAvailableSpellsGrid);
 
-            displayPlayerSpellsGrid();
-            disableAllGridPaneButtons(actionsGridPane);
 
+
+//            disableAllGridPaneButtons(actionsGridPane);
 
 //            disableAllGridPaneButtons(playerAvailableSpellsGrid);
 //            disableAllGridPaneButtons(combatGridPane, "enemyCombatGridPane");
         }
+
+//        disableAllGridPaneButtons(playerAvailableSpellsGrid);
     }
 
-    private void parryBtnOnClick() {
+    private void parryBtnOnClick(boolean actionSucceeded) {
+        wizardDodgeOrParry(attackingEnemy, enemyChosenSpell, MoveType.PARRY, actionSucceeded);
 
     }
 
-    private void dodgeBtnOnClick() {
+    private void dodgeBtnOnClick(boolean actionSucceeded) {
+        wizardDodgeOrParry(attackingEnemy, enemyChosenSpell, MoveType.DODGE, actionSucceeded);
 
     }
 
-    private void attackBtnOnClick() {
+    private void attackBtnOnClick(boolean actionSucceeded) {
         // GET THE ENEMY VICTIM
         List<Object> enemyObjectsList = returnSelectedNodes(gameSceneMainAnchorPane, "enemyCombatGridPane", "clickableNodePressed");
         Enemy enemyVictim = enemiesHashMap.get((String) enemyObjectsList.get(0));
@@ -284,9 +301,8 @@ public class GameSceneController implements Initializable {
         Enemy.checkEnemiesHpRatio();
 
         boolean isVulnerableSpell = enemyVictim.vulnerabilityChecker(enemyVictim.getEnemyName().getEnemyHpLimitRatio(), wizardChosenSpell);
-        boolean attackSucceeded = actionCircle.getRadius() <= successActionCircle.getRadius();
 
-        wizardCombatSystem(wizardChosenSpell, enemyVictim, attackSucceeded, isVulnerableSpell);
+        wizardCombatSystem(wizardChosenSpell, enemyVictim, actionSucceeded, isVulnerableSpell);
 
         // but I'm kinda lazy right now so this should do for now
         displayCharacters();
@@ -302,6 +318,12 @@ public class GameSceneController implements Initializable {
                 displayEnemyStats(enemiesHashMap.get(enemiesKeyList.get(0)));
                 selectSubGridPane(enemyCombatGridPane, enemiesHashMap.get(enemiesKeyList.get(0)).getName());
             }
+
+            displayPlayerSpellsGrid();
+            disableAllGridPaneButtons(playerAvailableSpellsGrid);
+            disableAllGridPaneButtons(combatGridPane, "enemyCombatGridPane");
+
+            enemyTurn();
         }
         else {
             System.out.println("all enemies died");
@@ -312,17 +334,38 @@ public class GameSceneController implements Initializable {
     }
 
     private void enemyTurn() {
-        // IF ENEMY LIST ISN'T EMPTY
-        if(!Enemy.enemiesHashMap.isEmpty()) {
-            Enemy attackingEnemy = getRandomEnemy();
-            Spell enemyChosenSpell = getEnemyRandomSpell(attackingEnemy);
+        attackingEnemy = getRandomEnemy();
+        enemyChosenSpell = getEnemyRandomSpell(attackingEnemy);
 
 
-            String chosenSpellName = attackingEnemy.returnChosenSpellName(enemyChosenSpell);
-            notifyEnemyChosenSpell(chosenSpellName, attackingEnemy);
+        String chosenSpellName = attackingEnemy.returnChosenSpellName(enemyChosenSpell);
+        notifyEnemyChosenSpell(chosenSpellName, attackingEnemy);
 
-        }
+        disableGridPaneButton(actionsGridPane, attackBtn);
 
+        enableGridPaneButton(actionsGridPane, parryBtn);
+        enableGridPaneButton(actionsGridPane, dodgeBtn);
+    }
+
+    public void wizardDodgeOrParry(Enemy attackingEnemy, Spell enemyChosenSpell, MoveType wizardMoveType, boolean actionSucceeded) {
+        boolean dodgeSuccess;
+        boolean parrySuccess;
+
+        dodgeSuccess = parrySuccess = actionSucceeded;
+
+        enemyCalculatedDamage = attackingEnemy.returnEnemyCalculatedDamage(enemyChosenSpell);
+
+        String attackName = attackingEnemy.returnAttackName(enemyChosenSpell);
+
+        boolean wizardDodgeOrParrySuccess = isWizardDodgeOrParrySuccess(attackingEnemy, enemyCalculatedDamage, attackName, wizardMoveType, dodgeSuccess, parrySuccess);
+        enemyAttack(wizardDodgeOrParrySuccess, enemyCalculatedDamage, attackingEnemy, enemyChosenSpell);
+        updateConsoleTa();
+
+        disableAllGridPaneButtons(actionsGridPane);
+//        enableGridPaneButton(actionsGridPane, attackBtn);
+
+        enableAllGridPaneButtons(playerAvailableSpellsGrid);
+        enableAllGridPaneButtons(combatGridPane, "enemyCombatGridPane");
     }
 
     private void displayPlayerStats() {
@@ -373,6 +416,7 @@ public class GameSceneController implements Initializable {
                 playerSpellInfoGridPane.setOnMouseReleased(event -> {
                     selectSubGridPane(playerAvailableSpellsGrid, playerSpellInfoGridPane);
                     defineSuccessActionCircle(spell);
+                    wizardChosenSpell = spell;
                     isSpellSelected = true;
                     actionCircle.setRadius(1);
                     checkAttackBtnConditions();
@@ -400,6 +444,11 @@ public class GameSceneController implements Initializable {
 
     public void defineSuccessActionCircle(Spell spell) {
         int successActionCircleRadius = (int) (baseActionCircle.getRadius() * spell.getSpellChance());
+        successActionCircle.setRadius(successActionCircleRadius);
+    }
+
+    public void defineSuccessActionCircle(double successChance) {
+        int successActionCircleRadius = (int) (baseActionCircle.getRadius() * successChance);
         successActionCircle.setRadius(successActionCircleRadius);
     }
 

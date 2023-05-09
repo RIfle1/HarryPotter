@@ -482,7 +482,10 @@ public abstract class AbstractCharacter {
             }
 
         } else {
-            System.out.println(attackingCharacterName + returnColoredText(" missed ", ANSI_YELLOW) + "their attack!");
+            String text = attackingCharacterName + returnColoredText(" missed ", ANSI_YELLOW) + "their attack!";
+            System.out.println(text);
+            GameSceneController.updateConsoleTaStatic(text, true);
+
         }
     }
 
@@ -544,7 +547,7 @@ public abstract class AbstractCharacter {
         castAttack(attackSucceeded, spell.getCharacterState(), attackedCharacter, calculatedDamage);
     }
 
-    public boolean dodgeSpell(boolean dodgeSuccess, AbstractCharacter attackingCharacter) {
+    public boolean dodge(boolean dodgeSuccess, AbstractCharacter attackingCharacter) {
         String text1 = "";
         String text2 = "";
 
@@ -585,7 +588,7 @@ public abstract class AbstractCharacter {
         // THE ATTACK CAN BE PARRIED ONLY IF THE ATTACKED CHARACTER'S DEFENSE IS HIGHER THAN THE ATTACKING CHARACTER'S CALCULATED SPELL DAMAGE
         if (parrySuccess) {
             System.out.println(text1);
-            GameSceneController.updateConsoleTaStatic(text1, true);
+            GameSceneController.updateConsoleTaStatic(text1, false);
 
             boolean attackSucceeded = Math.random() <= stupefy.getSpellChance();
             this.spellAttack(attackSucceeded, stupefy, attackingCharacter, newDamage);
@@ -599,8 +602,7 @@ public abstract class AbstractCharacter {
         }
     }
 
-    public boolean returnDodgeSuccess(AbstractCharacter attackingCharacter, Spell attackingSpell) {
-        double spellSuccess = Math.random();
+    public double returnDodgeChance(AbstractCharacter attackingCharacter, Spell attackingSpell) {
         double dodgeChance = attackingCharacter.returnSpellChance(attackingSpell);
 
 
@@ -616,10 +618,10 @@ public abstract class AbstractCharacter {
             dodgeChance = dodgeChance / enemyDodgeDivider;
         }
 
-        return spellSuccess <= dodgeChance;
+        return dodgeChance;
     }
 
-    public boolean returnParrySuccess(double calculatedDamage) {
+    public double returnParryChance() {
         // THE ATTACK CAN BE PARRIED ONLY IF THE ATTACKED CHARACTER'S DEFENSE IS HIGHER THAN THE ATTACKING CHARACTER'S CALCULATED SPELL DAMAGE
         double defensePoints = this.getDefensePoints();
 
@@ -630,6 +632,6 @@ public abstract class AbstractCharacter {
             defensePoints = defensePoints / enemyParryDivider;
         }
 
-        return defensePoints > calculatedDamage;
+        return defensePoints;
     }
 }

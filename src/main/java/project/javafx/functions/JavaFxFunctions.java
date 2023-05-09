@@ -19,6 +19,7 @@ import javafx.stage.Stage;
 import org.jetbrains.annotations.NotNull;
 import project.abstractClasses.AbstractCharacter;
 import project.classes.Enemy;
+import project.classes.Spell;
 import project.classes.Wizard;
 
 import java.io.FileInputStream;
@@ -237,35 +238,35 @@ public class JavaFxFunctions {
         return playerName;
     }
 
-    public static void disableGridPaneButton(GridPane parentGridpane, Node node) {
-        parentGridpane.getChildren().stream()
+    public static void disableGridPaneButton(GridPane parentGridPane, Node node) {
+        parentGridPane.getChildren().stream()
                 .filter(n -> n.equals(node))
                 .forEach(n -> n.setDisable(true));
     }
 
-    public static void disableAllGridPaneButtons(GridPane parentGridpane) {
-        parentGridpane.getChildren()
+    public static void disableAllGridPaneButtons(GridPane parentGridPane) {
+        parentGridPane.getChildren()
                 .forEach(node -> node.setDisable(true));
     }
 
-    public static void disableAllGridPaneButtons(GridPane mainGridPane, String buttonFxID) {
-        GridPane parentGridPane = (GridPane) mainGridPane.lookup("#" + buttonFxID);
+    public static void disableAllGridPaneButtons(GridPane mainGridPane, String parentGridPaneFxID) {
+        GridPane parentGridPane = (GridPane) mainGridPane.lookup("#" + parentGridPaneFxID);
         parentGridPane.getChildren().forEach(node -> node.setDisable(true));
     }
 
 
-    public static void enableGridPaneButton(GridPane parentGridpane, Node node) {
-        parentGridpane.getChildren().stream()
+    public static void enableGridPaneButton(GridPane parentGridPane, Node node) {
+        parentGridPane.getChildren().stream()
                 .filter(n -> n.equals(node))
                 .forEach(n -> n.setDisable(false));
     }
 
-    public static void enableAllGridPaneButtons(GridPane parentgridpane) {
-        parentgridpane.getChildren().forEach(node -> node.setDisable(false));
+    public static void enableAllGridPaneButtons(GridPane parentGridPane) {
+        parentGridPane.getChildren().forEach(node -> node.setDisable(false));
     }
 
-    public static void enableAllGridPaneButtons(GridPane mainGridPane, String fxID) {
-        GridPane parentGridPane = (GridPane) mainGridPane.lookup("#" + fxID);
+    public static void enableAllGridPaneButtons(GridPane mainGridPane, String parentGridPaneFxID) {
+        GridPane parentGridPane = (GridPane) mainGridPane.lookup("#" + parentGridPaneFxID);
         parentGridPane.getChildren().forEach(node -> node.setDisable(false));
     }
 
