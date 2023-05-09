@@ -148,6 +148,8 @@ public class GameSceneController implements Initializable {
             Optional<ButtonType> result = Objects.requireNonNull(createPopup(actionEvent, Alert.AlertType.CONFIRMATION, "Are you sure you want to quit the battle? All progress will be lost."));
 
             if (result.get() == ButtonType.OK) {
+                isEnemySelected = false;
+                isSpellSelected = false;
                 gameMenuScene(actionEvent);
             }
 
