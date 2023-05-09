@@ -55,11 +55,19 @@ public class LevelFunctions {
 
         // IF ENEMY LIST ISN'T EMPTY
         if(!Enemy.enemiesHashMap.isEmpty()) {
+
             Enemy attackingEnemy = getRandomEnemy();
-            Spell enemyChosenSpell = getEnemyRandomSpell(attackingEnemy);
+            Spell enemyChosenSpell = null;
+            String chosenSpellName = "";
 
+            if(attackingEnemy.getEnemyName().getEnemyCombat() == EnemyCombat.SPELL) {
+                enemyChosenSpell = getEnemyRandomSpell(attackingEnemy);
+                chosenSpellName = attackingEnemy.returnChosenSpellName(enemyChosenSpell);
+            }
+            else if(attackingEnemy.getEnemyName().getEnemyCombat() == EnemyCombat.MELEE) {
+                chosenSpellName = "Melee Attack";
+            }
 
-            String chosenSpellName = attackingEnemy.returnChosenSpellName(enemyChosenSpell);
             notifyEnemyChosenSpell(chosenSpellName, attackingEnemy);
 
             // =-------------------------------=
@@ -80,10 +88,28 @@ public class LevelFunctions {
     }
 
     public static void wizardDodgeOrParry(Enemy attackingEnemy, Spell enemyChosenSpell, MoveType wizardMoveType) {
-        double enemyCalculatedDamage = attackingEnemy.returnEnemyCalculatedDamage(enemyChosenSpell);
         double spellSuccess = Math.random();
-        boolean dodgeSuccess = spellSuccess <= wizard.returnDodgeChance(attackingEnemy, enemyChosenSpell);
-        boolean parrySuccess = wizard.returnParryChance() > enemyCalculatedDamage;
+
+
+        double enemyCalculatedDamage = 0;
+        boolean dodgeSuccess = false;
+        boolean parrySuccess = false;
+
+        if(attackingEnemy.getEnemyName().getEnemyCombat() == EnemyCombat.SPELL) {
+            enemyCalculatedDamage = attackingEnemy.returnEnemyCalculatedDamage(enemyChosenSpell);
+            double dodgeChance = attackingEnemy.returnSpellChance(enemyChosenSpell);
+
+            dodgeSuccess = spellSuccess <= wizard.returnDodgeChance(attackingEnemy, dodgeChance);
+            parrySuccess = wizard.returnParryChance() > enemyCalculatedDamage;
+        }
+        else if(attackingEnemy.getEnemyName().getEnemyCombat() == EnemyCombat.MELEE) {
+            enemyCalculatedDamage = attackingEnemy.getEnemyName().getEnemyCombat().getCombatDamage();
+            double dodgeChance = attackingEnemy.getEnemyName().getEnemyCombat().getCombatChance();
+
+            dodgeSuccess = spellSuccess <= wizard.returnDodgeChance(attackingEnemy, dodgeChance);
+            parrySuccess = wizard.returnParryChance() > enemyCalculatedDamage;
+        }
+
 
         // EXECUTE ACTION BASED ON PLAYER'S CHOICE
         String attackName = attackingEnemy.returnAttackName(enemyChosenSpell);
@@ -193,7 +219,8 @@ public class LevelFunctions {
 
             // GET PARRY AND DODGE SUCCESS
             double spellSuccess = Math.random();
-            boolean dodgeSuccess = spellSuccess <= enemyVictim.returnDodgeChance(wizard, wizardChosenSpell);
+            double dodgeChance = wizard.returnSpellChance(wizardChosenSpell);
+            boolean dodgeSuccess = spellSuccess <= enemyVictim.returnDodgeChance(wizard, dodgeChance);
             boolean parrySuccess = enemyVictim.returnParryChance() > wizardCalculatedDamage;
 
             // EXECUTE ACTION BASED ON RANDOM CHOICE

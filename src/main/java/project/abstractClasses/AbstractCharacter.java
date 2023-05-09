@@ -602,9 +602,7 @@ public abstract class AbstractCharacter {
         }
     }
 
-    public double returnDodgeChance(AbstractCharacter attackingCharacter, Spell attackingSpell) {
-        double dodgeChance = attackingCharacter.returnSpellChance(attackingSpell);
-
+    public double returnDodgeChance(AbstractCharacter attackingCharacter, double dodgeChance) {
 
         if (this.getClass() == Wizard.class) {
             if(((Enemy) attackingCharacter).getEnemyName().getEnemyCombat() == EnemyCombat.MELEE) {

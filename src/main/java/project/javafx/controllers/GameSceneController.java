@@ -26,9 +26,7 @@ import javafx.util.Duration;
 import project.classes.*;
 import project.enums.EnemyName;
 import project.enums.MoveType;
-import project.functions.ConsoleFunctions;
 import project.javafx.GuiMain;
-import project.javafx.functions.JavaFxFunctions;
 
 import java.net.URL;
 import java.util.*;
@@ -37,7 +35,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static project.classes.Enemy.*;
 import static project.classes.Wizard.wizard;
 import static project.enums.EnumMethods.returnFormattedEnum;
-import static project.functions.ConsoleFunctions.printTitle;
 import static project.functions.ConsoleFunctions.returnLineSeparator;
 import static project.functions.LevelFunctions.*;
 import static project.javafx.controllers.GameMenuController.gameMenuScene;
@@ -121,7 +118,7 @@ public class GameSceneController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         // TESTS TO DELETE AFTERWARDS
-        generateEnemies(10, 10, 14, EnemyName.VOLDEMORT);
+        generateEnemies(10, 10, 1, EnemyName.VOLDEMORT);
         try {
             wizard.setPotionList(Arrays.asList(Potion.highDefensePotion.clone(), Potion.highDamagePotion.clone(), Potion.highDamagePotion.clone(), Potion.highDamagePotion.clone(), Potion.highHealthPotion.clone(), Potion.highHealthPotion.clone(), Potion.highHealthPotion.clone()));
         } catch (CloneNotSupportedException e) {
@@ -168,7 +165,7 @@ public class GameSceneController implements Initializable {
 
         wizard.drinkPotion(potion);
 
-        updateConsoleTa();
+        updateConsoleT();
         displayPlayerStats();
         displayPlayerPotionsGridPane();
     }
@@ -177,7 +174,7 @@ public class GameSceneController implements Initializable {
         consoleT.setText("");
     }
 
-    private void updateConsoleTa() {
+    private void updateConsoleT() {
         String previousText = consoleT.getText();
 
         if (previousText.length() > 0) {
@@ -198,7 +195,8 @@ public class GameSceneController implements Initializable {
 
     @FXML
     private void dodgeOnClick(ActionEvent event) {
-        defineSuccessActionCircle(wizard.returnDodgeChance(attackingEnemy, enemyChosenSpell));
+        double dodgeChance = attackingEnemy.returnSpellChance(enemyChosenSpell);
+        defineSuccessActionCircle(wizard.returnDodgeChance(attackingEnemy, dodgeChance));
         actionButtonOnClick(event);
     }
 
@@ -254,19 +252,28 @@ public class GameSceneController implements Initializable {
 
             actionCircleTimeline.stop();
 
-            // these are useless anyway because the whole grid pane is reloaded
-//            deselectAllSubGridPanes(combatGridPane, "enemyCombatGridPane");
-//            deselectAllSubGridPanes(playerAvailableSpellsGrid);
+            displayCharacters();
+            displayPlayerStats();
 
+            if(!enemiesHashMap.isEmpty()) {
+                try {
+                    List<Object> enemyObjectsList = returnSelectedNodes(gameSceneMainAnchorPane, "enemyCombatGridPane", "clickableNodePressed");
+                    Enemy enemyVictim = enemiesHashMap.get((String) enemyObjectsList.get(0));
 
+                    displayEnemyStats(enemiesHashMap.get(enemyVictim.getName()));
+                    selectSubGridPane(enemyCombatGridPane, enemyVictim.getName());
+                } catch (Exception e) {
+                    displayEnemyStats(enemiesHashMap.get(enemiesKeyList.get(0)));
+                    selectSubGridPane(enemyCombatGridPane, enemiesHashMap.get(enemiesKeyList.get(0)).getName());
+                }
+            }
+            else {
 
-//            disableAllGridPaneButtons(actionsGridPane);
+                createPopup(event, Alert.AlertType.INFORMATION, "You won the battle! Congratulations!");
+            }
 
-//            disableAllGridPaneButtons(playerAvailableSpellsGrid);
-//            disableAllGridPaneButtons(combatGridPane, "enemyCombatGridPane");
+            updateConsoleT();
         }
-
-//        disableAllGridPaneButtons(playerAvailableSpellsGrid);
     }
 
     private void parryBtnOnClick(boolean actionSucceeded) {
@@ -304,21 +311,7 @@ public class GameSceneController implements Initializable {
 
         wizardCombatSystem(wizardChosenSpell, enemyVictim, actionSucceeded, isVulnerableSpell);
 
-        // but I'm kinda lazy right now so this should do for now
-        displayCharacters();
-        displayPlayerStats();
-
-
         if(enemiesHashMap.size() > 0) {
-            try {
-                displayEnemyStats(enemiesHashMap.get(enemyVictim.getName()));
-                selectSubGridPane(enemyCombatGridPane, enemyVictim.getName());
-            }
-            catch(Exception e) {
-                displayEnemyStats(enemiesHashMap.get(enemiesKeyList.get(0)));
-                selectSubGridPane(enemyCombatGridPane, enemiesHashMap.get(enemiesKeyList.get(0)).getName());
-            }
-
             displayPlayerSpellsGrid();
             disableAllGridPaneButtons(playerAvailableSpellsGrid);
             disableAllGridPaneButtons(combatGridPane, "enemyCombatGridPane");
@@ -326,16 +319,14 @@ public class GameSceneController implements Initializable {
             enemyTurn();
         }
         else {
-            System.out.println("all enemies died");
             isEnemySelected = false;
         }
-
-        updateConsoleTa();
     }
 
     private void enemyTurn() {
         attackingEnemy = getRandomEnemy();
         enemyChosenSpell = getEnemyRandomSpell(attackingEnemy);
+        enemyCalculatedDamage = attackingEnemy.returnEnemyCalculatedDamage(enemyChosenSpell);
 
 
         String chosenSpellName = attackingEnemy.returnChosenSpellName(enemyChosenSpell);
@@ -353,13 +344,11 @@ public class GameSceneController implements Initializable {
 
         dodgeSuccess = parrySuccess = actionSucceeded;
 
-        enemyCalculatedDamage = attackingEnemy.returnEnemyCalculatedDamage(enemyChosenSpell);
-
         String attackName = attackingEnemy.returnAttackName(enemyChosenSpell);
 
         boolean wizardDodgeOrParrySuccess = isWizardDodgeOrParrySuccess(attackingEnemy, enemyCalculatedDamage, attackName, wizardMoveType, dodgeSuccess, parrySuccess);
         enemyAttack(wizardDodgeOrParrySuccess, enemyCalculatedDamage, attackingEnemy, enemyChosenSpell);
-        updateConsoleTa();
+        updateConsoleT();
 
         disableAllGridPaneButtons(actionsGridPane);
 //        enableGridPaneButton(actionsGridPane, attackBtn);

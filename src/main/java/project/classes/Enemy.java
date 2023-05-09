@@ -328,7 +328,7 @@ public class Enemy extends AbstractCharacter {
         // CHOOSE A RANDOM SPELL FROM THE ENEMY'S SPELL LIST
         MoveType attackMoveType = MoveType.ATTACK;
 
-        int randomEnemySpellIndex = (int) GeneralFunctions.generateDoubleBetween(0, attackingEnemy.returnTypedSpellsList(attackMoveType).size() - 1);
+        int randomEnemySpellIndex = (int) GeneralFunctions.generateDoubleBetween(0, attackingEnemy.returnTypedSpellsList(attackMoveType).size());
         return attackingEnemy.returnTypedSpellsFromInt(attackMoveType, randomEnemySpellIndex);
     }
 
