@@ -6,6 +6,7 @@ import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Bounds;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
@@ -32,6 +33,7 @@ import java.io.IOException;
 import java.util.*;
 
 import static project.enums.EnumMethods.returnFormattedEnum;
+import static project.functions.GeneralFunctions.chooseRandomDouble;
 import static project.functions.GeneralFunctions.returnFileAttribute;
 import static project.functions.SaveFunctions.createWizardInstance;
 
@@ -41,6 +43,7 @@ public class JavaFxFunctions {
         Scene scene = getScene(FXMLLoader);
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
 
+        stage.setResizable(false);
         stage.setScene(scene);
         stage.show();
     }
@@ -48,6 +51,7 @@ public class JavaFxFunctions {
     public static void sendToScene(Stage stage, FXMLLoader FXMLLoader) {
         Scene scene = getScene(FXMLLoader);
 
+        stage.setResizable(false);
         stage.setScene(scene);
         stage.show();
     }
@@ -124,11 +128,12 @@ public class JavaFxFunctions {
         return saveInfoGridPane;
     }
 
-    public static ImageView returnObjectImageView(String objectName, double height, double width) {
+    public static ImageView returnObjectImageView(String objectName, double height, double width, double opacity) {
         Image spellImage = returnObjectImage(objectName);
         ImageView spellImageView = new ImageView(spellImage);
         spellImageView.setFitHeight(height);
         spellImageView.setFitWidth(width);
+        spellImageView.setOpacity(opacity);
 
 
         return spellImageView;
@@ -211,7 +216,7 @@ public class JavaFxFunctions {
             characterNameString = characterName = returnFormattedEnum(((Enemy) abstractCharacter).getEnemyName());
         }
 
-        ImageView characterImageView = returnObjectImageView(characterName, 50, 50);
+        ImageView characterImageView = returnObjectImageView(characterName, 50, 50, 1);
 
         Text characterNameText = new Text(characterNameString);
         characterNameText.setWrappingWidth(100);
@@ -351,7 +356,10 @@ public class JavaFxFunctions {
     }
 
     public static Node returnChildNodeById(GridPane parentGridPane, String childGridPaneFxId) {
-        return parentGridPane.lookup("#" + childGridPaneFxId);
+        return parentGridPane.getChildren().stream().filter(node -> node.getId().equals(childGridPaneFxId))
+                .map(node -> (GridPane) node)
+                .findFirst()
+                .orElse(null);
     }
 
 
@@ -382,33 +390,166 @@ public class JavaFxFunctions {
         nodeTimeline.setOnFinished(event -> onFinishedFunc.run());
     }
 
-    public static void translationEffect(Node attackedNode, ImageView imageViewNode, double startX, double startY, double endX, double endY, Runnable onFinishedFunc) {
-        double timeStamp = 1;
+    public static void animateAttack(GridPane mainGridPane, Node attackingNode, Node attackedNode,
+                                     String imgName, int imgHeight, int imgWidth, int imgColumn, int imgRow,
+                                     boolean isTranslated, Runnable beforeFinishRunnable, double beforeFinishTimeStampPercent,
+                                     Runnable onFinishedFunc) {
+        ImageView imageView = returnObjectImageView(imgName, imgHeight, imgWidth, 1);
+        mainGridPane.add(imageView, imgColumn, imgRow);
+
+        Bounds startingBounds = attackingNode.localToScene(attackingNode.getBoundsInLocal());
+        Bounds endingBounds = attackedNode.localToScene(attackedNode.getBoundsInLocal());
+
+        double boundsXDiff = endingBounds.getCenterX() - startingBounds.getCenterX();
+        double boundsYDiff = endingBounds.getCenterY() - startingBounds.getCenterY();
+
+        Timeline nodeTimelineX = translationEffect(isTranslated, imageView, boundsXDiff, boundsYDiff,
+                1, beforeFinishRunnable, beforeFinishTimeStampPercent,
+                1, false);
+
+        nodeTimelineX.setOnFinished(event -> {
+            onFinishedFunc.run();
+            mainGridPane.getChildren().remove(imageView);
+        });
+    }
+
+    @NotNull
+    public static Timeline translationEffect(boolean isTranslated, Node node,
+                                             double boundsXDiff, double boundsYDiff,
+                                             double timeStamp, Runnable beforeFinishRunnable, double beforeFinishTimeStampPercent,
+                                             int cycleCount, boolean autoReverse) {
 
         Timeline nodeTimelineX = new Timeline();
         Timeline nodeTimelineY = new Timeline();
 
-        KeyValue nodeKeyValueX = new KeyValue(imageViewNode.translateXProperty(), endX - startX, Interpolator.EASE_IN);
-        KeyValue nodeKeyValueY = new KeyValue(imageViewNode.translateYProperty(), endY - startY, Interpolator.EASE_IN);
+        KeyFrame nodeKeyFrameX = new KeyFrame(Duration.seconds(timeStamp * beforeFinishTimeStampPercent), event -> beforeFinishRunnable.run());
 
-        KeyFrame nodeKeyFrameX = new KeyFrame(Duration.seconds(timeStamp), nodeKeyValueX);
-        KeyFrame nodeKeyFrameY = new KeyFrame(Duration.seconds(timeStamp), nodeKeyValueY);
+        KeyValue nodeKeyValueX2 = new KeyValue(node.translateXProperty(), boundsXDiff, Interpolator.EASE_IN);
+        KeyFrame nodeKeyFrameX2 = new KeyFrame(Duration.seconds(timeStamp), nodeKeyValueX2);
 
-        nodeTimelineX.getKeyFrames().add(nodeKeyFrameX);
-        nodeTimelineY.getKeyFrames().add(nodeKeyFrameY);
-        nodeTimelineX.setCycleCount(1);
-        nodeTimelineY.setCycleCount(1);
+        nodeTimelineX.getKeyFrames().addAll(nodeKeyFrameX, nodeKeyFrameX2);
+
+        if(isTranslated) {
+            double endY = chooseRandomDouble(new double[]{-1, 1});
+            double power = 0.006;
+
+            for (int x = 0; x < Math.abs(boundsXDiff); x++) {
+                double y = endY * Math.exp(x * power);
+                KeyValue nodeKeyValueY = new KeyValue(node.translateYProperty(), y, Interpolator.EASE_IN);
+                KeyFrame nodeKeyFrameY = new KeyFrame(Duration.seconds((timeStamp / Math.abs(boundsXDiff)) * x), nodeKeyValueY);
+
+                nodeTimelineY.getKeyFrames().add(nodeKeyFrameY);
+            }
+
+        }
+        else {
+            KeyValue nodeKeyValueY = new KeyValue(node.translateYProperty(), boundsYDiff, Interpolator.EASE_IN);
+            KeyFrame nodeKeyFrameY = new KeyFrame(Duration.seconds(timeStamp), nodeKeyValueY);
+            nodeTimelineY.getKeyFrames().add(nodeKeyFrameY);
+        }
+
+
+
+
+        nodeTimelineX.setCycleCount(cycleCount);
+        nodeTimelineY.setCycleCount(cycleCount);
+
+        nodeTimelineX.setAutoReverse(autoReverse);
+        nodeTimelineY.setAutoReverse(autoReverse);
 
         Thread threadX = new Thread(nodeTimelineX::play);
         Thread threadY = new Thread(nodeTimelineY::play);
 
         threadX.start();
         threadY.start();
+        return nodeTimelineX;
+    }
 
-        nodeTimelineX.setOnFinished(event -> {
-            shakeEffect(attackedNode, onFinishedFunc);
-            ((GridPane) imageViewNode.getParent()).getChildren().remove(imageViewNode);
-        });
+    public static void parryAnimation(boolean attackerAttackSucceeded, GridPane attackingCharacterParentGridPane,
+                                GridPane attackingCharacterGridPane, GridPane attackedCharacterGridPane,
+                                GridPane attackedCharacterParentGridPane, Runnable onEndFunc) {
+
+        ImageView shield = returnObjectImageView("shield", 100,220, 0.2);
+
+        animateAttack(attackingCharacterParentGridPane,
+                attackingCharacterGridPane,
+                attackedCharacterGridPane,
+                "fire",
+                100,
+                100,
+                GridPane.getColumnIndex(attackingCharacterGridPane),
+                GridPane.getRowIndex(attackingCharacterGridPane),
+                !attackerAttackSucceeded,
+                () -> {
+                    if(attackerAttackSucceeded) {
+                        int columnIndex = GridPane.getColumnIndex(attackedCharacterGridPane);
+                        int rowIndex = GridPane.getRowIndex(attackedCharacterGridPane);
+
+                        attackedCharacterParentGridPane.add(shield, columnIndex, rowIndex);
+                    }
+                },
+                0.1,
+                () -> {
+                    if(attackerAttackSucceeded) animateAttack(attackedCharacterParentGridPane,
+                            attackedCharacterGridPane,
+                            attackingCharacterGridPane,
+                            "fire",
+                            100,
+                            100,
+                            GridPane.getColumnIndex(attackedCharacterGridPane),
+                            GridPane.getRowIndex(attackedCharacterGridPane),
+                            false,
+                            () -> {},
+                            0.1,
+                            () -> {
+                                shakeEffect(attackingCharacterGridPane, onEndFunc);
+                                attackedCharacterParentGridPane.getChildren().remove(shield);
+                            }
+                    );
+                });
+    }
+
+    public static void dodgeAnimation(boolean attackerAttackSucceeded, GridPane attackingCharacterParentGridPane,
+                                      GridPane attackingCharacterGridPane, GridPane attackedCharacterGridPane) {
+        animateAttack(attackingCharacterParentGridPane,
+                attackingCharacterGridPane,
+                attackedCharacterGridPane,
+                "fire",
+                100,
+                100,
+                GridPane.getColumnIndex(attackingCharacterGridPane),
+                GridPane.getRowIndex(attackingCharacterGridPane),
+                !attackerAttackSucceeded,
+                () -> {
+                    double randomDodge = chooseRandomDouble(new double[]{-1, 1});
+
+                    if(attackerAttackSucceeded) {
+                        translationEffect(false, attackedCharacterGridPane, 100, randomDodge * 200,
+                                1, () -> {}, 0,
+                                2, true);
+                    }
+                },
+                0.1,
+                () ->{});
+    }
+
+    public static void attackAnimation(boolean attackingCharacterSucceeded, GridPane attackingCharacterParentGridPane,
+                                 GridPane attackingCharacterGridPane, GridPane attackedCharacterGridPane,
+                                 Runnable onEndFunc) {
+        animateAttack(attackingCharacterParentGridPane,
+                attackingCharacterGridPane,
+                attackedCharacterGridPane,
+                "fire",
+                100,
+                100,
+                GridPane.getColumnIndex(attackingCharacterGridPane),
+                GridPane.getRowIndex(attackingCharacterGridPane),
+                !attackingCharacterSucceeded,
+                () -> {},
+                0,
+                () -> {
+                    if(attackingCharacterSucceeded) shakeEffect(attackedCharacterGridPane, onEndFunc);
+                });
     }
 
 

@@ -40,7 +40,6 @@ import static project.functions.LevelFunctions.*;
 import static project.javafx.controllers.GameMenuController.gameMenuScene;
 import static project.javafx.functions.JavaFxFunctions.*;
 
-// TODO - USE applyPotionEffect() before the player's turn
 
 public class GameSceneController implements Initializable {
     private static final Text consoleTStatic = new Text();
@@ -117,12 +116,24 @@ public class GameSceneController implements Initializable {
     @FXML
     private Circle successActionCircle;
 
-    public static void gameScene(ActionEvent event, Level l) {
+    public static void gameScene(ActionEvent event, Level levelParam) {
         Enemy.clearEnemies();
-        l.getEnemyNameList().forEach(enemyName ->
-                generateEnemies(l.getEnemyMinLevel(), l.getEnemyMaxLevel(), l.getEnemyAmount(), enemyName));
-        combatTimeout = l.getCombatTimeout();
-        level = l;
+        levelParam.getEnemyNameList().forEach(enemyName ->
+                generateEnemies(levelParam.getEnemyMinLevel(), levelParam.getEnemyMaxLevel(), levelParam.getEnemyAmount(), enemyName));
+        combatTimeout = levelParam.getCombatTimeout();
+        level = levelParam;
+
+        gameSceneStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+
+        FXMLLoader gameSceneFxmlLoader = new FXMLLoader(GuiMain.class.getResource("GameScene.fxml"));
+        sendToScene(event, gameSceneFxmlLoader);
+    }
+
+    public static void gameScene(ActionEvent event, int enemyMinLevel, int enemyMaxLevel, int enemyAmount, Level levelParam) {
+        Enemy.clearEnemies();
+        generateEnemies(enemyMinLevel,  enemyMaxLevel, enemyAmount);
+        combatTimeout = levelParam.getCombatTimeout();
+        level = levelParam;
 
         gameSceneStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
 
@@ -176,7 +187,7 @@ public class GameSceneController implements Initializable {
 
 
         Text attackText = new Text(spellName);
-        ImageView spellIcon = returnObjectImageView(spellName, 30, 30);
+        ImageView spellIcon = returnObjectImageView(spellName, 30, 30, 1);
 
         attackText.getStyleClass().add("simpleEnabledNode");
 
@@ -346,7 +357,7 @@ public class GameSceneController implements Initializable {
 
             if (enemiesHashMap.isEmpty()) {
                 wizardWon();
-            } else if (wizard.isDead()) {
+            } else if (wizard.checkIfDead()) {
                 wizardLost();
             }
         }
@@ -385,12 +396,12 @@ public class GameSceneController implements Initializable {
     }
 
     private void parryBtnOnClick(boolean actionSucceeded) {
-        wizardDodgeOrParry(attackingEnemy, enemyChosenSpell, MoveType.PARRY, actionSucceeded);
+        wizardDodgeOrParry(attackingEnemy, enemyChosenSpell, MoveType.PARRY, false, actionSucceeded);
 
     }
 
     private void dodgeBtnOnClick(boolean actionSucceeded) {
-        wizardDodgeOrParry(attackingEnemy, enemyChosenSpell, MoveType.DODGE, actionSucceeded);
+        wizardDodgeOrParry(attackingEnemy, enemyChosenSpell, MoveType.DODGE, actionSucceeded, false);
 
     }
 
@@ -412,20 +423,32 @@ public class GameSceneController implements Initializable {
         // ACTIVATE POTIONS ----------------- MIGHT HAVE TO REMOVE THIS AND MOVE IT TO A MORE GENERAL FUNCTION LATER
         Wizard.wizard.applyPotionEffect();
 
-        // WARN THE PLAYER ABOUT ENEMY CHANGES ----------------- MIGHT HAVE TO REMOVE THIS AND MOVE IT TO A MORE GENERAL FUNCTION LATER
-        Enemy.checkEnemiesHpRatio();
-
+        enemyVictim.updateBossVulnerableSpellsList();
         boolean isVulnerableSpell = enemyVictim.vulnerabilityChecker(enemyVictim.getEnemyName().getEnemyHpLimitRatio(), wizardChosenSpell);
 
-        wizardCombatSystem(wizardChosenSpell, enemyVictim, actionSucceeded, isVulnerableSpell);
+        // CALCULATE THE SPELL DAMAGE BASED ON OTHER BUFFS
+        double wizardCalculatedDamage = wizard.returnSpellCalculatedDamage(wizardChosenSpell, enemyVictim);
 
-        if (isVulnerableSpell && actionSucceeded) {
-            ImageView spellEffectImageView = returnObjectImageView("fire", 100, 100);
-            combatGridPane.add(spellEffectImageView, 0, 0);
-            Bounds anchorPoint = playerGridPane.localToScene(playerGridPane.getBoundsInLocal());
-            Bounds anchorPoint2 = enemyGridPane.localToScene(enemyGridPane.getBoundsInLocal());
+        // GET PARRY AND DODGE SUCCESS
+        double spellSuccess = Math.random();
+        double dodgeChance = wizard.returnSpellChance(wizardChosenSpell);
+        boolean enemyDodgeSuccess = spellSuccess <= enemyVictim.returnDodgeChance(wizard, dodgeChance);
+        boolean enemyParrySuccess = enemyVictim.returnParryChance() > wizardCalculatedDamage;
 
-            translationEffect(enemyGridPane, spellEffectImageView, anchorPoint.getMinX(), anchorPoint.getMinY(), anchorPoint2.getMinX(), anchorPoint2.getMinY(), () -> refreshEnemiesGridPane(enemyGridPane));
+        wizardCombatSystem(wizardChosenSpell, enemyVictim, actionSucceeded, isVulnerableSpell, enemyDodgeSuccess, enemyParrySuccess, wizardCalculatedDamage);
+
+        if (isVulnerableSpell && !enemyDodgeSuccess && !enemyParrySuccess) {
+            attackAnimation(actionSucceeded, playerCombatGridPane,
+                    playerGridPane, enemyGridPane,
+                    () -> refreshEnemiesGridPane(enemyGridPane));
+        }
+        else if(enemyDodgeSuccess) {
+            dodgeAnimation(actionSucceeded, playerCombatGridPane, playerGridPane, enemyGridPane);
+        }
+        else if(enemyParrySuccess) {
+            parryAnimation(actionSucceeded, playerCombatGridPane,
+                    playerGridPane, enemyGridPane, enemyCombatGridPane,
+                    () -> refreshPlayerGridPane(playerGridPane));
         }
 
         displayPlayerPotionsGridPane();
@@ -448,12 +471,13 @@ public class GameSceneController implements Initializable {
 
         if (attackingEnemy.getEnemyName().getEnemyCombat() == EnemyCombat.SPELL) {
             enemyChosenSpell = getEnemyRandomSpell(attackingEnemy);
-            enemyCalculatedDamage = attackingEnemy.returnEnemyCalculatedDamage(enemyChosenSpell);
+            enemyCalculatedDamage = attackingEnemy.returnSpellCalculatedDamage(enemyChosenSpell, wizard);
             chosenSpellName = attackingEnemy.returnChosenSpellName(enemyChosenSpell);
             dodgeChance = attackingEnemy.returnSpellChance(enemyChosenSpell);
 
         } else if (attackingEnemy.getEnemyName().getEnemyCombat() == EnemyCombat.MELEE) {
             chosenSpellName = "Melee Attack";
+            enemyCalculatedDamage = attackingEnemy.returnMeleeCalculatedDamage(wizard);
             dodgeChance = attackingEnemy.getEnemyName().getEnemyCombat().getCombatChance();
         }
 
@@ -467,20 +491,32 @@ public class GameSceneController implements Initializable {
         checkCombatTimeout();
     }
 
-    public void wizardDodgeOrParry(Enemy attackingEnemy, Spell enemyChosenSpell, MoveType wizardMoveType, boolean actionSucceeded) {
-        boolean dodgeSuccess;
-        boolean parrySuccess;
-
-        dodgeSuccess = parrySuccess = actionSucceeded;
-
+    public void wizardDodgeOrParry(Enemy attackingEnemy, Spell enemyChosenSpell, MoveType wizardMoveType, boolean dodgeSuccess, boolean parrySuccess) {
         String attackName = attackingEnemy.returnAttackName(enemyChosenSpell);
 
-        boolean wizardDodgeOrParrySuccess = isWizardDodgeOrParrySuccess(attackingEnemy, enemyCalculatedDamage, attackName, wizardMoveType, dodgeSuccess, parrySuccess);
-        enemyAttack(wizardDodgeOrParrySuccess, enemyCalculatedDamage, attackingEnemy, enemyChosenSpell);
+        boolean enemyAttackSucceeded = isAttackSucceeded(attackingEnemy, enemyChosenSpell);
+        boolean wizardDodgeOrParrySuccess = isWizardDodgeOrParrySuccess(attackingEnemy, enemyCalculatedDamage, attackName, wizardMoveType, dodgeSuccess, parrySuccess, enemyAttackSucceeded);
 
-        if (!wizardDodgeOrParrySuccess) {
-            shakeEffect(playerGridPane, () -> refreshPlayerGridPane(playerGridPane));
+        enemyAttack(enemyAttackSucceeded, wizardDodgeOrParrySuccess, enemyCalculatedDamage, attackingEnemy, enemyChosenSpell);
+        GridPane enemyGridPane = (GridPane) returnChildNodeById(enemyCombatGridPane, attackingEnemy.getName());
+
+        if(!wizardDodgeOrParrySuccess) {
+            attackAnimation(enemyAttackSucceeded, enemyCombatGridPane,
+                    enemyGridPane, playerGridPane, () -> refreshPlayerGridPane(playerGridPane));
         }
+        else if(dodgeSuccess) {
+            dodgeAnimation(enemyAttackSucceeded, enemyCombatGridPane,
+                    enemyGridPane, playerGridPane);
+        }
+        else if(parrySuccess) {
+            parryAnimation(enemyAttackSucceeded, enemyCombatGridPane,
+                    enemyGridPane, playerGridPane, playerCombatGridPane,
+                    () -> refreshEnemiesGridPane(enemyGridPane));
+        }
+
+        // WARN THE PLAYER ABOUT ENEMY CHANGES
+        Enemy.checkEnemiesHpRatio();
+        displayPlayerSpellsGrid();
 
         updateConsoleT();
 
@@ -488,7 +524,6 @@ public class GameSceneController implements Initializable {
         enableAllGridPaneButtons(playerAvailableSpellsGrid);
         enableAllGridPaneButtons(combatGridPane, "enemyCombatGridPane");
     }
-
     private void displayPlayerStats() {
         psNameT.setText(checkPlayerNameLength(wizard.getName(), 20));
 
@@ -516,30 +551,32 @@ public class GameSceneController implements Initializable {
     }
 
     private void updateDeathLine() {
-        List<EnemyName> enemyNameList = level.getEnemyNameList();
-        List<String> enemyDeathLineList = new ArrayList<>();
+        if(!level.getEnemyNameList().isEmpty()) {
+            List<EnemyName> enemyNameList = level.getEnemyNameList();
+            List<String> enemyDeathLineList = new ArrayList<>();
 
-        if (enemyNameList.size() > 1) {
-            StringBuilder deathLine = new StringBuilder();
-            enemyNameList.forEach(enemyName -> deathLine.append(enemyName.getEnemyDeathLine().get(0)).append("\n"));
-            enemyDeathLineList.add(deathLine.toString());
-        } else if (!enemyNameList.get(0).getEnemyDeathLine().isEmpty()) {
-            enemyDeathLineList.addAll(enemyNameList.get(0).getEnemyDeathLine());
-        }
-
-        boolean gryffindorHouse = wizard.getHouseName() == HouseName.GRYFFINDOR;
-        List<String> objectiveList = level.getObjectiveList();
-
-        if (enemyDeathLineList.size() > 1) {
-            if ((gryffindorHouse && objectiveList.size() > 1) || level.equals(Level.The_Order_of_the_Phoenix)) {
-                deathLine = enemyDeathLineList.get(1);
-            } else {
-                deathLine = enemyDeathLineList.get(0);
+            if (enemyNameList.size() > 1) {
+                StringBuilder deathLine = new StringBuilder();
+                enemyNameList.forEach(enemyName -> deathLine.append(enemyName.getEnemyDeathLine().get(0)).append("\n"));
+                enemyDeathLineList.add(deathLine.toString());
+            } else if (!enemyNameList.get(0).getEnemyDeathLine().isEmpty()) {
+                enemyDeathLineList.addAll(enemyNameList.get(0).getEnemyDeathLine());
             }
-        } else if (enemyDeathLineList.size() == 1) {
-            deathLine = enemyDeathLineList.get(0);
-        } else {
-            deathLine = "";
+
+            boolean gryffindorHouse = wizard.getHouseName() == HouseName.GRYFFINDOR;
+            List<String> objectiveList = level.getObjectiveList();
+
+            if (enemyDeathLineList.size() > 1) {
+                if ((gryffindorHouse && objectiveList.size() > 1) || level.equals(Level.The_Order_of_the_Phoenix)) {
+                    deathLine = enemyDeathLineList.get(1);
+                } else {
+                    deathLine = enemyDeathLineList.get(0);
+                }
+            } else if (enemyDeathLineList.size() == 1) {
+                deathLine = enemyDeathLineList.get(0);
+            } else {
+                deathLine = "";
+            }
         }
     }
 
@@ -566,7 +603,7 @@ public class GameSceneController implements Initializable {
             playerSpellInfoGridPane.getColumnConstraints().addAll(column1, column2);
 
             Text spellText = new Text(spellName);
-            ImageView spellIcon = returnObjectImageView(spellName, 30, 30);
+            ImageView spellIcon = returnObjectImageView(spellName, 30, 30, 1);
 
             playerSpellInfoGridPane.add(spellIcon, 0, 0);
             playerSpellInfoGridPane.add(spellText, 1, 0);
@@ -647,7 +684,7 @@ public class GameSceneController implements Initializable {
 
             formattedPotionName = formattedPotionName.substring(0, 1).toUpperCase() + formattedPotionName.substring(1);
 
-            ImageView potionIcon = returnObjectImageView(formattedPotionName, 45, 45);
+            ImageView potionIcon = returnObjectImageView(formattedPotionName, 45, 45, 1);
             Text potionText = new Text(potionName);
             potionText.getStyleClass().add("simpleEnabledNode");
 

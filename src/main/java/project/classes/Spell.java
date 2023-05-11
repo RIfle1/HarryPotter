@@ -31,7 +31,7 @@ public class Spell implements Cloneable{
     private int spellReadyIn;
     private String spellColor;
     final public static double maxDefenseReductionPercent = 0.2;
-    final public static double parryMultiplier = 0.3;
+    final public static double parryMultiplier = 1;
 
     public static Spell wingardiumLeviosa = Spell.builder()
             .spellName("Wingardium Leviosa")

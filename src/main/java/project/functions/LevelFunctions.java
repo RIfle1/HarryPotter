@@ -90,20 +90,19 @@ public class LevelFunctions {
     public static void wizardDodgeOrParry(Enemy attackingEnemy, Spell enemyChosenSpell, MoveType wizardMoveType) {
         double spellSuccess = Math.random();
 
-
         double enemyCalculatedDamage = 0;
         boolean dodgeSuccess = false;
         boolean parrySuccess = false;
 
         if(attackingEnemy.getEnemyName().getEnemyCombat() == EnemyCombat.SPELL) {
-            enemyCalculatedDamage = attackingEnemy.returnEnemyCalculatedDamage(enemyChosenSpell);
+            enemyCalculatedDamage = attackingEnemy.returnSpellCalculatedDamage(enemyChosenSpell, wizard);
             double dodgeChance = attackingEnemy.returnSpellChance(enemyChosenSpell);
 
             dodgeSuccess = spellSuccess <= wizard.returnDodgeChance(attackingEnemy, dodgeChance);
             parrySuccess = wizard.returnParryChance() > enemyCalculatedDamage;
         }
         else if(attackingEnemy.getEnemyName().getEnemyCombat() == EnemyCombat.MELEE) {
-            enemyCalculatedDamage = attackingEnemy.getEnemyName().getEnemyCombat().getCombatDamage();
+            enemyCalculatedDamage = attackingEnemy.returnMeleeCalculatedDamage(wizard);
             double dodgeChance = attackingEnemy.getEnemyName().getEnemyCombat().getCombatChance();
 
             dodgeSuccess = spellSuccess <= wizard.returnDodgeChance(attackingEnemy, dodgeChance);
@@ -114,39 +113,57 @@ public class LevelFunctions {
         // EXECUTE ACTION BASED ON PLAYER'S CHOICE
         String attackName = attackingEnemy.returnAttackName(enemyChosenSpell);
 
-        boolean wizardDodgeOrParrySuccess = isWizardDodgeOrParrySuccess(attackingEnemy, enemyCalculatedDamage, attackName, wizardMoveType, dodgeSuccess, parrySuccess);
-        enemyAttack(wizardDodgeOrParrySuccess, enemyCalculatedDamage, attackingEnemy, enemyChosenSpell);
+        boolean attackSucceeded = isAttackSucceeded(attackingEnemy, enemyChosenSpell);
+        boolean wizardDodgeOrParrySuccess = isWizardDodgeOrParrySuccess(attackingEnemy, enemyCalculatedDamage, attackName, wizardMoveType, dodgeSuccess, parrySuccess, attackSucceeded);
+
+        enemyAttack(attackSucceeded, wizardDodgeOrParrySuccess, enemyCalculatedDamage, attackingEnemy, enemyChosenSpell);
     }
 
-    public static boolean isWizardDodgeOrParrySuccess(Enemy attackingEnemy, double enemyCalculatedDamage, String attackName, MoveType wizardMoveType, boolean dodgeSuccess, boolean parrySuccess) {
+    public static boolean isWizardDodgeOrParrySuccess(Enemy attackingEnemy, double enemyCalculatedDamage,
+                                                      String attackName, MoveType wizardMoveType,
+                                                      boolean dodgeSuccess, boolean parrySuccess, boolean attackSucceeded) {
         boolean wizardDodgeOrParrySuccess = false;
-        if (wizardMoveType == MoveType.DODGE) {
-            wizardDodgeOrParrySuccess = wizard.dodge(dodgeSuccess, attackingEnemy);
-        } else if (wizardMoveType == MoveType.PARRY) {
-            wizardDodgeOrParrySuccess = wizard.parry(parrySuccess, attackName, attackingEnemy, enemyCalculatedDamage);
+        if(attackSucceeded) {
+            if (wizardMoveType == MoveType.DODGE) {
+                wizardDodgeOrParrySuccess = wizard.dodge(dodgeSuccess, attackingEnemy);
+            } else if (wizardMoveType == MoveType.PARRY) {
+                wizardDodgeOrParrySuccess = wizard.parry(parrySuccess, attackName, attackingEnemy, enemyCalculatedDamage);
+            }
         }
         return wizardDodgeOrParrySuccess;
     }
 
-    public static void enemyAttack(boolean wizardDodgeOrParrySuccess, double enemyCalculatedDamage, Enemy attackingEnemy, Spell enemyChosenSpell) {
+    public static void enemyAttack(boolean attackSucceeded, boolean wizardDodgeOrParrySuccess, double enemyCalculatedDamage, Enemy attackingEnemy, Spell enemyChosenSpell) {
         String spellSpecialAttackLine = "";
-        boolean attackSucceeded = false;
+//        boolean attackSucceeded = false;
         CharacterState characterState = null;
 
-        // IF DODGE OR PARRY FAILED, THE ENEMY WILL ATTACK
+        // IF DODGE OR PARRY FAILED AND THE ENEMY DIDN'T MISS THEIR SHOT
         if(!wizardDodgeOrParrySuccess) {
             if(attackingEnemy.getEnemyName().getEnemyCombat() == EnemyCombat.SPELL) {
-                attackSucceeded = Math.random() <= enemyChosenSpell.getSpellChance();
+//                attackSucceeded = Math.random() <= enemyChosenSpell.getSpellChance();
                 spellSpecialAttackLine = returnColoredText(enemyChosenSpell.getSpellSpecialAttackLine(), ANSI_PURPLE);
                 characterState = enemyChosenSpell.getCharacterState();
             }
             else if(attackingEnemy.getEnemyName().getEnemyCombat() == EnemyCombat.MELEE) {
-                attackSucceeded = Math.random() <= attackingEnemy.getEnemyName().getEnemyCombat().getCombatChance();
+//                attackSucceeded = Math.random() <= attackingEnemy.getEnemyName().getEnemyCombat().getCombatChance();
                 spellSpecialAttackLine = returnColoredText(returnFormattedEnum(attackingEnemy.getEnemyName()) + " melee attack!", ANSI_RED);
                 characterState = CharacterState.STANDING;
             }
             attackingEnemy.castAttack(attackSucceeded, characterState, wizard, enemyCalculatedDamage, spellSpecialAttackLine);
         }
+
+    }
+
+    public static boolean isAttackSucceeded(Enemy attackingEnemy, Spell enemyChosenSpell) {
+        boolean attackSucceeded = false;
+        if(attackingEnemy.getEnemyName().getEnemyCombat() == EnemyCombat.SPELL) {
+            attackSucceeded = Math.random() <= enemyChosenSpell.getSpellChance();
+        }
+        else if(attackingEnemy.getEnemyName().getEnemyCombat() == EnemyCombat.MELEE) {
+            attackSucceeded = Math.random() <= attackingEnemy.getEnemyName().getEnemyCombat().getCombatChance();
+        }
+        return attackSucceeded;
     }
 
     private static void wizardTurn() {
@@ -194,22 +211,32 @@ public class LevelFunctions {
         // CHECK IF ENEMY IS A BOSS AND HIS HP LIMIT HAS BEEN REACHED AND RETURN IF CHOSEN SPELL CAN AFFECT THE ENEMY OR NOT
         boolean isVulnerableSpell = enemyVictim.vulnerabilityChecker(enemyVictim.getEnemyName().getEnemyHpLimitRatio(), wizardChosenSpell);
 
-        wizardCombatSystem(wizardChosenSpell, enemyVictim, attackSucceeded, isVulnerableSpell);
+        // CALCULATE THE SPELL DAMAGE BASED ON OTHER BUFFS
+        double wizardCalculatedDamage = wizard.returnSpellCalculatedDamage(wizardChosenSpell, enemyVictim);
+
+        // GET PARRY AND DODGE SUCCESS
+        double spellSuccess = Math.random();
+        double dodgeChance = wizard.returnSpellChance(wizardChosenSpell);
+        boolean dodgeSuccess = spellSuccess <= enemyVictim.returnDodgeChance(wizard, dodgeChance);
+        boolean parrySuccess = enemyVictim.returnParryChance() > wizardCalculatedDamage;
+
+        wizardCombatSystem(wizardChosenSpell, enemyVictim, attackSucceeded, isVulnerableSpell, dodgeSuccess, parrySuccess, wizardCalculatedDamage);
         ConsoleFunctions.continuePromptExtra();
     }
 
     // CONSOLE AND GUI FUNCTION
-    public static void wizardCombatSystem(Spell wizardChosenSpell, Enemy enemyVictim, boolean attackSucceeded, boolean isVulnerableSpell) {
+    public static void wizardCombatSystem(Spell wizardChosenSpell, Enemy enemyVictim,
+                                          boolean attackSucceeded, boolean isVulnerableSpell,
+                                          boolean enemyDodgeSuccess, boolean enemyParrySuccess,
+                                          double wizardCalculatedDamage) {
         MoveType enemyMoveType;
-        double wizardCalculatedDamage;
         // INITIALIZE VARIABLE
         boolean enemyDodgeOrParrySuccess = false;
 
         // CREATE A LIST OF MOVE TYPES THAT THE ENEMY CAN USE
         List<String> moveTypeList = MoveType.returnMoveTypeListExcept(new ArrayList<>(Arrays.asList(MoveType.ATTACK, MoveType.FOLLOW_UP)));
 
-        // CALCULATE THE SPELL DAMAGE BASED ON OTHER BUFFS AND THEN ATTACK THE CHOSEN ENEMY
-        wizardCalculatedDamage = wizard.returnSpellCalculatedDamage(wizardChosenSpell, enemyVictim);
+        // GENERATE A RANDOM MOVE TYPE
         int generateRandomMoveType = (int) GeneralFunctions.generateDoubleBetween(0, moveTypeList.size() - 1);
 
         String spellName = wizardChosenSpell.getSpellName();
@@ -224,17 +251,12 @@ public class LevelFunctions {
             // ENEMY RANDOM MOVE TYPE
             enemyMoveType = MoveType.setMoveType(moveTypeList.get(generateRandomMoveType));
 
-            // GET PARRY AND DODGE SUCCESS
-            double spellSuccess = Math.random();
-            double dodgeChance = wizard.returnSpellChance(wizardChosenSpell);
-            boolean dodgeSuccess = spellSuccess <= enemyVictim.returnDodgeChance(wizard, dodgeChance);
-            boolean parrySuccess = enemyVictim.returnParryChance() > wizardCalculatedDamage;
 
             // EXECUTE ACTION BASED ON RANDOM CHOICE
             if (enemyMoveType == MoveType.DODGE) {
-                enemyDodgeOrParrySuccess = enemyVictim.dodge(dodgeSuccess, wizard);
+                enemyDodgeOrParrySuccess = enemyVictim.dodge(enemyDodgeSuccess, wizard);
             } else if (enemyMoveType == MoveType.PARRY) {
-                enemyDodgeOrParrySuccess = enemyVictim.parry(parrySuccess, wizardChosenSpell.getSpellName(), wizard, wizardCalculatedDamage);
+                enemyDodgeOrParrySuccess = enemyVictim.parry(enemyParrySuccess, wizardChosenSpell.getSpellName(), wizard, wizardCalculatedDamage);
             }
 
             // IF DODGE OR PARRY FAILED, THE WIZARD WILL ATTACK
@@ -358,6 +380,7 @@ public class LevelFunctions {
     public static void wizardEndLevelRewards(Level level) {
         wizard.setSpecPoints(wizard.getSpecPoints() + Wizard.wizardSpecs);
         wizard.reduceSpellsCooldown();
+        wizard.updateStats();
         Level.unlockNextLevel(level);
     }
 

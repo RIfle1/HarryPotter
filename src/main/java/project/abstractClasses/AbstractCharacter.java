@@ -453,7 +453,7 @@ public abstract class AbstractCharacter {
         return spell.getSpellChance() * (1 + luckPercent);
     }
 
-    public boolean isDead() {
+    public boolean checkIfDead() {
         return !(this.healthPoints > 0);
     }
 
@@ -479,18 +479,17 @@ public abstract class AbstractCharacter {
             // PRINT AFTER CAST STUFF INTO CONSOLE
             double healthPoints = attackingCharacter.getHealthPoints();
             double maxHealthPoints = attackingCharacter.getMaxHealthPoints();
-            attackAfterCast(attackingCharacter, attackedCharacterName, attackingCharacterName, (int) damageTaken, healthPoints, maxHealthPoints);
 
+            if(this.getClass() == Wizard.class) {
+                GameSceneController.updateConsoleTaStatic(spellSpecialAttackLine, false);
+                System.out.println(spellSpecialAttackLine);
+            }
+
+            attackAfterCast(attackingCharacter, attackedCharacterName, attackingCharacterName, (int) damageTaken, healthPoints, maxHealthPoints);
 
             // CHECK ENEMY'S CHARACTER AND ACT ACCORDINGLY (ADD XP AND ITEM DROPS)
             if (attackingCharacter.getClass() == Enemy.class) {
                 ((Enemy) attackingCharacter).checkHealth();
-            }
-
-            if(this.getClass() == Wizard.class) {
-                GameSceneController.updateConsoleTaStatic(spellSpecialAttackLine, false);
-                // PRINT IN CONSOLE
-                System.out.println(spellSpecialAttackLine);
             }
 
         } else {
@@ -572,6 +571,7 @@ public abstract class AbstractCharacter {
     public boolean parry(boolean parrySuccess, String parriedAttackName, AbstractCharacter attackingCharacter, double calculatedDamage) {
         String text1 = "";
         String text2 = "";
+
         double newDamage = calculatedDamage * (1 + parryMultiplier);
 
         if (this.getClass() == Wizard.class) {
@@ -588,10 +588,9 @@ public abstract class AbstractCharacter {
             System.out.println(text1);
             GameSceneController.updateConsoleTaStatic(text1, false);
 
-            boolean attackSucceeded = Math.random() <= stupefy.getSpellChance();
 //            this.spellAttack(attackSucceeded, stupefy, attackingCharacter, newDamage);
             String spellSpecialAttackLine = returnColoredText(stupefy.getSpellSpecialAttackLine(), ANSI_PURPLE);
-            this.castAttack(attackSucceeded, stupefy.getCharacterState(), attackingCharacter, calculatedDamage, spellSpecialAttackLine);
+            this.castAttack(true, stupefy.getCharacterState(), attackingCharacter, calculatedDamage, spellSpecialAttackLine);
 
             return true;
         } else {

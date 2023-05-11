@@ -35,6 +35,10 @@ public class GeneralFunctions {
         }
     }
 
+    public static double chooseRandomDouble(double[] array) {
+        return array[new Random().nextInt(array.length)];
+    }
+
     public static String generateRandomString(int length) {
         UUID randomUUID = UUID.randomUUID();
         return randomUUID.toString().replaceAll("_", "").substring(0,length);
@@ -291,6 +295,7 @@ public class GeneralFunctions {
 
         assert objectList != null;
         boolean containsClass = objectList.stream().anyMatch(o -> findAllClasses("project/classes").contains(o.getClass()));
+        boolean containsEnums = objectList.stream().anyMatch(o -> findAllClasses("project/enums").contains(o.getClass()));
 
         if (containsClass) {
             List<Object> newList = new ArrayList<>();
@@ -300,7 +305,16 @@ public class GeneralFunctions {
 
 
             return newList;
-        } else {
+        }
+        else if(containsEnums) {
+            System.out.println(objectValue);
+
+            List<Object> newList = new ArrayList<>();
+            objectList.forEach(o -> newList.add(o.toString()));
+
+            return newList;
+        }
+        else {
             return objectValue;
         }
     }

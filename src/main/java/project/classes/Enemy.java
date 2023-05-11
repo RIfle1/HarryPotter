@@ -76,7 +76,7 @@ public class Enemy extends AbstractCharacter {
     }
 
     public void checkHealth() {
-        if (this.isDead()) {
+        if (this.checkIfDead()) {
             wizard.addExperience(this.getExperiencePoints());
             this.givePotion(wizard);
             this.delete();
@@ -212,44 +212,52 @@ public class Enemy extends AbstractCharacter {
         return isVulnerableSpell;
     }
 
-    public void updateBossVulnerableSpellsList() throws CloneNotSupportedException {
-        if(this.getEnemyName() == EnemyName.BASILISK) {
-            if(wizard.getHouseName() == HouseName.GRYFFINDOR) {
-                EnemyName.BASILISK.addVulnerableSpell(Spell.legendarySword.clone());
+    public void updateBossVulnerableSpellsList(){
+        try {
+            if(this.getEnemyName().getVulnerableSpellList().isEmpty()) {
+                if(this.getEnemyName() == EnemyName.BASILISK) {
+                    if(wizard.getHouseName() == HouseName.GRYFFINDOR) {
+                        EnemyName.BASILISK.addVulnerableSpell(Spell.legendarySword.clone());
+                    }
+                    else {
+                        EnemyName.BASILISK.addVulnerableSpell(Spell.accio.clone());
+                    }
+                }
+                else if(this.getEnemyName() == EnemyName.TROLL) {
+                    EnemyName.TROLL.addVulnerableSpell(Spell.wingardiumLeviosa.clone());
+                }
+                else if(this.getEnemyName() == EnemyName.DEMENTOR) {
+                    EnemyName.DEMENTOR.addVulnerableSpell(Spell.expectroPatronum.clone());
+                }
+                else if(this.getEnemyName() == EnemyName.DEATH_EATER) {
+                    EnemyName.DEATH_EATER.addVulnerableSpell(Spell.sectumsempra.clone());
+                }
             }
-            else {
-                EnemyName.BASILISK.addVulnerableSpell(Spell.accio.clone());
-            }
         }
-        else if(this.getEnemyName() == EnemyName.TROLL) {
-            EnemyName.TROLL.addVulnerableSpell(Spell.wingardiumLeviosa.clone());
-        }
-        else if(this.getEnemyName() == EnemyName.DEMENTOR) {
-            EnemyName.DEMENTOR.addVulnerableSpell(Spell.expectroPatronum.clone());
-        }
-        else if(this.getEnemyName() == EnemyName.DEATH_EATER) {
-            EnemyName.DEATH_EATER.addVulnerableSpell(Spell.sectumsempra.clone());
+        catch (CloneNotSupportedException e) {
+            e.printStackTrace();
         }
     }
 
     public void checkHpRatio() {
         double hpLimit = this.getMaxHealthPoints() * this.getEnemyName().getEnemyHpLimitRatio();
 
-        if(this.getEnemyName().getEnemyType() == EnemyType.BOSS && this.getHealthPoints() <= hpLimit && this.getEnemyName().getVulnerableSpellList().size() == 0) {
+        if(this.getEnemyName().getEnemyType() == EnemyType.BOSS && this.getHealthPoints() <= hpLimit) {
 
-            try {
-                this.updateBossVulnerableSpellsList();
-            }
-            catch (CloneNotSupportedException e) {
-                e.printStackTrace();
-            }
+            this.updateBossVulnerableSpellsList();
 
             String text = returnFormattedEnum(this.getEnemyName()) + " is only " +  returnColoredText("vulnerable ", ANSI_YELLOW) + "to: \n" + getVulnerableSpellsList();
             printTitle(text);
+            GameSceneController.updateConsoleTaStatic(text, true);
 
             if(this.getEnemyName() == EnemyName.BASILISK && wizard.getHouseName() == HouseName.GRYFFINDOR) {
-                printTitle(returnColoredText("You see a shiny object in the distance... You pick it up and realize it's Godric Gryffindor's legendary sword.", ANSI_GREEN));
-                printTitle(returnColoredText("You can now use this legendary sword to defeat the Basilisk", ANSI_BLUE));
+                String text1 = returnColoredText("You see a shiny object in the distance... You pick it up and realize it's Godric Gryffindor's legendary sword.", ANSI_GREEN);
+                String text2 = returnColoredText("You can now use this legendary sword to defeat the Basilisk", ANSI_BLUE);
+                printTitleTop(text1);
+                printTitleBottom(text2);
+                GameSceneController.updateConsoleTaStatic(text1, false);
+                GameSceneController.updateConsoleTaStatic(text2, true);
+
                 try {
                     wizard.putSpellsHashMap(Spell.legendarySword.clone());
                 }
@@ -276,19 +284,6 @@ public class Enemy extends AbstractCharacter {
             }
         }
         return maxLength;
-    }
-
-    public double returnEnemyCalculatedDamage(Spell enemyChosenSpell) {
-        double enemyCalculatedDamage = 0;
-
-        if(this.getEnemyName().getEnemyCombat() == EnemyCombat.SPELL) {
-            enemyCalculatedDamage = this.returnSpellCalculatedDamage(enemyChosenSpell, wizard);
-        }
-        else if(this.getEnemyName().getEnemyCombat() == EnemyCombat.MELEE) {
-            enemyCalculatedDamage = this.returnMeleeCalculatedDamage(wizard);
-        }
-
-        return enemyCalculatedDamage;
     }
 
     public String returnAttackName(Spell enemyChosenSpell) {

@@ -28,6 +28,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static project.classes.Wizard.wizard;
 import static project.enums.EnumMethods.returnFormattedEnum;
 import static project.functions.GeneralFunctions.checkPositiveInt;
+import static project.javafx.controllers.BattleArenaMenuController.battleArenaScene;
 import static project.javafx.functions.JavaFxFunctions.*;
 import static project.javafx.controllers.GameSceneController.gameScene;
 import static project.javafx.controllers.MainMenuController.mainMenuScene;
@@ -162,7 +163,13 @@ public class GameMenuController implements Initializable {
             levelText.getStyleClass().add("infoItemTextHover");
             levelText.onMouseReleasedProperty().set(event -> {
                 ActionEvent actionEvent = new ActionEvent(event.getSource(), event.getTarget());
-                gameScene(actionEvent, level);
+                if(!level.equals(Level.Battle_Arena)) {
+                    gameScene(actionEvent, level);
+                }
+                else {
+                    battleArenaScene(actionEvent);
+                }
+
             });
 
             chooseLevelGrid.add(levelText, 0, index1.get() + 1);
@@ -186,7 +193,7 @@ public class GameMenuController implements Initializable {
             Text spellChance = new Text((int) (spell.getSpellChance() * 100) + "%");
             Text spellCooldown = new Text(String.valueOf(spell.getSpellCooldown()));
 
-            ImageView spellImageView = returnObjectImageView(spellName, 80, 80);
+            ImageView spellImageView = returnObjectImageView(spellName, 80, 80, 1);
             spellGrid.getStyleClass().add("infoItemText");
 
             spellGrid.add(spellImageView, 0, index2.get() + 1);

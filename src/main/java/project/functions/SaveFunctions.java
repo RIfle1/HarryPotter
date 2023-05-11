@@ -126,7 +126,7 @@ public class SaveFunctions {
 
         ((List<?>) enumList).forEach(o -> {
             JSONObject jsonObject1 = new JSONObject();
-            GeneralFunctions.returnStringGettersList(enuM).stream().filter(string -> !string.equals("getRequiredSpellList")).forEach(string -> {
+            GeneralFunctions.returnStringGettersList(enuM).stream().filter(string -> string.equals("isUnlocked")).forEach(string -> {
                 String string2 = returnFieldFromMethod(string, "is");
                 jsonObject1.put(string2, GeneralFunctions.runGetterMethod(enuM, o, string));
             });

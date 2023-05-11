@@ -1,6 +1,10 @@
 .mainWindow {
     -fx-pref-height: 1010px;
+    -fx-max-height: 1010px;
+    -fx-min-height: 1010px;
     -fx-pref-width: 1920px;
+    -fx-max-width: 1920px;
+    -fx-min-width: 1920px;
     -fx-background-color: grey;
 }
 
