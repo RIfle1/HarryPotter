@@ -16,7 +16,6 @@
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
-<?import javafx.scene.text.TextFlow?>
 
 <AnchorPane fx:id="gameSceneMainAnchorPane" onKeyPressed="#onKeyPressed" prefHeight="400.0" prefWidth="600.0" styleClass="mainWindow" stylesheets="@generalStyles.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="project.javafx.controllers.GameSceneController">
    <children>
@@ -306,7 +305,11 @@
                      </children>
                   </GridPane>
                   <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="infoItemText" text="Objective" GridPane.rowIndex="7" />
-                  <TextFlow fx:id="objectiveTf" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="9" />
+                  <AnchorPane GridPane.rowIndex="9">
+                     <children>
+                        <Text fx:id="objectiveT" layoutX="10.0" layoutY="16.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="consoleText" textAlignment="CENTER" wrappingWidth="363.0" />
+                     </children>
+                  </AnchorPane>
                   <Line endX="214.5" startX="-100.0" GridPane.rowIndex="6" />
                   <Line endX="214.5" startX="-100.0" GridPane.rowIndex="10" />
                   <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="infoItemText" text="Console" GridPane.rowIndex="11" />

@@ -129,16 +129,23 @@ public class LevelFunctions {
     }
 
     public static void enemyAttack(boolean wizardDodgeOrParrySuccess, double enemyCalculatedDamage, Enemy attackingEnemy, Spell enemyChosenSpell) {
+        String spellSpecialAttackLine = "";
+        boolean attackSucceeded = false;
+        CharacterState characterState = null;
+
         // IF DODGE OR PARRY FAILED, THE ENEMY WILL ATTACK
         if(!wizardDodgeOrParrySuccess) {
             if(attackingEnemy.getEnemyName().getEnemyCombat() == EnemyCombat.SPELL) {
-                boolean attackSucceeded = Math.random() <= enemyChosenSpell.getSpellChance();
-                attackingEnemy.spellAttack(attackSucceeded, enemyChosenSpell, wizard, enemyCalculatedDamage);
+                attackSucceeded = Math.random() <= enemyChosenSpell.getSpellChance();
+                spellSpecialAttackLine = returnColoredText(enemyChosenSpell.getSpellSpecialAttackLine(), ANSI_PURPLE);
+                characterState = enemyChosenSpell.getCharacterState();
             }
             else if(attackingEnemy.getEnemyName().getEnemyCombat() == EnemyCombat.MELEE) {
-                boolean attackSucceeded = Math.random() <= attackingEnemy.getEnemyName().getEnemyCombat().getCombatChance();
-                attackingEnemy.meleeAttack(attackSucceeded, wizard, enemyCalculatedDamage);
+                attackSucceeded = Math.random() <= attackingEnemy.getEnemyName().getEnemyCombat().getCombatChance();
+                spellSpecialAttackLine = returnColoredText(returnFormattedEnum(attackingEnemy.getEnemyName()) + " melee attack!", ANSI_RED);
+                characterState = CharacterState.STANDING;
             }
+            attackingEnemy.castAttack(attackSucceeded, characterState, wizard, enemyCalculatedDamage, spellSpecialAttackLine);
         }
     }
 
@@ -232,7 +239,8 @@ public class LevelFunctions {
 
             // IF DODGE OR PARRY FAILED, THE WIZARD WILL ATTACK
             if(!enemyDodgeOrParrySuccess) {
-                wizard.spellAttack(attackSucceeded, wizardChosenSpell, enemyVictim, wizardCalculatedDamage);
+                String spellSpecialAttackLine = returnColoredText(wizardChosenSpell.getSpellSpecialAttackLine(), ANSI_PURPLE);
+                wizard.castAttack(attackSucceeded, wizardChosenSpell.getCharacterState(), enemyVictim, wizardCalculatedDamage, spellSpecialAttackLine);
             }
         }
 
@@ -249,6 +257,7 @@ public class LevelFunctions {
             actionList.add("Switch Teams");
         }
         ConsoleFunctions.printChoices(actionList);
+
 
         int choice = ConsoleFunctions.returnChoiceInt(1, actionList.size(), false, null);
 
@@ -289,7 +298,7 @@ public class LevelFunctions {
         List<String> enemyDeathLineCopy = new ArrayList<>(enemyDeathLine);
 
         if(enemyDeathLine.size() < 2) {
-            enemyDeathLineCopy.add("You Took Too Long To Defeat The Enemies. Just go to the next level already...");
+            enemyDeathLineCopy.add(EnemyName.timeoutDeathLine);
             supposedTimeout = false;
         }
 
@@ -328,19 +337,28 @@ public class LevelFunctions {
     private static void levelOutcome(List<String> enemyDeathLine, String graduationLine,
                                      Level level, int combatTimeout, boolean supposedTimeout) {
         if(combatTimeout == 0) {
-            printTitle(enemyDeathLine.get(1));
+            String text = enemyDeathLine.get(1);
+            printTitle(text);
         }
         else if (Enemy.enemiesHashMap.isEmpty()) {
-            printTitle(enemyDeathLine.get(0));
+            String text = enemyDeathLine.get(0);
+            printTitle(text);
         } else if (wizard.getHealthPoints() <= 0) {
-            printTitle(returnColoredText("You died.", ANSI_RED));
+            String text = returnColoredText("You died.", ANSI_RED);
+            printTitle(text);
         }
+
         if((Enemy.enemiesHashMap.isEmpty() || supposedTimeout) && wizard.getHealthPoints() > 0) {
             printTitle(returnColoredText(graduationLine, ANSI_YELLOW));
-            wizard.setSpecPoints(wizard.getSpecPoints() + Wizard.wizardSpecs);
-            wizard.reduceSpellsCooldown();
-            Level.unlockNextLevel(level);
+
+            wizardEndLevelRewards(level);
         }
+    }
+
+    public static void wizardEndLevelRewards(Level level) {
+        wizard.setSpecPoints(wizard.getSpecPoints() + Wizard.wizardSpecs);
+        wizard.reduceSpellsCooldown();
+        Level.unlockNextLevel(level);
     }
 
     public static void battleArena() {
@@ -376,14 +394,16 @@ public class LevelFunctions {
         String objective;
         List<String> enemyDeathLine = new ArrayList<>();
         boolean gryffindorHouse = wizard.getHouseName() == HouseName.GRYFFINDOR;
+
         if(gryffindorHouse) {
             objective = "Your Objective is to kill the Basilisk with Godric Gryffindor's legendary Sword.";
-            enemyDeathLine.add(enemyName.getEnemyDeathLine().get(0));
+            enemyDeathLine.add(enemyName.getEnemyDeathLine().get(1));
         }
         else {
             objective = "Your Objective is to kill the Basilisk by removing one of his teeth with Accio and then stabbing Tom Riddle's Journal.";
-            enemyDeathLine.add(enemyName.getEnemyDeathLine().get(1));
+            enemyDeathLine.add(enemyName.getEnemyDeathLine().get(0));
         }
+
         int enemyMinLevel = 2;
         int enemyMaxLevel = (int) wizard.getLevel();
         int enemyAmount = 1;
@@ -468,9 +488,6 @@ public class LevelFunctions {
 
         Enemy.generateEnemies(enemyMinLevel, enemyMaxLevel, enemyAmount, enemyName1);
         Enemy.generateEnemies(enemyMinLevel, enemyMaxLevel, enemyAmount, enemyName2);
-
-        System.out.println(Enemy.enemiesHashMap);
-        System.out.println(Enemy.enemiesKeyList);
 
         levelRepetition(level, objective, enemyDeathLine, graduationLine, 100, false);
     }

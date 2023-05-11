@@ -59,8 +59,8 @@ public class SaveProgressController implements Initializable {
         saveFiles.forEach(filename -> {
             GridPane saveInfoGridPane = returnSaveInfoGridPane(filename);
 
-            saveInfoGridPane.onMouseReleasedProperty().set(mouseEvent -> {
-                ActionEvent actionEvent = new ActionEvent(mouseEvent.getSource(), mouseEvent.getTarget());
+            saveInfoGridPane.onMouseReleasedProperty().set(event -> {
+                ActionEvent actionEvent = new ActionEvent(event.getSource(), event.getTarget());
                 Optional<ButtonType> option = createPopup(actionEvent, Alert.AlertType.CONFIRMATION,"Are you sure you want to overwrite this save file?");
 
                 if(option.get() == ButtonType.OK) {

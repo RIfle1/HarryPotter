@@ -123,6 +123,11 @@ public class GameMenuController implements Initializable {
         sendToScene(event, FXMLLoader);
     }
 
+    public static void gameMenuScene(Stage stage) {
+        FXMLLoader FXMLLoader = new FXMLLoader(GuiMain.class.getResource("GameMenu.fxml"));
+        sendToScene(stage, FXMLLoader);
+    }
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         wizard.updateStats();
@@ -157,7 +162,7 @@ public class GameMenuController implements Initializable {
             levelText.getStyleClass().add("infoItemTextHover");
             levelText.onMouseReleasedProperty().set(event -> {
                 ActionEvent actionEvent = new ActionEvent(event.getSource(), event.getTarget());
-                gameScene(actionEvent);
+                gameScene(actionEvent, level);
             });
 
             chooseLevelGrid.add(levelText, 0, index1.get() + 1);

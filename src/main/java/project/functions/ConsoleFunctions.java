@@ -14,6 +14,7 @@ import java.util.Scanner;
 import static java.lang.System.exit;
 import static project.classes.Color.*;
 import static project.classes.Spell.returnAllSpells;
+import static project.classes.Wizard.wizard;
 import static project.enums.Level.*;
 import static project.functions.LevelFunctions.levelHashMap;
 import static project.functions.SaveFunctions.loadGamePrompt;
@@ -167,19 +168,19 @@ public class ConsoleFunctions {
         Level chosenLevel = setLevel(chosenLevelString);
         levelHashMap.get(chosenLevel).run();
 
-        Wizard.wizard.reduceSpellsCooldown();
+//        wizard.reduceSpellsCooldown();
         ConsoleFunctions.chooseAction();
     }
 
     public static void chooseAction() {
-        Wizard.wizard.updateStats();
-        Wizard.wizard.restoreWizardHpDf();
+        wizard.updateStats();
+        wizard.restoreWizardHpDf();
 
         String[] actionList = {
                 "Choose Level (" + Level.returnUnlockedLevelsList().size() + "/" + returnAllLevels().size() + " unlocked)",
-                "Upgrade Specs" + (Wizard.wizard.getSpecPoints() > 0 ? " (" + (int) Wizard.wizard.getSpecPoints() + " points available)" : " (No points available)"),
+                "Upgrade Specs" + (wizard.getSpecPoints() > 0 ? " (" + (int) wizard.getSpecPoints() + " points available)" : " (No points available)"),
                 "Check Stats",
-                "Check Available Spells (" + Wizard.wizard.getSpellsKeyList().size() + "/" + returnAllSpells().size() + " available)",
+                "Check Available Spells (" + wizard.getSpellsKeyList().size() + "/" + returnAllSpells().size() + " available)",
                 "Save Game",
                 "Load Game"
         };
@@ -189,9 +190,9 @@ public class ConsoleFunctions {
 
         switch (returnChoiceInt(1, actionList.length, false, null)) {
             case 1 -> chooseLevel();
-            case 2 -> Wizard.wizard.upgradeSpec(ConsoleFunctions::chooseAction);
-            case 3 -> System.out.println(Wizard.wizard.returnAllStringStats(0));
-            case 4 -> Wizard.wizard.printAllCharacterSpells();
+            case 2 -> wizard.upgradeSpec(ConsoleFunctions::chooseAction);
+            case 3 -> System.out.println(wizard.returnAllStringStats(0));
+            case 4 -> wizard.printAllCharacterSpells();
             case 5 -> saveGame();
             case 6 -> loadGamePrompt();
         }

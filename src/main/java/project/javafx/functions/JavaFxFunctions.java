@@ -1,5 +1,9 @@
 package project.javafx.functions;
 
+import javafx.animation.Interpolator;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.HPos;
@@ -16,19 +20,16 @@ import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import org.jetbrains.annotations.NotNull;
 import project.abstractClasses.AbstractCharacter;
 import project.classes.Enemy;
-import project.classes.Spell;
 import project.classes.Wizard;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 import static project.enums.EnumMethods.returnFormattedEnum;
 import static project.functions.GeneralFunctions.returnFileAttribute;
@@ -37,6 +38,21 @@ import static project.functions.SaveFunctions.createWizardInstance;
 public class JavaFxFunctions {
 
     public static void sendToScene(ActionEvent event, FXMLLoader FXMLLoader) {
+        Scene scene = getScene(FXMLLoader);
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    public static void sendToScene(Stage stage, FXMLLoader FXMLLoader) {
+        Scene scene = getScene(FXMLLoader);
+
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    private static Scene getScene(FXMLLoader FXMLLoader) {
         Scene scene;
 
         try {
@@ -44,16 +60,21 @@ public class JavaFxFunctions {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-
-        stage.setScene(scene);
-        stage.show();
+        return scene;
     }
 
     public static Optional<ButtonType> createPopup(ActionEvent event, Alert.AlertType alertType, String popUpMsg) {
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
 
+        Alert alert = new Alert(alertType, "");
+        alert.initModality(Modality.APPLICATION_MODAL);
+        alert.initOwner(stage);
+
+        alert.getDialogPane().setContentText(popUpMsg);
+        return alert.showAndWait();
+    }
+
+    public static Optional<ButtonType> createPopup(Stage stage, Alert.AlertType alertType, String popUpMsg) {
         Alert alert = new Alert(alertType, "");
         alert.initModality(Modality.APPLICATION_MODAL);
         alert.initOwner(stage);
@@ -329,5 +350,37 @@ public class JavaFxFunctions {
                 .findFirst()
                 .orElse(null);
     }
+
+
+    public static void shakeEffect(Node node, Runnable onFinishedFunc) {
+        Timeline nodeTimeline = new Timeline();
+        double timeStamp = 0.6;
+        double multiplier = 0.5;
+        double maxVal = 2.5;
+        double increment = 0.1;
+        List<KeyFrame> keyFrames = new ArrayList<>();
+
+        for (double x = timeStamp; x < maxVal; x += increment) {
+            int y = (int) ((Math.sin(13 * x) * 12) / x);
+            KeyValue nodeKeyValueQ = new KeyValue(node.translateXProperty(),  y, Interpolator.EASE_IN);
+            KeyFrame nodeKeyFrameQ = new KeyFrame(Duration.seconds(x * multiplier), nodeKeyValueQ);
+
+            keyFrames.add(nodeKeyFrameQ);
+        }
+
+        KeyValue nodeKeyValueS = new KeyValue(node.translateXProperty(), 0, Interpolator.EASE_IN);
+        KeyFrame nodeKeyFrameS = new KeyFrame(Duration.seconds((maxVal + increment) * multiplier), nodeKeyValueS);
+        keyFrames.add(nodeKeyFrameS);
+
+        System.out.println(keyFrames);
+        nodeTimeline.getKeyFrames().addAll(keyFrames);
+        nodeTimeline.setCycleCount(1);
+
+        System.out.println(nodeTimeline.getKeyFrames());
+
+        nodeTimeline.play();
+        nodeTimeline.setOnFinished(event -> onFinishedFunc.run());
+    }
+
 
 }

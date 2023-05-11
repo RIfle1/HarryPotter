@@ -356,6 +356,9 @@ public abstract class AbstractCharacter {
 
     public double takeDamage(double calculatedDamage) {
         this.healthPoints -= calculatedDamage;
+        if(this.healthPoints < 0) {
+            this.healthPoints = 0;
+        }
         return calculatedDamage;
     }
 
@@ -412,12 +415,12 @@ public abstract class AbstractCharacter {
     public void reduceSpellsCooldown(int cooldown) {
         HashMap<String, Spell> spellsHashMap = this.getSpellsHashMap();
 
-        spellsHashMap.forEach((key, value) -> {
-            int newValue = value.getSpellReadyIn() - cooldown;
+        spellsHashMap.forEach((key, spell) -> {
+            int newValue = spell.getSpellReadyIn() - cooldown;
             if (newValue < 0) {
                 newValue = 0;
             }
-            value.setSpellReadyIn(newValue);
+            spell.setSpellReadyIn(newValue);
         });
     }
 
@@ -450,35 +453,44 @@ public abstract class AbstractCharacter {
         return spell.getSpellChance() * (1 + luckPercent);
     }
 
-    public void castAttack(boolean attackSucceeded, CharacterState characterState, AbstractCharacter attackedCharacter, double calculatedDamage) {
+    public boolean isDead() {
+        return !(this.healthPoints > 0);
+    }
+
+    public void castAttack(boolean attackSucceeded, CharacterState characterState, AbstractCharacter attackingCharacter, double calculatedDamage, String spellSpecialAttackLine) {
         String attackedCharacterName = "";
         String attackingCharacterName = "";
 
         if (this.getClass() == Enemy.class) {
             attackingCharacterName = returnFormattedEnum(((Enemy) this).getEnemyName());
-            attackedCharacterName = attackedCharacter.getName();
+            attackedCharacterName = attackingCharacter.getName();
         } else if (this.getClass() == Wizard.class) {
             attackingCharacterName = this.getName();
-            attackedCharacterName = returnFormattedEnum(((Enemy) attackedCharacter).getEnemyName());
+            attackedCharacterName = returnFormattedEnum(((Enemy) attackingCharacter).getEnemyName());
         }
 
         if (attackSucceeded) {
             // TAKE DAMAGE
-            double damageTaken = attackedCharacter.takeDamage(calculatedDamage);
+            double damageTaken = attackingCharacter.takeDamage(calculatedDamage);
 
             // CHANGE CHARACTER STATE
-            attackedCharacter.setCharacterState(characterState);
+            attackingCharacter.setCharacterState(characterState);
 
             // PRINT AFTER CAST STUFF INTO CONSOLE
-            double healthPoints = attackedCharacter.getHealthPoints();
-            double maxHealthPoints = attackedCharacter.getMaxHealthPoints();
-            attackAfterCast(attackedCharacter, attackedCharacterName, attackingCharacterName, (int) damageTaken, healthPoints, maxHealthPoints);
+            double healthPoints = attackingCharacter.getHealthPoints();
+            double maxHealthPoints = attackingCharacter.getMaxHealthPoints();
+            attackAfterCast(attackingCharacter, attackedCharacterName, attackingCharacterName, (int) damageTaken, healthPoints, maxHealthPoints);
 
 
             // CHECK ENEMY'S CHARACTER AND ACT ACCORDINGLY (ADD XP AND ITEM DROPS)
-            if (attackedCharacter.getClass() == Enemy.class) {
-                assert this instanceof Wizard;
-                ((Enemy) attackedCharacter).checkHealth((Wizard) this);
+            if (attackingCharacter.getClass() == Enemy.class) {
+                ((Enemy) attackingCharacter).checkHealth();
+            }
+
+            if(this.getClass() == Wizard.class) {
+                GameSceneController.updateConsoleTaStatic(spellSpecialAttackLine, false);
+                // PRINT IN CONSOLE
+                System.out.println(spellSpecialAttackLine);
             }
 
         } else {
@@ -533,20 +545,6 @@ public abstract class AbstractCharacter {
         }
     }
 
-    public void spellAttack(boolean attackSucceeded, Spell spell, AbstractCharacter attackedCharacter, double calculatedDamage) {
-
-        if(this.getClass() == Wizard.class) {
-            String spellSpecialAttackLine = returnColoredText(spell.getSpellSpecialAttackLine(), ANSI_PURPLE);
-            // PRINT IN GUI CONSOLE
-            GameSceneController.updateConsoleTaStatic(spellSpecialAttackLine, false);
-            // PRINT IN CONSOLE
-            System.out.println(spellSpecialAttackLine);
-        }
-
-        // CAST SPELL
-        castAttack(attackSucceeded, spell.getCharacterState(), attackedCharacter, calculatedDamage);
-    }
-
     public boolean dodge(boolean dodgeSuccess, AbstractCharacter attackingCharacter) {
         String text1 = "";
         String text2 = "";
@@ -591,7 +589,9 @@ public abstract class AbstractCharacter {
             GameSceneController.updateConsoleTaStatic(text1, false);
 
             boolean attackSucceeded = Math.random() <= stupefy.getSpellChance();
-            this.spellAttack(attackSucceeded, stupefy, attackingCharacter, newDamage);
+//            this.spellAttack(attackSucceeded, stupefy, attackingCharacter, newDamage);
+            String spellSpecialAttackLine = returnColoredText(stupefy.getSpellSpecialAttackLine(), ANSI_PURPLE);
+            this.castAttack(attackSucceeded, stupefy.getCharacterState(), attackingCharacter, calculatedDamage, spellSpecialAttackLine);
 
             return true;
         } else {

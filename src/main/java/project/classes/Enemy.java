@@ -62,7 +62,7 @@ public class Enemy extends AbstractCharacter {
         wizard.setPotionList(newPotionList);
     }
 
-    public void killEnemy() {
+    public void delete() {
         enemiesHashMap.remove(this.getName());
         enemiesKeyList.remove(this.getName());
     }
@@ -75,11 +75,11 @@ public class Enemy extends AbstractCharacter {
         return allEnemyNames.get(randomInt);
     }
 
-    public void checkHealth(Wizard wizard) {
-        if (this.getHealthPoints() <= 0) {
-            this.killEnemy();
+    public void checkHealth() {
+        if (this.isDead()) {
             wizard.addExperience(this.getExperiencePoints());
             this.givePotion(wizard);
+            this.delete();
         }
     }
 
@@ -175,13 +175,6 @@ public class Enemy extends AbstractCharacter {
         }
     }
 
-
-    public void meleeAttack(boolean attackSucceeded, AbstractCharacter attackedCharacter, double calculatedDamage) {
-        // CONSOLE STUFF
-        System.out.println(returnColoredText(returnFormattedEnum(this.getEnemyName()) + " melee attack!", ANSI_RED));
-
-        castAttack(attackSucceeded, CharacterState.STANDING, attackedCharacter, calculatedDamage);
-    }
 
     public String getVulnerableSpellsList() {
         StringBuilder vulnerableSpellsList = new StringBuilder();

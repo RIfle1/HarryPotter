@@ -108,7 +108,6 @@ public class Wizard extends AbstractCharacter {
     }
 
     public String returnAllStringStats(int extraNameLength) {
-        this.updateStats();
         return this.returnStringStats(extraNameLength) + this.returnStringSpecs();
     }
 
