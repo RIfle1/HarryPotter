@@ -149,7 +149,7 @@ public class JavaFxFunctions {
         return new Image(imgInputStream);
     }
 
-    public static GridPane returnCharacterGridPane(AbstractCharacter abstractCharacter) {
+    public static GridPane generateCharacterGridPane(AbstractCharacter abstractCharacter) {
 
         // CHARACTER NAME AND PROFILE PIC GRID PANE
         GridPane horizontalGridPane = new GridPane();
@@ -198,7 +198,6 @@ public class JavaFxFunctions {
         verticalGridPane.getColumnConstraints().addAll(verticalGridPaneColumn1);
 
         verticalGridPane.add(horizontalGridPane, 0, 0);
-
 
 //        verticalGridPane.setGridLinesVisible(true);
 
@@ -351,6 +350,10 @@ public class JavaFxFunctions {
                 .orElse(null);
     }
 
+    public static Node returnChildNodeById(GridPane parentGridPane, String childGridPaneFxId) {
+        return parentGridPane.lookup("#" + childGridPaneFxId);
+    }
+
 
     public static void shakeEffect(Node node, Runnable onFinishedFunc) {
         Timeline nodeTimeline = new Timeline();
@@ -372,14 +375,40 @@ public class JavaFxFunctions {
         KeyFrame nodeKeyFrameS = new KeyFrame(Duration.seconds((maxVal + increment) * multiplier), nodeKeyValueS);
         keyFrames.add(nodeKeyFrameS);
 
-        System.out.println(keyFrames);
         nodeTimeline.getKeyFrames().addAll(keyFrames);
         nodeTimeline.setCycleCount(1);
 
-        System.out.println(nodeTimeline.getKeyFrames());
-
         nodeTimeline.play();
         nodeTimeline.setOnFinished(event -> onFinishedFunc.run());
+    }
+
+    public static void translationEffect(Node attackedNode, ImageView imageViewNode, double startX, double startY, double endX, double endY, Runnable onFinishedFunc) {
+        double timeStamp = 1;
+
+        Timeline nodeTimelineX = new Timeline();
+        Timeline nodeTimelineY = new Timeline();
+
+        KeyValue nodeKeyValueX = new KeyValue(imageViewNode.translateXProperty(), endX - startX, Interpolator.EASE_IN);
+        KeyValue nodeKeyValueY = new KeyValue(imageViewNode.translateYProperty(), endY - startY, Interpolator.EASE_IN);
+
+        KeyFrame nodeKeyFrameX = new KeyFrame(Duration.seconds(timeStamp), nodeKeyValueX);
+        KeyFrame nodeKeyFrameY = new KeyFrame(Duration.seconds(timeStamp), nodeKeyValueY);
+
+        nodeTimelineX.getKeyFrames().add(nodeKeyFrameX);
+        nodeTimelineY.getKeyFrames().add(nodeKeyFrameY);
+        nodeTimelineX.setCycleCount(1);
+        nodeTimelineY.setCycleCount(1);
+
+        Thread threadX = new Thread(nodeTimelineX::play);
+        Thread threadY = new Thread(nodeTimelineY::play);
+
+        threadX.start();
+        threadY.start();
+
+        nodeTimelineX.setOnFinished(event -> {
+            shakeEffect(attackedNode, onFinishedFunc);
+            ((GridPane) imageViewNode.getParent()).getChildren().remove(imageViewNode);
+        });
     }
 
 

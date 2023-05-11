@@ -1,13 +1,14 @@
 package project.javafx.controllers;
 
-import javafx.animation.*;
+import javafx.animation.Interpolator;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.geometry.HPos;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
+import javafx.geometry.*;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -50,6 +51,15 @@ public class GameSceneController implements Initializable {
     private static double enemyCalculatedDamage;
     private static boolean isSpellSelected = false;
     private static boolean isEnemySelected = false;
+    private static Level level;
+    private static int combatTimeout;
+    private static String deathLine;
+    private static double dodgeChance;
+    private static Stage gameSceneStage;
+    private static GridPane playerGridPane;
+    private final Timeline actionCircleTimeline = new Timeline();
+    private final GridPane enemyCombatGridPane = new GridPane();
+    private final GridPane playerCombatGridPane = new GridPane();
     @FXML
     private AnchorPane gameSceneMainAnchorPane;
     @FXML
@@ -106,13 +116,6 @@ public class GameSceneController implements Initializable {
     private Text psNameT;
     @FXML
     private Circle successActionCircle;
-    private final Timeline actionCircleTimeline = new Timeline();
-    private final GridPane enemyCombatGridPane = new GridPane();
-    private static Level level;
-    private static int combatTimeout;
-    private static String deathLine;
-    private static double dodgeChance;
-    private static Stage gameSceneStage;
 
     public static void gameScene(ActionEvent event, Level l) {
         Enemy.clearEnemies();
@@ -125,6 +128,62 @@ public class GameSceneController implements Initializable {
 
         FXMLLoader gameSceneFxmlLoader = new FXMLLoader(GuiMain.class.getResource("GameScene.fxml"));
         sendToScene(event, gameSceneFxmlLoader);
+    }
+
+    private static void returnToGameMenu(Stage stage, Optional<ButtonType> result) {
+        if (result.get() == ButtonType.OK) {
+            isEnemySelected = false;
+            isSpellSelected = false;
+            gameMenuScene(stage);
+        }
+    }
+
+    public static void updateConsoleTaStatic(String text, boolean isSeparationNeeded) {
+        HashMap<String, String> colorsHashMap = Color.returnAllColorsHashMap();
+
+        for (Map.Entry<String, String> entry : colorsHashMap.entrySet()) {
+            // I can probably make use of the color later if I want to add colored text in the gui console
+            String color = entry.getKey();
+            String colorCode = entry.getValue();
+
+            if (text.contains(colorCode)) {
+                text = text.replace(colorCode, "");
+            }
+        }
+        if (isSeparationNeeded) {
+            text = text + "\n" + returnLineSeparator(text.length());
+        }
+
+        if (consoleTStatic.getText().length() > 0) {
+            text = consoleTStatic.getText() + "\n" + text;
+        }
+
+        consoleTStatic.setText(text);
+    }
+
+    private static GridPane returnEnemyAvailableAttacksGridPane(String spellName) {
+        GridPane enemySpellGridPane = new GridPane();
+
+        ColumnConstraints column1 = new ColumnConstraints();
+        ColumnConstraints column2 = new ColumnConstraints();
+
+        column1.setHalignment(HPos.CENTER);
+        column1.setPercentWidth(20);
+        column2.setHalignment(HPos.LEFT);
+        column2.setPercentWidth(80);
+
+        enemySpellGridPane.getColumnConstraints().addAll(column1, column2);
+
+
+        Text attackText = new Text(spellName);
+        ImageView spellIcon = returnObjectImageView(spellName, 30, 30);
+
+        attackText.getStyleClass().add("simpleEnabledNode");
+
+        enemySpellGridPane.add(spellIcon, 0, 0);
+        enemySpellGridPane.add(attackText, 1, 0);
+
+        return enemySpellGridPane;
     }
 
     @Override
@@ -140,7 +199,12 @@ public class GameSceneController implements Initializable {
 
         enemyCombatGridPane.setAlignment(Pos.CENTER);
         enemyCombatGridPane.setId("enemyCombatGridPane");
+
+        playerCombatGridPane.setAlignment(Pos.CENTER);
+        playerCombatGridPane.setId("playerCombatGridPane");
+
         combatGridPane.add(enemyCombatGridPane, 2, 0);
+        combatGridPane.add(playerCombatGridPane, 0, 0);
 
         disableAllGridPaneButtons(actionsGridPane);
         initializeActionCircleTimeline();
@@ -204,7 +268,7 @@ public class GameSceneController implements Initializable {
     @FXML
     private void parryOnClick(ActionEvent event) {
         double parrySuccess = wizard.returnParryChance() / enemyCalculatedDamage;
-        if(parrySuccess > 1) parrySuccess = 1;
+        if (parrySuccess > 1) parrySuccess = 1;
 
         defineSuccessActionCircle(parrySuccess);
         actionButtonOnClick(event);
@@ -214,7 +278,7 @@ public class GameSceneController implements Initializable {
         if (level.isSwitchTeams()) {
             Optional<ButtonType> result = createPopup(gameSceneStage, Alert.AlertType.CONFIRMATION, "You have the possibility the join the enemies. Do you want to join them?");
 
-            if(result.get() == ButtonType.OK) {
+            if (result.get() == ButtonType.OK) {
                 createPopup(gameSceneStage, Alert.AlertType.INFORMATION, "You have switched teams! Great job! You gained nothing, now do the level properly.");
             }
         }
@@ -268,31 +332,28 @@ public class GameSceneController implements Initializable {
 
             boolean actionSucceeded = actionCircle.getRadius() <= successActionCircle.getRadius();
 
-            if(buttonId.equals(attackBtn.getId())) {
+            if (buttonId.equals(attackBtn.getId())) {
                 attackBtnOnClick(actionSucceeded);
-            } else if(buttonId.equals(dodgeBtn.getId())) {
+            } else if (buttonId.equals(dodgeBtn.getId())) {
                 dodgeBtnOnClick(actionSucceeded);
-            } else if(buttonId.equals(parryBtn.getId())) {
+            } else if (buttonId.equals(parryBtn.getId())) {
                 parryBtnOnClick(actionSucceeded);
             }
 
             actionCircleTimeline.stop();
 
-            displayPlayerStats();
-
             updateConsoleT();
-            
-            if(enemiesHashMap.isEmpty()) {
+
+            if (enemiesHashMap.isEmpty()) {
                 wizardWon();
-            }
-            else if(wizard.isDead()) {
+            } else if (wizard.isDead()) {
                 wizardLost();
             }
         }
     }
 
     private void wizardLost() {
-        Optional<ButtonType> result = Objects.requireNonNull(createPopup(gameSceneStage , Alert.AlertType.INFORMATION, "You lost the battle! Better luck next time!"));
+        Optional<ButtonType> result = Objects.requireNonNull(createPopup(gameSceneStage, Alert.AlertType.INFORMATION, "You lost the battle! Better luck next time!"));
         returnToGameMenu(gameSceneStage, result);
     }
 
@@ -308,27 +369,18 @@ public class GameSceneController implements Initializable {
     private void checkCombatTimeout() {
         combatTimeout--;
 
-        if(combatTimeout == 0) {
+        if (combatTimeout == 0) {
             String timeoutMsg;
-            if(level.equals(Level.The_Order_of_the_Phoenix)) {
+            if (level.equals(Level.The_Order_of_the_Phoenix)) {
                 timeoutMsg = "You distracted Dolores Umbridge long enough for the fireworks to go off." + "\n" + level.getGraduationLine();
                 actionCircleTimeline.stop();
                 wizardEndLevelRewards(level);
-            }
-            else {
+            } else {
                 timeoutMsg = EnemyName.timeoutDeathLine;
             }
 
             Optional<ButtonType> result = Objects.requireNonNull(createPopup(gameSceneStage, Alert.AlertType.INFORMATION, timeoutMsg));
             returnToGameMenu(gameSceneStage, result);
-        }
-    }
-
-    private static void returnToGameMenu(Stage stage, Optional<ButtonType> result) {
-        if (result.get() == ButtonType.OK) {
-            isEnemySelected = false;
-            isSpellSelected = false;
-            gameMenuScene(stage);
         }
     }
 
@@ -367,17 +419,24 @@ public class GameSceneController implements Initializable {
 
         wizardCombatSystem(wizardChosenSpell, enemyVictim, actionSucceeded, isVulnerableSpell);
 
-        shakeEffect(enemyGridPane, () -> refreshEnemiesGridPane(enemyGridPane));
+        if (isVulnerableSpell && actionSucceeded) {
+            ImageView spellEffectImageView = returnObjectImageView("fire", 100, 100);
+            combatGridPane.add(spellEffectImageView, 0, 0);
+            Bounds anchorPoint = playerGridPane.localToScene(playerGridPane.getBoundsInLocal());
+            Bounds anchorPoint2 = enemyGridPane.localToScene(enemyGridPane.getBoundsInLocal());
+
+            translationEffect(enemyGridPane, spellEffectImageView, anchorPoint.getMinX(), anchorPoint.getMinY(), anchorPoint2.getMinX(), anchorPoint2.getMinY(), () -> refreshEnemiesGridPane(enemyGridPane));
+        }
+
         displayPlayerPotionsGridPane();
 
-        if(!enemiesHashMap.isEmpty()) {
+        if (!enemiesHashMap.isEmpty()) {
             displayPlayerSpellsGrid();
             disableAllGridPaneButtons(playerAvailableSpellsGrid);
             disableAllGridPaneButtons(combatGridPane, "enemyCombatGridPane");
 
             enemyTurn();
-        }
-        else {
+        } else {
             isEnemySelected = false;
         }
     }
@@ -387,14 +446,13 @@ public class GameSceneController implements Initializable {
 
         String chosenSpellName = "";
 
-        if(attackingEnemy.getEnemyName().getEnemyCombat() == EnemyCombat.SPELL) {
+        if (attackingEnemy.getEnemyName().getEnemyCombat() == EnemyCombat.SPELL) {
             enemyChosenSpell = getEnemyRandomSpell(attackingEnemy);
             enemyCalculatedDamage = attackingEnemy.returnEnemyCalculatedDamage(enemyChosenSpell);
             chosenSpellName = attackingEnemy.returnChosenSpellName(enemyChosenSpell);
             dodgeChance = attackingEnemy.returnSpellChance(enemyChosenSpell);
 
-        }
-        else if(attackingEnemy.getEnemyName().getEnemyCombat() == EnemyCombat.MELEE) {
+        } else if (attackingEnemy.getEnemyName().getEnemyCombat() == EnemyCombat.MELEE) {
             chosenSpellName = "Melee Attack";
             dodgeChance = attackingEnemy.getEnemyName().getEnemyCombat().getCombatChance();
         }
@@ -419,11 +477,14 @@ public class GameSceneController implements Initializable {
 
         boolean wizardDodgeOrParrySuccess = isWizardDodgeOrParrySuccess(attackingEnemy, enemyCalculatedDamage, attackName, wizardMoveType, dodgeSuccess, parrySuccess);
         enemyAttack(wizardDodgeOrParrySuccess, enemyCalculatedDamage, attackingEnemy, enemyChosenSpell);
+
+        if (!wizardDodgeOrParrySuccess) {
+            shakeEffect(playerGridPane, () -> refreshPlayerGridPane(playerGridPane));
+        }
+
         updateConsoleT();
 
         disableAllGridPaneButtons(actionsGridPane);
-//        enableGridPaneButton(actionsGridPane, attackBtn);
-
         enableAllGridPaneButtons(playerAvailableSpellsGrid);
         enableAllGridPaneButtons(combatGridPane, "enemyCombatGridPane");
     }
@@ -446,10 +507,9 @@ public class GameSceneController implements Initializable {
         List<String> objectiveList = level.getObjectiveList();
         String objective;
 
-        if(gryffindorHouse && objectiveList.size() > 1) {
+        if (gryffindorHouse && objectiveList.size() > 1) {
             objective = objectiveList.get(1);
-        }
-        else {
+        } else {
             objective = objectiveList.get(0);
         }
         objectiveT.setText(objective);
@@ -459,27 +519,26 @@ public class GameSceneController implements Initializable {
         List<EnemyName> enemyNameList = level.getEnemyNameList();
         List<String> enemyDeathLineList = new ArrayList<>();
 
-        if(enemyNameList.size() > 1) {
+        if (enemyNameList.size() > 1) {
             StringBuilder deathLine = new StringBuilder();
-            enemyNameList.forEach(enemyName -> deathLine.append(enemyName.getEnemyDeathLine().get(0)));
+            enemyNameList.forEach(enemyName -> deathLine.append(enemyName.getEnemyDeathLine().get(0)).append("\n"));
             enemyDeathLineList.add(deathLine.toString());
-        }
-        else if(!enemyNameList.get(0).getEnemyDeathLine().isEmpty()){
+        } else if (!enemyNameList.get(0).getEnemyDeathLine().isEmpty()) {
             enemyDeathLineList.addAll(enemyNameList.get(0).getEnemyDeathLine());
         }
 
         boolean gryffindorHouse = wizard.getHouseName() == HouseName.GRYFFINDOR;
         List<String> objectiveList = level.getObjectiveList();
 
-        if(enemyDeathLineList.size() > 1) {
-            if((gryffindorHouse && objectiveList.size() > 1) || level.equals(Level.The_Order_of_the_Phoenix)) {
+        if (enemyDeathLineList.size() > 1) {
+            if ((gryffindorHouse && objectiveList.size() > 1) || level.equals(Level.The_Order_of_the_Phoenix)) {
                 deathLine = enemyDeathLineList.get(1);
-            }
-            else {
+            } else {
                 deathLine = enemyDeathLineList.get(0);
             }
-        }
-        else {
+        } else if (enemyDeathLineList.size() == 1) {
+            deathLine = enemyDeathLineList.get(0);
+        } else {
             deathLine = "";
         }
     }
@@ -514,7 +573,7 @@ public class GameSceneController implements Initializable {
 
             playerSpellInfoGridPane.getStyleClass().addAll("clickableNode");
 
-            if(wizard.checkSpellReady(spell)) {
+            if (wizard.checkSpellReady(spell)) {
                 spellText.getStyleClass().add("simpleEnabledNode");
                 playerSpellInfoGridPane.setOnMouseReleased(event -> {
                     selectSubGridPane(playerAvailableSpellsGrid, playerSpellInfoGridPane);
@@ -524,8 +583,7 @@ public class GameSceneController implements Initializable {
                     actionCircle.setRadius(1);
                     checkAttackBtnConditions();
                 });
-            }
-            else {
+            } else {
                 spellText.getStyleClass().add("simpleDisabledNode");
                 playerSpellInfoGridPane.setOnMouseReleased(event -> {
                     ActionEvent actionEvent = new ActionEvent(event.getSource(), event.getTarget());
@@ -607,9 +665,9 @@ public class GameSceneController implements Initializable {
     }
 
     private void displayCharacters() {
-
         // DISPLAY PLAYER IN COMBAT AREA
-        combatGridPane.add(returnCharacterGridPane(wizard), 0, 0);
+        playerGridPane = generateCharacterGridPane(wizard);
+        playerCombatGridPane.add(playerGridPane, 0, 0);
 
         // DISPLAY ENEMIES IN COMBAT AREA
         displayEnemiesGridPanes();
@@ -624,7 +682,7 @@ public class GameSceneController implements Initializable {
         AtomicInteger enemyCombatGridPaneColumn = new AtomicInteger(0);
 
         enemiesHashMap.forEach((enemyName, enemy) -> {
-            GridPane enemyGridPane = returnCharacterGridPane(enemy);
+            GridPane enemyGridPane = generateCharacterGridPane(enemy);
             GridPane.setMargin(enemyGridPane, new Insets(0, 10, 20, 10));
             enemyGridPane.setId(enemy.getName());
 
@@ -637,7 +695,7 @@ public class GameSceneController implements Initializable {
             enemyCombatGridPane.add(enemyGridPane, enemyCombatGridPaneColumn.get(), enemyCombatGridPaneRow.get());
             enemyCombatGridPaneRow.getAndIncrement();
 
-            if(enemyCombatGridPaneRow.get() == 7) {
+            if (enemyCombatGridPaneRow.get() == 7) {
                 enemyCombatGridPaneRow.set(0);
                 enemyCombatGridPaneColumn.getAndIncrement();
             }
@@ -651,26 +709,37 @@ public class GameSceneController implements Initializable {
 
         Enemy enemy = enemiesHashMap.get(enemyGridPane.getId());
 
-        if(enemy == null) {
+        if (enemy == null) {
             enemyCombatGridPane.getChildren().remove(enemyGridPane);
-        }
-        else {
+        } else {
             assert enemyHealthBar != null;
             enemyHealthBar.setProgress(enemy.getHealthPoints() / enemy.getMaxHealthPoints());
         }
 
-        if(!enemiesHashMap.isEmpty()) {
+        if (!enemiesHashMap.isEmpty()) {
             try {
                 List<Object> enemyObjectsList = returnSelectedNodes(gameSceneMainAnchorPane, "enemyCombatGridPane", "clickableNodePressed");
                 Enemy enemyVictim = enemiesHashMap.get((String) enemyObjectsList.get(0));
-
                 displayEnemyStats(enemiesHashMap.get(enemyVictim.getName()));
-//                selectSubGridPane(enemyCombatGridPane, enemyVictim.getName());
+
             } catch (Exception e) {
                 displayEnemyStats(enemiesHashMap.get(enemiesKeyList.get(0)));
-//                selectSubGridPane(enemyCombatGridPane, enemiesHashMap.get(enemiesKeyList.get(0)).getName());
+                isEnemySelected = false;
+
             }
         }
+    }
+
+    private void refreshPlayerGridPane(GridPane wizardGridPane) {
+        ProgressBar enemyHealthBar = (ProgressBar) wizardGridPane.getChildren()
+                .stream().filter(node -> node instanceof ProgressBar)
+                .findFirst().orElse(null);
+
+
+        assert enemyHealthBar != null;
+        enemyHealthBar.setProgress(wizard.getHealthPoints() / wizard.getMaxHealthPoints());
+
+        displayPlayerStats();
     }
 
     private void enemyGridPaneOnClick(Enemy enemy, GridPane enemyGridPane) {
@@ -682,7 +751,7 @@ public class GameSceneController implements Initializable {
     }
 
     public void checkAttackBtnConditions() {
-        if(isEnemySelected && isSpellSelected) {
+        if (isEnemySelected && isSpellSelected) {
             enableGridPaneButton(actionsGridPane, attackBtn);
         }
     }
@@ -715,53 +784,6 @@ public class GameSceneController implements Initializable {
         }
 
         enemyAvailableAttacksGrid.setVgap(5);
-    }
-
-    public static void updateConsoleTaStatic(String text, boolean isSeparationNeeded) {
-        HashMap<String, String> colorsHashMap = Color.returnAllColorsHashMap();
-
-        for (Map.Entry<String, String> entry : colorsHashMap.entrySet()) {
-            // I can probably make use of the color later if I want to add colored text in the gui console
-            String color = entry.getKey();
-            String colorCode = entry.getValue();
-
-            if (text.contains(colorCode)) {
-                text = text.replace(colorCode, "");
-            }
-        }
-        if(isSeparationNeeded) {
-            text = text + "\n" + returnLineSeparator(text.length());
-        }
-
-        if(consoleTStatic.getText().length() > 0) {
-            text = consoleTStatic.getText() + "\n" + text;
-        }
-
-        consoleTStatic.setText(text);
-    }
-    private static GridPane returnEnemyAvailableAttacksGridPane(String spellName) {
-        GridPane enemySpellGridPane = new GridPane();
-
-        ColumnConstraints column1 = new ColumnConstraints();
-        ColumnConstraints column2 = new ColumnConstraints();
-
-        column1.setHalignment(HPos.CENTER);
-        column1.setPercentWidth(20);
-        column2.setHalignment(HPos.LEFT);
-        column2.setPercentWidth(80);
-
-        enemySpellGridPane.getColumnConstraints().addAll(column1, column2);
-
-
-        Text attackText = new Text(spellName);
-        ImageView spellIcon = returnObjectImageView(spellName, 30, 30);
-
-        attackText.getStyleClass().add("simpleEnabledNode");
-
-        enemySpellGridPane.add(spellIcon, 0, 0);
-        enemySpellGridPane.add(attackText, 1, 0);
-
-        return enemySpellGridPane;
     }
 
 }
