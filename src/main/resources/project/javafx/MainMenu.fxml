@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.String?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
@@ -7,7 +8,8 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane styleClass="mainWindow" stylesheets="@generalStyles.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="project.javafx.controllers.MainMenuController">
+<AnchorPane stylesheets="@generalStyles.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="project.javafx.controllers.MainMenuController">
+   <AnchorPane layoutX="701.0" layoutY="108.0" prefHeight="795.0" prefWidth="519.0" styleClass="mainMenuObject" stylesheets="@generalStyles.css" />
 
     <Text layoutY="61.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Harry Potter: The Text RPG" textAlignment="CENTER" wrappingWidth="1920.0">
         <font>
@@ -24,21 +26,25 @@
        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
      </rowConstraints>
       <children>
-           <Text fx:id="newGameT" onMouseReleased="#newGameOnClicked" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="menuItemText" text="New Game" GridPane.halignment="CENTER">
+           <Text fx:id="newGameT" fill="WHITE" onMouseReleased="#newGameOnClicked" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="menuItemText" text="New Game" GridPane.halignment="CENTER">
                <font>
                    <Font name="Bell MT" size="43.0" />
                </font>
            </Text>
-           <Text fx:id="continueGameT" onMouseReleased="#continueGameOnClicked" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="menuItemText" text="Continue" GridPane.halignment="CENTER" GridPane.rowIndex="1">
+           <Text fx:id="continueGameT" fill="WHITE" onMouseReleased="#continueGameOnClicked" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="menuItemText" text="Continue" GridPane.halignment="CENTER" GridPane.rowIndex="1">
                <font>
                    <Font name="Bell MT" size="43.0" />
                </font>
            </Text>
-           <Text fx:id="loadGameT" onMouseReleased="#loadGameOnClicked" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="menuItemText" text="Load Game" GridPane.halignment="CENTER" GridPane.rowIndex="2">
+           <Text fx:id="loadGameT" fill="WHITE" onMouseReleased="#loadGameOnClicked" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="menuItemText" text="Load Game" GridPane.halignment="CENTER" GridPane.rowIndex="2">
                <font>
                    <Font name="Bell MT" size="43.0" />
                </font>
            </Text>
       </children>
    </GridPane>
+   <styleClass>
+      <String fx:value="mainWindow" />
+      <String fx:value="mainMenuBackground" />
+   </styleClass>
 </AnchorPane>

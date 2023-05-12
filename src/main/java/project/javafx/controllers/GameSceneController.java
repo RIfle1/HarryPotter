@@ -14,6 +14,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -199,15 +200,6 @@ public class GameSceneController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        // TESTS TO DELETE AFTERWARDS
-//        generateEnemies(10, 10, 3, EnemyName.VOLDEMORT);
-//        try {
-//            wizard.setPotionList(Arrays.asList(Potion.highCooldownPotion ,Potion.highDefensePotion.clone(), Potion.highDamagePotion.clone(), Potion.highDamagePotion.clone(), Potion.highDamagePotion.clone(), Potion.highHealthPotion.clone(), Potion.highHealthPotion.clone(), Potion.highHealthPotion.clone()));
-//        } catch (CloneNotSupportedException e) {
-//            throw new RuntimeException(e);
-//        }
-        // TESTS TO DELETE AFTERWARDS
-
         enemyCombatGridPane.setAlignment(Pos.CENTER);
         enemyCombatGridPane.setId("enemyCombatGridPane");
 
@@ -219,8 +211,6 @@ public class GameSceneController implements Initializable {
 
         disableAllGridPaneButtons(actionsGridPane);
         initializeActionCircleTimeline();
-
-        updateLevelImg();
 
         displayPlayerStats();
         displayObjective();
@@ -408,66 +398,90 @@ public class GameSceneController implements Initializable {
     }
 
     private void attackBtnOnClick(boolean actionSucceeded) {
-        // GET THE ENEMY VICTIM
-        List<Object> enemyObjectsList = returnSelectedNodes(gameSceneMainAnchorPane, "enemyCombatGridPane", "clickableNodePressed");
-        Enemy enemyVictim = enemiesHashMap.get((String) enemyObjectsList.get(0));
+        try {
+            // GET THE ENEMY VICTIM
+            List<Object> enemyObjectsList = returnSelectedNodes(combatGridPane, "enemyCombatGridPane", "clickableNodePressed");
+            Enemy enemyVictim = enemiesHashMap.get((String) enemyObjectsList.get(0));
+//        combatGridPane.getChildren().forEach(node -> System.out.println(node.getStyleClass()));
+//        System.out.println(enemyVictim);
 
-        // Maybe I'll need this later for optimizations IDK like only reloading the grid pane in question and not the whole thing
-        GridPane enemyGridPane = (GridPane) enemyObjectsList.get(1);
+            // Maybe I'll need this later for optimizations IDK like only reloading the grid pane in question and not the whole thing
+            GridPane enemyGridPane = (GridPane) enemyObjectsList.get(1);
 
-        // GET THE WIZARD SPELL
-        List<Object> spellObjectsList = returnSelectedNodes(playerAvailableSpellsGrid, "clickableNodePressed");
-        Spell wizardChosenSpell = wizard.getSpellsHashMap().get((String) spellObjectsList.get(0));
+            // GET THE WIZARD SPELL
+            List<Object> spellObjectsList = returnSelectedNodes(playerAvailableSpellsGrid, "clickableNodePressed");
+            Spell wizardChosenSpell = wizard.getSpellsHashMap().get((String) spellObjectsList.get(0));
 
-        // Maybe I'll need this later for optimizations IDK
-        GridPane spellGridPane = (GridPane) spellObjectsList.get(1);
 
-        // ACTIVATE POTIONS ----------------- MIGHT HAVE TO REMOVE THIS AND MOVE IT TO A MORE GENERAL FUNCTION LATER
-        Wizard.wizard.applyPotionEffect();
+            // Maybe I'll need this later for optimizations IDK
+            GridPane spellGridPane = (GridPane) spellObjectsList.get(1);
 
-        enemyVictim.updateBossVulnerableSpellsList();
-        boolean isVulnerableSpell = enemyVictim.vulnerabilityChecker(enemyVictim.getEnemyName().getEnemyHpLimitRatio(), wizardChosenSpell);
+            // ACTIVATE POTIONS ----------------- MIGHT HAVE TO REMOVE THIS AND MOVE IT TO A MORE GENERAL FUNCTION LATER
+            Wizard.wizard.applyPotionEffect();
 
-        // CALCULATE THE SPELL DAMAGE BASED ON OTHER BUFFS
-        double wizardCalculatedDamage = wizard.returnSpellCalculatedDamage(wizardChosenSpell, enemyVictim);
+            enemyVictim.updateBossVulnerableSpellsList();
+            boolean isVulnerableSpell = enemyVictim.vulnerabilityChecker(enemyVictim.getEnemyName().getEnemyHpLimitRatio(), wizardChosenSpell);
 
-        // GET PARRY AND DODGE SUCCESS
-        double spellSuccess = Math.random();
-        double dodgeChance = wizard.returnSpellChance(wizardChosenSpell);
+            // CALCULATE THE SPELL DAMAGE BASED ON OTHER BUFFS
+            double wizardCalculatedDamage = wizard.returnSpellCalculatedDamage(wizardChosenSpell, enemyVictim);
 
-        boolean enemyDodgeSuccess = spellSuccess <= enemyVictim.returnDodgeChance(wizard, dodgeChance);
-        boolean enemyParrySuccess = false;
-        if(!enemyDodgeSuccess) enemyParrySuccess = enemyVictim.returnParryChance() > wizardCalculatedDamage;
+            // GET PARRY AND DODGE SUCCESS
+            double spellSuccess = Math.random();
+            double dodgeChance = wizard.returnSpellChance(wizardChosenSpell);
 
-        wizardCombatSystem(wizardChosenSpell, enemyVictim, actionSucceeded, isVulnerableSpell, enemyDodgeSuccess, enemyParrySuccess, wizardCalculatedDamage);
+            boolean enemyDodgeSuccess = spellSuccess <= enemyVictim.returnDodgeChance(wizard, dodgeChance);
+            boolean enemyParrySuccess = false;
+            if(!enemyDodgeSuccess) enemyParrySuccess = enemyVictim.returnParryChance() > wizardCalculatedDamage;
 
-        if (isVulnerableSpell && !enemyDodgeSuccess) {
-            attackAnimation(actionSucceeded, playerCombatGridPane,
-                    playerGridPane, enemyGridPane,
-                    wizardChosenSpell.getSpellImg(), 100, 200, false, () -> refreshEnemiesGridPane(enemyGridPane));
+            wizardCombatSystem(wizardChosenSpell, enemyVictim, actionSucceeded, isVulnerableSpell, enemyDodgeSuccess, enemyParrySuccess, wizardCalculatedDamage);
+
+            if (isVulnerableSpell && !enemyDodgeSuccess) {
+                attackAnimation(actionSucceeded, playerCombatGridPane,
+                        playerGridPane, enemyGridPane,
+                        wizardChosenSpell.getSpellImg(), 100, 200, false, () -> refreshEnemiesGridPane(enemyGridPane));
+            }
+            else if(enemyDodgeSuccess) {
+                dodgeAnimation(actionSucceeded, playerCombatGridPane, playerGridPane, enemyGridPane,
+                        wizardChosenSpell.getSpellImg(), 100, 200, false);
+            }
+            else if(enemyParrySuccess) {
+                parryAnimation(actionSucceeded, playerCombatGridPane,
+                        playerGridPane, enemyGridPane, enemyCombatGridPane,
+                        wizardChosenSpell.getSpellImg(), 100, 200, wizard,
+                        () -> refreshPlayerGridPane(playerGridPane));
+            }
+
+            displayPlayerPotionsGridPane();
+
+            if (!enemiesHashMap.isEmpty()) {
+                displayPlayerSpellsGrid();
+                disableAllGridPaneButtons(playerAvailableSpellsGrid);
+                disableAllGridPaneButtons(combatGridPane, "enemyCombatGridPane");
+
+                enemyTurn();
+            } else {
+                isEnemySelected = false;
+            }
         }
-        else if(enemyDodgeSuccess) {
-            dodgeAnimation(actionSucceeded, playerCombatGridPane, playerGridPane, enemyGridPane,
-                    wizardChosenSpell.getSpellImg(), 100, 200, false);
-        }
-        else if(enemyParrySuccess) {
-            parryAnimation(actionSucceeded, playerCombatGridPane,
-                    playerGridPane, enemyGridPane, enemyCombatGridPane,
-                    wizardChosenSpell.getSpellImg(), 100, 200, wizard,
-                    () -> refreshPlayerGridPane(playerGridPane));
-        }
+        catch (Exception e) {
+            System.out.println("No enemy selected");
 
-        displayPlayerPotionsGridPane();
+            try {
+                List<Object> enemyObjectsList = returnSelectedNodes(combatGridPane, "enemyCombatGridPane", "clickableNodePressed");
+                GridPane enemyGridPane = (GridPane) enemyObjectsList.get(0);
+                combatGridPane.getChildren().remove(enemyGridPane);
+            }
+            catch(Exception ex) {
+                System.out.println("Node Deleted");
+            }
 
-        if (!enemiesHashMap.isEmpty()) {
-            displayPlayerSpellsGrid();
-            disableAllGridPaneButtons(playerAvailableSpellsGrid);
-            disableAllGridPaneButtons(combatGridPane, "enemyCombatGridPane");
-
-            enemyTurn();
-        } else {
             isEnemySelected = false;
+            isSpellSelected = false;
+            checkAttackBtnConditions();
+            displayPlayerSpellsGrid();
+            createPopup(gameSceneStage, Alert.AlertType.ERROR, "No enemy selected");
         }
+
     }
 
     private void enemyTurn() {
@@ -560,6 +574,17 @@ public class GameSceneController implements Initializable {
 
         psDefenseT.setText(String.valueOf((int) wizard.getDefensePoints()));
         psLevelT.setText(String.valueOf((int) wizard.getLevel()));
+
+//        ImageView levelImg = returnObjectImageView(returnFormattedEnum(level), 725, 1132, 1);
+//        middleGridPane.add(levelImg, 0, 0);
+        Image img = returnObjectImage(returnFormattedEnum(level));
+
+        BackgroundImage levelBackgroundImage = new BackgroundImage(img, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
+        Background levelBackground = new Background(levelBackgroundImage);
+
+//        middleGridPane.setStyle("-fx-background-radius: 50");
+        middleGridPane.setBackground(levelBackground);
+
     }
 
     private void displayObjective() {
@@ -603,13 +628,6 @@ public class GameSceneController implements Initializable {
                 deathLine = enemyDeathLineList.get(0);
             }
         }
-    }
-
-    private void updateLevelImg() {
-//        ImageView levelImg = returnObjectImageView(returnFormattedEnum(level), 725, 1132, 1);
-//        middleGridPane.add(levelImg, 0, 0);
-
-        middleGridPane.setBackground(new Background(new BackgroundImage(returnObjectImage(returnFormattedEnum(level)), BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT)));
     }
 
     private void displayPlayerSpellsGrid() {
@@ -749,7 +767,7 @@ public class GameSceneController implements Initializable {
 
         for (int i = 0; i < maxRows; i++) {
             RowConstraints row = new RowConstraints();
-            row.setMaxHeight(Region.USE_COMPUTED_SIZE);
+            row.setMaxHeight(110);
             row.setMinHeight(Region.USE_COMPUTED_SIZE);
             row.setPrefHeight(Region.USE_COMPUTED_SIZE);
             enemyCombatGridPane.getRowConstraints().add(row);
@@ -791,6 +809,7 @@ public class GameSceneController implements Initializable {
         if (enemy == null) {
             enemyCombatGridPane.getChildren().remove(enemyGridPane);
             isEnemySelected = false;
+            checkAttackBtnConditions();
         } else {
             assert enemyHealthBar != null;
             enemyHealthBar.setProgress(enemy.getHealthPoints() / enemy.getMaxHealthPoints());
@@ -798,7 +817,7 @@ public class GameSceneController implements Initializable {
 
         if (!enemiesHashMap.isEmpty()) {
             try {
-                List<Object> enemyObjectsList = returnSelectedNodes(gameSceneMainAnchorPane, "enemyCombatGridPane", "clickableNodePressed");
+                List<Object> enemyObjectsList = returnSelectedNodes(combatGridPane, "enemyCombatGridPane", "clickableNodePressed");
                 Enemy enemyVictim = enemiesHashMap.get((String) enemyObjectsList.get(0));
                 displayEnemyStats(enemiesHashMap.get(enemyVictim.getName()));
 
@@ -833,6 +852,11 @@ public class GameSceneController implements Initializable {
     public void checkAttackBtnConditions() {
         if (isEnemySelected && isSpellSelected) {
             enableGridPaneButton(actionsGridPane, attackBtn);
+        }
+        else {
+            actionCircleTimeline.stop();
+            disableGridPaneButton(actionsGridPane, attackBtn);
+            enableAllGridPaneButtons(combatGridPane, "enemyCombatGridPane");
         }
     }
 

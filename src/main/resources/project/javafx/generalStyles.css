@@ -15,7 +15,7 @@
 }
 
 .menuItemText:hover {
-    -fx-fill: lightblue;
+    -fx-fill: #062172;
     -fx-font-family: "Bell MT", sans-serif;
     -fx-font-size: 43;
 }
@@ -40,7 +40,7 @@
     -fx-font-family: "Bell MT", sans-serif;
     -fx-font-size: 35;
     -fx-font-style: italic;
-    -fx-fill: lightblue;
+    -fx-fill: #062172;
 }
 
 .infoItemTextHover {
@@ -50,7 +50,7 @@
 }
 
 .infoItemTextHover:hover {
-    -fx-fill: lightblue;
+    -fx-fill: #062172;
     -fx-font-family: "Bell MT", sans-serif;
     -fx-font-size: 29;
 }
@@ -78,7 +78,7 @@
 }
 
 .saveInfoGridPane:hover {
-    -fx-border-color: lightblue;
+    -fx-border-color: #062172;
     -fx-border-width: 2;
 }
 
@@ -90,13 +90,13 @@
 .simpleEnabledNode {
     -fx-font-family: "Bell MT", sans-serif;
     -fx-font-size: 20;
-    -fx-fill: lightblue;
+    -fx-fill: #062172;
 }
 
 .simpleDisabledNode {
     -fx-font-family: "Bell MT", sans-serif;
     -fx-font-size: 20;
-    -fx-fill: #e37b7b;
+    -fx-fill: darkred;
 }
 
 .scrollPane {
@@ -104,34 +104,37 @@
 }
 
 .defaultAnchorPane {
-    -fx-background-color: grey;
+    -fx-background-color: transparent;
 }
 
 .clickableNode {
     -fx-border-color: transparent;
-    -fx-border-width: 1;
+    -fx-border-width: 3;
+    -fx-border-radius: 15;
 }
 
 .clickableNode:hover {
-    -fx-border-color: lightblue;
-    -fx-border-width: 1;
+    -fx-border-color: darkred;
+    -fx-border-width: 3;
+    -fx-border-radius: 15;
 }
 
 .clickableNodePressed {
-    -fx-border-color: lightblue;
-    -fx-border-width: 1;
+    -fx-border-color: darkred;
+    -fx-border-width: 3;
+    -fx-border-radius: 15;
 }
 
 .consoleText {
     -fx-font-family: "Bell MT", sans-serif;
     -fx-font-size: 15;
-    -fx-text-fill: black;
+    -fx-text-fill: #062172;
 }
 
 .characterGridPaneText{
     -fx-font-family: "Bell MT", sans-serif;
     -fx-font-size: 16;
-    -fx-text-fill: black;
+    -fx-text-fill: #062172;
     -fx-text-alignment: center;
     -fx-wrap-text: 100px;
 }
@@ -141,11 +144,35 @@
     -fx-padding: 0px;
 }
 
-.playerGridPaneBackground {
-    -fx-background-color: lightgrey;
+.characterTopGridPaneBackground {
+    -fx-background-color: #db954a;
+    -fx-background-radius: 15 15 0 0;
+    -fx-opacity: 0.6;
+}
+
+.characterBottomGridPaneBackground {
+    -fx-background-color: #db954a;
+    -fx-background-radius: 0 0 15 15;
+    -fx-opacity: 0.6;
 }
 
 
-.enemyGridPaneBackground {
-    -fx-background-color: indianred;
+.papyrusBackground {
+    -fx-background-image: url('../../icons/Papyrus.png');
+    -fx-background-size: 100% 100%;
+}
+
+.mainMenuBackground {
+    -fx-background-image: url('../../icons/MainMenu.jpg');
+    -fx-background-size: 100% 100%;
+}
+
+.mainMenuObject {
+    -fx-background-color: black;
+    -fx-opacity: 0.5;
+    -fx-background-radius: 100;
+}
+
+.levelBackground {
+    -fx-background-radius: 50;
 }

@@ -28,10 +28,12 @@ import project.classes.Enemy;
 import project.classes.Wizard;
 import project.enums.EnemyCombat;
 
+import java.awt.*;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
+import java.util.List;
 
 import static project.enums.EnumMethods.returnFormattedEnum;
 import static project.functions.GeneralFunctions.chooseRandomDouble;
@@ -212,6 +214,12 @@ public class JavaFxFunctions {
         verticalGridPane.getRowConstraints().addAll(verticalGridPaneRow1, verticalGridPaneRow2);
         verticalGridPane.getColumnConstraints().addAll(verticalGridPaneColumn1);
 
+        StackPane backgroundPane1 = new StackPane();
+        backgroundPane1.getStyleClass().add("characterTopGridPaneBackground");
+        GridPane.setFillHeight(backgroundPane1, true);
+        GridPane.setFillWidth(backgroundPane1, true);
+        verticalGridPane.add(backgroundPane1, 0, 0);
+
         verticalGridPane.add(horizontalGridPane, 0, 0);
 
 //        verticalGridPane.setGridLinesVisible(true);
@@ -229,7 +237,7 @@ public class JavaFxFunctions {
         ImageView characterImageView = returnObjectImageView(characterName, 50, 50, 1);
 
         Text characterNameText = new Text(characterNameString);
-        characterNameText.setWrappingWidth(100);
+        characterNameText.setWrappingWidth(80);
         characterNameText.getStyleClass().add("characterGridPaneText");
 
         horizontalGridPane.add(characterImageView, 0, 0);
@@ -237,18 +245,16 @@ public class JavaFxFunctions {
 
         ProgressBar characterHealthBar = generateCharacterProgressBar(abstractCharacter.getHealthPoints() / abstractCharacter.getMaxHealthPoints());
 
-        verticalGridPane.add(characterHealthBar, 0, 1);
-
         verticalGridPane.setId(abstractCharacter.getName());
 
-        StackPane backgroundPane1 = new StackPane();
         StackPane backgroundPane2 = new StackPane();
-        backgroundPane1.getStyleClass().add("playerGridPaneBackground");
-        backgroundPane2.getStyleClass().add("playerGridPaneBackground");
-        GridPane.setFillHeight(backgroundPane1, true);
-        GridPane.setFillWidth(backgroundPane1, true);
+        backgroundPane2.getStyleClass().add("characterBottomGridPaneBackground");
         GridPane.setFillHeight(backgroundPane2, true);
         GridPane.setFillWidth(backgroundPane2, true);
+        verticalGridPane.add(backgroundPane2, 0, 1);
+
+        verticalGridPane.add(characterHealthBar, 0, 1);
+        verticalGridPane.getStyleClass().add("clickableNode");
 
 
         return verticalGridPane;
@@ -355,7 +361,7 @@ public class JavaFxFunctions {
         return returnSelectedNodesSub(selectedObjectClass, parentGridPane);
     }
 
-    public static List<Object> returnSelectedNodes(AnchorPane mainAnchorPane, String parentGridPaneFxID, String selectedObjectClass) {
+    public static List<Object> returnSelectedNodes(GridPane mainAnchorPane, String parentGridPaneFxID, String selectedObjectClass) {
         GridPane parentGridPane = (GridPane) mainAnchorPane.lookup("#" + parentGridPaneFxID);
         return returnSelectedNodesSub(selectedObjectClass, parentGridPane);
     }

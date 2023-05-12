@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.String?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ProgressBar?>
@@ -17,7 +18,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane fx:id="gameSceneMainAnchorPane" maxHeight="1010.0" maxWidth="1920.0" minHeight="1010.0" minWidth="1920.0" onKeyPressed="#onKeyPressed" prefHeight="1010.0" prefWidth="1920.0" styleClass="mainWindow" stylesheets="@generalStyles.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="project.javafx.controllers.GameSceneController">
+<AnchorPane fx:id="gameSceneMainAnchorPane" maxHeight="1010.0" maxWidth="1920.0" minHeight="1010.0" minWidth="1920.0" onKeyPressed="#onKeyPressed" prefHeight="1010.0" prefWidth="1920.0" stylesheets="@generalStyles.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="project.javafx.controllers.GameSceneController">
    <children>
       <GridPane fx:id="gameMainGrid" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1010.0" prefWidth="1920.0">
         <columnConstraints>
@@ -208,7 +209,7 @@
                                              </stops>
                                           </RadialGradient>
                                        </fill></Circle>
-                                    <Circle fx:id="actionCircle" fill="#80808000" layoutX="202.0" layoutY="109.0" radius="1.0" stroke="LIGHTBLUE" strokeType="INSIDE" strokeWidth="3.0" />
+                                    <Circle fx:id="actionCircle" fill="#80808000" layoutX="202.0" layoutY="109.0" radius="1.0" stroke="#062172" strokeType="INSIDE" strokeWidth="3.0" />
                                  </children>
                               </AnchorPane>
                               <Line endX="260.0" startX="-85.0" GridPane.rowIndex="1" />
@@ -317,7 +318,7 @@
                   <Line endX="214.5" startX="-100.0" GridPane.rowIndex="3" />
                   <ScrollPane styleClass="scrollPane" vbarPolicy="ALWAYS" GridPane.rowIndex="4">
                     <content>
-                      <AnchorPane prefHeight="180.0" prefWidth="369.0" styleClass="defaultAnchorPane">
+                      <AnchorPane prefHeight="180.0" prefWidth="369.0">
                            <children>
                               <GridPane fx:id="playerPotionsGridPane" maxHeight="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="369.0">
                                 <columnConstraints>
@@ -331,6 +332,10 @@
                                  </padding>
                               </GridPane>
                            </children>
+                           <styleClass>
+                              <String fx:value="defaultAnchorPane" />
+                              <String fx:value="papyrusBackground" />
+                           </styleClass>
                         </AnchorPane>
                     </content>
                   </ScrollPane>
@@ -352,10 +357,14 @@
                               <Insets bottom="5.0" left="5.0" />
                            </GridPane.margin>
                            <content>
-                              <AnchorPane prefHeight="211.0" prefWidth="364.0" styleClass="defaultAnchorPane">
+                              <AnchorPane prefHeight="211.0" prefWidth="364.0">
                                  <children>
                                     <Text fx:id="consoleT" layoutX="10.0" layoutY="16.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="consoleText" />
                                  </children>
+                                 <styleClass>
+                                    <String fx:value="defaultAnchorPane" />
+                                    <String fx:value="papyrusBackground" />
+                                 </styleClass>
                               </AnchorPane>
                            </content>
                         </ScrollPane>
@@ -436,4 +445,8 @@
          </children>
       </GridPane>
    </children>
+   <styleClass>
+      <String fx:value="mainWindow" />
+      <String fx:value="papyrusBackground" />
+   </styleClass>
 </AnchorPane>
