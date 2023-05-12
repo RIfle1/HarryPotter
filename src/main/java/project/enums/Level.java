@@ -90,7 +90,7 @@ public enum Level {
             1,
             1,
             1,
-            "You have graduated from the Battle Arena!",
+            "You deafeated all the enemies in the Battle Arena!",
             100,
             false);
 
@@ -141,8 +141,10 @@ public enum Level {
     }
 
     public static void unlockNextLevel(Level previousLevel) {
-        Level nextLevel = setLevel(returnLevelList().get(returnLevelList().indexOf(returnFormattedEnum(previousLevel)) + 1));
-        nextLevel.setUnlocked(true);
+        if(!previousLevel.equals(Level.Battle_Arena)) {
+            Level nextLevel = setLevel(returnLevelList().get(returnLevelList().indexOf(returnFormattedEnum(previousLevel)) + 1));
+            nextLevel.setUnlocked(true);
+        }
     }
 
     public static Level setLevel(String level) {

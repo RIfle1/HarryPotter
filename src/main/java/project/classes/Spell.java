@@ -30,6 +30,7 @@ public class Spell implements Cloneable{
     private int spellCooldown;
     private int spellReadyIn;
     private String spellColor;
+    private String spellImg;
     final public static double maxDefenseReductionPercent = 0.2;
     final public static double parryMultiplier = 1;
 
@@ -45,6 +46,7 @@ public class Spell implements Cloneable{
             .spellCooldown(0)
             .spellReadyIn(0)
             .spellColor(Color.ANSI_RED)
+            .spellImg("Damage Spell")
             .build();
 
     public static Spell basicCast = Spell.builder()
@@ -59,6 +61,7 @@ public class Spell implements Cloneable{
             .spellCooldown(0)
             .spellReadyIn(0)
             .spellColor(Color.ANSI_RED)
+            .spellImg("Damage Spell")
             .build();
 
 //    public static Spell protego = Spell.builder()
@@ -87,6 +90,7 @@ public class Spell implements Cloneable{
             .spellCooldown(1)
             .spellReadyIn(0)
             .spellColor(Color.ANSI_YELLOW)
+            .spellImg("FollowUp Spell")
             .build();
 
     public static Spell glacius = Spell.builder()
@@ -101,6 +105,7 @@ public class Spell implements Cloneable{
             .spellCooldown(2)
             .spellReadyIn(0)
             .spellColor(Color.ANSI_RED)
+            .spellImg("Damage Spell")
             .build();
 
 //    public static Spell transformation = Spell.builder()
@@ -129,6 +134,7 @@ public class Spell implements Cloneable{
             .spellCooldown(2)
             .spellReadyIn(0)
             .spellColor(Color.ANSI_RED)
+            .spellImg("Damage Spell")
             .build();
 
     public static Spell descendo = Spell.builder()
@@ -143,6 +149,7 @@ public class Spell implements Cloneable{
             .spellCooldown(2)
             .spellReadyIn(0)
             .spellColor(Color.ANSI_RED)
+            .spellImg("Damage Spell")
             .build();
 
     public static Spell depulso = Spell.builder()
@@ -157,6 +164,7 @@ public class Spell implements Cloneable{
             .spellCooldown(2)
             .spellReadyIn(0)
             .spellColor(Color.ANSI_RED)
+            .spellImg("Damage Spell")
             .build();
 
     public static Spell bombarda = Spell.builder()
@@ -171,6 +179,7 @@ public class Spell implements Cloneable{
             .spellCooldown(3)
             .spellReadyIn(0)
             .spellColor(Color.ANSI_RED)
+            .spellImg("Damage Spell")
             .build();
 
     public static Spell confringo = Spell.builder()
@@ -185,6 +194,7 @@ public class Spell implements Cloneable{
             .spellCooldown(2)
             .spellReadyIn(0)
             .spellColor(Color.ANSI_RED)
+            .spellImg("Damage Spell")
             .build();
 
     public static Spell diffindo = Spell.builder()
@@ -199,6 +209,7 @@ public class Spell implements Cloneable{
             .spellCooldown(2)
             .spellReadyIn(0)
             .spellColor(Color.ANSI_RED)
+            .spellImg("Damage Spell")
             .build();
 
     public static Spell incendio = Spell.builder()
@@ -213,6 +224,7 @@ public class Spell implements Cloneable{
             .spellCooldown(2)
             .spellReadyIn(0)
             .spellColor(Color.ANSI_RED)
+            .spellImg("Damage Spell")
             .build();
 
     public static Spell avadaKedavra = Spell.builder()
@@ -227,6 +239,7 @@ public class Spell implements Cloneable{
             .spellCooldown(6)
             .spellReadyIn(0)
             .spellColor(Color.ANSI_RED)
+            .spellImg("Forbidden Spell")
             .build();
 
     public static Spell crucio = Spell.builder()
@@ -241,6 +254,7 @@ public class Spell implements Cloneable{
             .spellCooldown(4)
             .spellReadyIn(0)
             .spellColor(Color.ANSI_RED)
+            .spellImg("Forbidden Spell")
             .build();
 
     public static Spell legendarySword = Spell.builder()
@@ -255,6 +269,7 @@ public class Spell implements Cloneable{
             .spellCooldown(0)
             .spellReadyIn(0)
             .spellColor(Color.ANSI_YELLOW)
+            .spellImg("Damage Spell")
             .build();
 
     public static Spell expectroPatronum = Spell.builder()
@@ -269,6 +284,7 @@ public class Spell implements Cloneable{
             .spellCooldown(0)
             .spellReadyIn(0)
             .spellColor(Color.ANSI_BLUE)
+            .spellImg("Damage Spell")
             .build();
 
     public static Spell sectumsempra = Spell.builder()
@@ -283,6 +299,7 @@ public class Spell implements Cloneable{
             .spellCooldown(0)
             .spellReadyIn(0)
             .spellColor(Color.ANSI_RED)
+            .spellImg("Damage Spell")
             .build();
 
     public static Spell expelliarmus = Spell.builder()
@@ -297,6 +314,7 @@ public class Spell implements Cloneable{
             .spellCooldown(2)
             .spellReadyIn(0)
             .spellColor(Color.ANSI_RED)
+            .spellImg("Damage Spell")
             .build();
 
 //    public static Spell oneClap = Spell.builder()

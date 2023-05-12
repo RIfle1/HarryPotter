@@ -141,5 +141,11 @@
     -fx-padding: 0px;
 }
 
-.
+.playerGridPaneBackground {
+    -fx-background-color: lightgrey;
+}
 
+
+.enemyGridPaneBackground {
+    -fx-background-color: indianred;
+}

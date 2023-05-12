@@ -26,6 +26,7 @@ import org.jetbrains.annotations.NotNull;
 import project.abstractClasses.AbstractCharacter;
 import project.classes.Enemy;
 import project.classes.Wizard;
+import project.enums.EnemyCombat;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -162,18 +163,27 @@ public class JavaFxFunctions {
         ColumnConstraints horizontalGridPaneColumn1 = new ColumnConstraints();
         ColumnConstraints horizontalGridPaneColumn2 = new ColumnConstraints();
 
+        RowConstraints horizontalGridPaneRow1 = new RowConstraints();
+
         horizontalGridPaneColumn1.setHalignment(HPos.CENTER);
         horizontalGridPaneColumn2.setHalignment(HPos.CENTER);
 
+        horizontalGridPaneRow1.setValignment(VPos.CENTER);
+
         horizontalGridPaneColumn1.setMaxWidth(Region.USE_COMPUTED_SIZE);
         horizontalGridPaneColumn1.setMinWidth(Region.USE_COMPUTED_SIZE);
-        horizontalGridPaneColumn1.setPrefWidth(50);
+        horizontalGridPaneColumn1.setPrefWidth(70);
 
         horizontalGridPaneColumn2.setMaxWidth(Region.USE_COMPUTED_SIZE);
         horizontalGridPaneColumn2.setMinWidth(Region.USE_COMPUTED_SIZE);
         horizontalGridPaneColumn2.setPrefWidth(100);
 
+        horizontalGridPaneRow1.setMaxHeight(Region.USE_COMPUTED_SIZE);
+        horizontalGridPaneRow1.setMinHeight(Region.USE_COMPUTED_SIZE);
+        horizontalGridPaneRow1.setPrefHeight(70);
+
         horizontalGridPane.getColumnConstraints().addAll(horizontalGridPaneColumn1, horizontalGridPaneColumn2);
+        horizontalGridPane.getRowConstraints().add(horizontalGridPaneRow1);
 
 
 //        horizontalGridPane.setGridLinesVisible(true);
@@ -225,16 +235,27 @@ public class JavaFxFunctions {
         horizontalGridPane.add(characterImageView, 0, 0);
         horizontalGridPane.add(characterNameText, 1, 0);
 
-        ProgressBar characterHealthBar = returnCharacterProgressBar(abstractCharacter.getHealthPoints() / abstractCharacter.getMaxHealthPoints());
+        ProgressBar characterHealthBar = generateCharacterProgressBar(abstractCharacter.getHealthPoints() / abstractCharacter.getMaxHealthPoints());
 
         verticalGridPane.add(characterHealthBar, 0, 1);
+
         verticalGridPane.setId(abstractCharacter.getName());
+
+        StackPane backgroundPane1 = new StackPane();
+        StackPane backgroundPane2 = new StackPane();
+        backgroundPane1.getStyleClass().add("playerGridPaneBackground");
+        backgroundPane2.getStyleClass().add("playerGridPaneBackground");
+        GridPane.setFillHeight(backgroundPane1, true);
+        GridPane.setFillWidth(backgroundPane1, true);
+        GridPane.setFillHeight(backgroundPane2, true);
+        GridPane.setFillWidth(backgroundPane2, true);
+
 
         return verticalGridPane;
     }
 
 
-    private static ProgressBar returnCharacterProgressBar(double progressBarValue) {
+    private static ProgressBar generateCharacterProgressBar(double progressBarValue) {
         ProgressBar characterHealthBar = new ProgressBar();
         characterHealthBar.setProgress(progressBarValue);
         characterHealthBar.setPrefHeight(12);
@@ -391,10 +412,12 @@ public class JavaFxFunctions {
     }
 
     public static void animateAttack(GridPane mainGridPane, Node attackingNode, Node attackedNode,
-                                     String imgName, int imgHeight, int imgWidth, int imgColumn, int imgRow,
+                                     String imgName, int imgHeight, int imgWidth, int imgColumn, int imgRow, boolean rotate,
                                      boolean isTranslated, Runnable beforeFinishRunnable, double beforeFinishTimeStampPercent,
                                      Runnable onFinishedFunc) {
         ImageView imageView = returnObjectImageView(imgName, imgHeight, imgWidth, 1);
+        if(rotate) imageView.setRotate(180);
+
         mainGridPane.add(imageView, imgColumn, imgRow);
 
         Bounds startingBounds = attackingNode.localToScene(attackingNode.getBoundsInLocal());
@@ -466,19 +489,33 @@ public class JavaFxFunctions {
     }
 
     public static void parryAnimation(boolean attackerAttackSucceeded, GridPane attackingCharacterParentGridPane,
-                                GridPane attackingCharacterGridPane, GridPane attackedCharacterGridPane,
-                                GridPane attackedCharacterParentGridPane, Runnable onEndFunc) {
+                                      GridPane attackingCharacterGridPane, GridPane attackedCharacterGridPane,
+                                      GridPane attackedCharacterParentGridPane,
+                                      String imgName, int imgHeight, int imgWidth, AbstractCharacter attackingCharacter,
+                                      Runnable onEndFunc) {
 
         ImageView shield = returnObjectImageView("shield", 100,220, 0.2);
+        boolean rotateInitialAttack;
+        boolean rotateParry;
+
+        if(attackingCharacter instanceof Enemy) {
+            rotateInitialAttack = ((Enemy) attackingCharacter).getEnemyName().getEnemyCombat().equals(EnemyCombat.SPELL);
+            rotateParry = false;
+        }
+        else {
+            rotateInitialAttack = false;
+            rotateParry = true;
+        }
 
         animateAttack(attackingCharacterParentGridPane,
                 attackingCharacterGridPane,
                 attackedCharacterGridPane,
-                "fire",
-                100,
-                100,
+                imgName,
+                imgHeight,
+                imgWidth,
                 GridPane.getColumnIndex(attackingCharacterGridPane),
                 GridPane.getRowIndex(attackingCharacterGridPane),
+                rotateInitialAttack,
                 !attackerAttackSucceeded,
                 () -> {
                     if(attackerAttackSucceeded) {
@@ -493,11 +530,12 @@ public class JavaFxFunctions {
                     if(attackerAttackSucceeded) animateAttack(attackedCharacterParentGridPane,
                             attackedCharacterGridPane,
                             attackingCharacterGridPane,
-                            "fire",
+                            "FollowUp Spell",
                             100,
-                            100,
+                            200,
                             GridPane.getColumnIndex(attackedCharacterGridPane),
                             GridPane.getRowIndex(attackedCharacterGridPane),
+                            rotateParry,
                             false,
                             () -> {},
                             0.1,
@@ -510,15 +548,17 @@ public class JavaFxFunctions {
     }
 
     public static void dodgeAnimation(boolean attackerAttackSucceeded, GridPane attackingCharacterParentGridPane,
-                                      GridPane attackingCharacterGridPane, GridPane attackedCharacterGridPane) {
+                                      GridPane attackingCharacterGridPane, GridPane attackedCharacterGridPane,
+                                      String imgName, int imgHeight, int imgWidth, boolean rotate) {
         animateAttack(attackingCharacterParentGridPane,
                 attackingCharacterGridPane,
                 attackedCharacterGridPane,
-                "fire",
-                100,
-                100,
+                imgName,
+                imgHeight,
+                imgWidth,
                 GridPane.getColumnIndex(attackingCharacterGridPane),
                 GridPane.getRowIndex(attackingCharacterGridPane),
+                rotate,
                 !attackerAttackSucceeded,
                 () -> {
                     double randomDodge = chooseRandomDouble(new double[]{-1, 1});
@@ -535,15 +575,16 @@ public class JavaFxFunctions {
 
     public static void attackAnimation(boolean attackingCharacterSucceeded, GridPane attackingCharacterParentGridPane,
                                  GridPane attackingCharacterGridPane, GridPane attackedCharacterGridPane,
-                                 Runnable onEndFunc) {
+                                 String imgName, int imgHeight, int imgWidth, boolean rotate, Runnable onEndFunc) {
         animateAttack(attackingCharacterParentGridPane,
                 attackingCharacterGridPane,
                 attackedCharacterGridPane,
-                "fire",
-                100,
-                100,
+                imgName,
+                imgHeight,
+                imgWidth,
                 GridPane.getColumnIndex(attackingCharacterGridPane),
                 GridPane.getRowIndex(attackingCharacterGridPane),
+                rotate,
                 !attackingCharacterSucceeded,
                 () -> {},
                 0,

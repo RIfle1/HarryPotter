@@ -17,9 +17,7 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.*;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -115,6 +113,8 @@ public class GameSceneController implements Initializable {
     private Text psNameT;
     @FXML
     private Circle successActionCircle;
+    @FXML
+    private GridPane middleGridPane;
 
     public static void gameScene(ActionEvent event, Level levelParam) {
         Enemy.clearEnemies();
@@ -219,6 +219,8 @@ public class GameSceneController implements Initializable {
 
         disableAllGridPaneButtons(actionsGridPane);
         initializeActionCircleTimeline();
+
+        updateLevelImg();
 
         displayPlayerStats();
         displayObjective();
@@ -432,22 +434,26 @@ public class GameSceneController implements Initializable {
         // GET PARRY AND DODGE SUCCESS
         double spellSuccess = Math.random();
         double dodgeChance = wizard.returnSpellChance(wizardChosenSpell);
+
         boolean enemyDodgeSuccess = spellSuccess <= enemyVictim.returnDodgeChance(wizard, dodgeChance);
-        boolean enemyParrySuccess = enemyVictim.returnParryChance() > wizardCalculatedDamage;
+        boolean enemyParrySuccess = false;
+        if(!enemyDodgeSuccess) enemyParrySuccess = enemyVictim.returnParryChance() > wizardCalculatedDamage;
 
         wizardCombatSystem(wizardChosenSpell, enemyVictim, actionSucceeded, isVulnerableSpell, enemyDodgeSuccess, enemyParrySuccess, wizardCalculatedDamage);
 
-        if (isVulnerableSpell && !enemyDodgeSuccess && !enemyParrySuccess) {
+        if (isVulnerableSpell && !enemyDodgeSuccess) {
             attackAnimation(actionSucceeded, playerCombatGridPane,
                     playerGridPane, enemyGridPane,
-                    () -> refreshEnemiesGridPane(enemyGridPane));
+                    wizardChosenSpell.getSpellImg(), 100, 200, false, () -> refreshEnemiesGridPane(enemyGridPane));
         }
         else if(enemyDodgeSuccess) {
-            dodgeAnimation(actionSucceeded, playerCombatGridPane, playerGridPane, enemyGridPane);
+            dodgeAnimation(actionSucceeded, playerCombatGridPane, playerGridPane, enemyGridPane,
+                    wizardChosenSpell.getSpellImg(), 100, 200, false);
         }
         else if(enemyParrySuccess) {
             parryAnimation(actionSucceeded, playerCombatGridPane,
                     playerGridPane, enemyGridPane, enemyCombatGridPane,
+                    wizardChosenSpell.getSpellImg(), 100, 200, wizard,
                     () -> refreshPlayerGridPane(playerGridPane));
         }
 
@@ -500,17 +506,36 @@ public class GameSceneController implements Initializable {
         enemyAttack(enemyAttackSucceeded, wizardDodgeOrParrySuccess, enemyCalculatedDamage, attackingEnemy, enemyChosenSpell);
         GridPane enemyGridPane = (GridPane) returnChildNodeById(enemyCombatGridPane, attackingEnemy.getName());
 
+        String spellImg = "";
+        int imgHeight = 0;
+        int imgWidth = 0;
+        boolean rotate = true;
+
+        if(attackingEnemy.getEnemyName().getEnemyCombat() == EnemyCombat.SPELL) {
+            spellImg = enemyChosenSpell.getSpellImg();
+            imgHeight = 100;
+            imgWidth = 200;
+        }
+        else if(attackingEnemy.getEnemyName().getEnemyCombat() == EnemyCombat.MELEE) {
+            spellImg = "Melee";
+            imgHeight = 200;
+            imgWidth = 50;
+            rotate = false;
+        }
+
         if(!wizardDodgeOrParrySuccess) {
             attackAnimation(enemyAttackSucceeded, enemyCombatGridPane,
-                    enemyGridPane, playerGridPane, () -> refreshPlayerGridPane(playerGridPane));
+                    enemyGridPane, playerGridPane, spellImg, imgHeight, imgWidth, rotate,
+                    () -> refreshPlayerGridPane(playerGridPane));
         }
         else if(dodgeSuccess) {
             dodgeAnimation(enemyAttackSucceeded, enemyCombatGridPane,
-                    enemyGridPane, playerGridPane);
+                    enemyGridPane, playerGridPane, spellImg, imgHeight, imgWidth, rotate);
         }
         else if(parrySuccess) {
             parryAnimation(enemyAttackSucceeded, enemyCombatGridPane,
                     enemyGridPane, playerGridPane, playerCombatGridPane,
+                    spellImg, imgHeight, imgWidth, attackingEnemy,
                     () -> refreshEnemiesGridPane(enemyGridPane));
         }
 
@@ -551,6 +576,8 @@ public class GameSceneController implements Initializable {
     }
 
     private void updateDeathLine() {
+        deathLine = "";
+
         if(!level.getEnemyNameList().isEmpty()) {
             List<EnemyName> enemyNameList = level.getEnemyNameList();
             List<String> enemyDeathLineList = new ArrayList<>();
@@ -574,10 +601,15 @@ public class GameSceneController implements Initializable {
                 }
             } else if (enemyDeathLineList.size() == 1) {
                 deathLine = enemyDeathLineList.get(0);
-            } else {
-                deathLine = "";
             }
         }
+    }
+
+    private void updateLevelImg() {
+//        ImageView levelImg = returnObjectImageView(returnFormattedEnum(level), 725, 1132, 1);
+//        middleGridPane.add(levelImg, 0, 0);
+
+        middleGridPane.setBackground(new Background(new BackgroundImage(returnObjectImage(returnFormattedEnum(level)), BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT)));
     }
 
     private void displayPlayerSpellsGrid() {
@@ -713,6 +745,16 @@ public class GameSceneController implements Initializable {
     private void displayEnemiesGridPanes() {
         enemyCombatGridPane.getChildren().clear();
 
+        int maxRows = 7;
+
+        for (int i = 0; i < maxRows; i++) {
+            RowConstraints row = new RowConstraints();
+            row.setMaxHeight(Region.USE_COMPUTED_SIZE);
+            row.setMinHeight(Region.USE_COMPUTED_SIZE);
+            row.setPrefHeight(Region.USE_COMPUTED_SIZE);
+            enemyCombatGridPane.getRowConstraints().add(row);
+        }
+
 //        enemyCombatGridPane.setGridLinesVisible(true);
 
         AtomicInteger enemyCombatGridPaneRow = new AtomicInteger(0);
@@ -732,7 +774,7 @@ public class GameSceneController implements Initializable {
             enemyCombatGridPane.add(enemyGridPane, enemyCombatGridPaneColumn.get(), enemyCombatGridPaneRow.get());
             enemyCombatGridPaneRow.getAndIncrement();
 
-            if (enemyCombatGridPaneRow.get() == 7) {
+            if (enemyCombatGridPaneRow.get() == maxRows) {
                 enemyCombatGridPaneRow.set(0);
                 enemyCombatGridPaneColumn.getAndIncrement();
             }
@@ -748,6 +790,7 @@ public class GameSceneController implements Initializable {
 
         if (enemy == null) {
             enemyCombatGridPane.getChildren().remove(enemyGridPane);
+            isEnemySelected = false;
         } else {
             assert enemyHealthBar != null;
             enemyHealthBar.setProgress(enemy.getHealthPoints() / enemy.getMaxHealthPoints());
