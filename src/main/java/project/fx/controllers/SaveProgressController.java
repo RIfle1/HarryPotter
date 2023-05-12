@@ -1,4 +1,4 @@
-package project.javafx.controllers;
+package project.fx.controllers;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -16,9 +16,9 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static project.javafx.functions.JavaFxFunctions.createPopup;
-import static project.javafx.functions.JavaFxFunctions.returnSaveInfoGridPane;
-import static project.javafx.controllers.GameMenuController.gameMenuScene;
+import static project.fx.functions.JavaFxFunctions.createPopup;
+import static project.fx.functions.JavaFxFunctions.returnSaveInfoGridPane;
+import static project.fx.controllers.GameMenuController.gameMenuScene;
 
 public class SaveProgressController implements Initializable {
 

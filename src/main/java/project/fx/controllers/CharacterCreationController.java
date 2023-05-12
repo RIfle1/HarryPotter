@@ -1,4 +1,4 @@
-package project.javafx.controllers;
+package project.fx.controllers;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -14,7 +14,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import project.classes.Wand;
 import project.enums.*;
-import project.javafx.GuiMain;
+import project.fx.GuiMain;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -23,9 +23,9 @@ import java.util.ResourceBundle;
 
 import static project.functions.CharacterCreation.characterInit;
 import static project.functions.GeneralFunctions.checkString;
-import static project.javafx.functions.JavaFxFunctions.sendToScene;
-import static project.javafx.controllers.GameMenuController.gameMenuScene;
-import static project.javafx.controllers.MainMenuController.mainMenuScene;
+import static project.fx.functions.JavaFxFunctions.sendToScene;
+import static project.fx.controllers.GameMenuController.gameMenuScene;
+import static project.fx.controllers.MainMenuController.mainMenuScene;
 
 public class CharacterCreationController implements Initializable {
     @FXML

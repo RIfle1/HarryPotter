@@ -176,3 +176,8 @@
 .levelBackground {
     -fx-background-radius: 50;
 }
+
+.mainMenuTitleBackground {
+    -fx-background-image: url('../../icons/TitleBackground.png');
+    -fx-background-size: 100% 100%;
+}

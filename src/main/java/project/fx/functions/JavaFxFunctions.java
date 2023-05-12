@@ -1,4 +1,4 @@
-package project.javafx.functions;
+package project.fx.functions;
 
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
@@ -28,7 +28,6 @@ import project.classes.Enemy;
 import project.classes.Wizard;
 import project.enums.EnemyCombat;
 
-import java.awt.*;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -158,7 +157,6 @@ public class JavaFxFunctions {
     }
 
     public static GridPane generateCharacterGridPane(AbstractCharacter abstractCharacter) {
-
         // CHARACTER NAME AND PROFILE PIC GRID PANE
         GridPane horizontalGridPane = new GridPane();
         horizontalGridPane.setAlignment(Pos.CENTER);
@@ -180,9 +178,9 @@ public class JavaFxFunctions {
         horizontalGridPaneColumn2.setMinWidth(Region.USE_COMPUTED_SIZE);
         horizontalGridPaneColumn2.setPrefWidth(100);
 
-        horizontalGridPaneRow1.setMaxHeight(Region.USE_COMPUTED_SIZE);
-        horizontalGridPaneRow1.setMinHeight(Region.USE_COMPUTED_SIZE);
-        horizontalGridPaneRow1.setPrefHeight(70);
+//        horizontalGridPaneRow1.setMaxHeight(Region.USE_COMPUTED_SIZE);
+//        horizontalGridPaneRow1.setMinHeight(Region.USE_COMPUTED_SIZE);
+//        horizontalGridPaneRow1.setPrefHeight(60);
 
         horizontalGridPane.getColumnConstraints().addAll(horizontalGridPaneColumn1, horizontalGridPaneColumn2);
         horizontalGridPane.getRowConstraints().add(horizontalGridPaneRow1);
@@ -197,16 +195,25 @@ public class JavaFxFunctions {
         RowConstraints verticalGridPaneRow2 = new RowConstraints();
         ColumnConstraints verticalGridPaneColumn1 = new ColumnConstraints();
 
+        int verticalGridPaneColumn1Height = 170;
+
         verticalGridPaneColumn1.setMaxWidth(Region.USE_PREF_SIZE);
         verticalGridPaneColumn1.setMinWidth(Region.USE_PREF_SIZE);
-        verticalGridPaneColumn1.setPrefWidth(150);
+        verticalGridPaneColumn1.setPrefWidth(verticalGridPaneColumn1Height);
 
         verticalGridPaneColumn1.setHgrow(Priority.ALWAYS);
         verticalGridPaneColumn1.setHalignment(HPos.CENTER);
 
+        int verticalGridPaneRow1Height = 60;
+        int verticalGridPaneRow2Height = 25;
+
+        verticalGridPaneRow1.setMaxHeight(Region.USE_PREF_SIZE);
+        verticalGridPaneRow1.setMinHeight(Region.USE_PREF_SIZE);
+        verticalGridPaneRow1.setPrefHeight(verticalGridPaneRow1Height);
+
         verticalGridPaneRow2.setMaxHeight(Region.USE_PREF_SIZE);
         verticalGridPaneRow2.setMinHeight(Region.USE_PREF_SIZE);
-        verticalGridPaneRow2.setPrefHeight(25);
+        verticalGridPaneRow2.setPrefHeight(verticalGridPaneRow2Height);
 
         verticalGridPaneRow2.setVgrow(Priority.ALWAYS);
         verticalGridPaneRow2.setValignment(VPos.CENTER);
@@ -254,8 +261,13 @@ public class JavaFxFunctions {
         verticalGridPane.add(backgroundPane2, 0, 1);
 
         verticalGridPane.add(characterHealthBar, 0, 1);
-        verticalGridPane.getStyleClass().add("clickableNode");
+//        verticalGridPane.getStyleClass().add("clickableNode");
 
+
+        verticalGridPane.setPrefHeight(verticalGridPaneRow1Height + verticalGridPaneRow2Height);
+        verticalGridPane.setPrefWidth(verticalGridPaneColumn1Height);
+
+//        verticalGridPane.setGridLinesVisible(true);
 
         return verticalGridPane;
     }
@@ -369,10 +381,17 @@ public class JavaFxFunctions {
     @NotNull
     public static List<Object> returnSelectedNodesSub(String selectedObjectClass, GridPane parentGridPane) {
 
-        GridPane selectedNode = (GridPane) returnNodeByClass(parentGridPane, selectedObjectClass);
-        String nodeId = selectedNode.getId();
+        try {
+            GridPane selectedNode = (GridPane) returnNodeByClass(parentGridPane, selectedObjectClass);
+            String nodeId = selectedNode.getId();
 
-        return Arrays.asList(nodeId, selectedNode);
+            return Arrays.asList(nodeId, selectedNode);
+        }
+        catch (NullPointerException e) {
+            System.out.println("returnSelectedNodesSub *FUNCTION* -> No node found");
+            return new ArrayList<>();
+        }
+
     }
 
     public static Node returnNodeByClass(GridPane parentGridPane, String objectClass) {

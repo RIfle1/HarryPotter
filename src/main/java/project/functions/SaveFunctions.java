@@ -11,7 +11,6 @@ import project.classes.Wizard;
 import project.enums.Level;
 
 import java.io.*;
-import java.text.DateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -20,8 +19,8 @@ import java.util.stream.Stream;
 
 import static project.functions.GeneralFunctions.generateRandomString;
 import static project.functions.GeneralFunctions.returnFileAttribute;
-import static project.javafx.functions.JavaFxFunctions.createPopup;
-import static project.javafx.controllers.GameMenuController.gameMenuScene;
+import static project.fx.functions.JavaFxFunctions.createPopup;
+import static project.fx.controllers.GameMenuController.gameMenuScene;
 
 public class SaveFunctions {
     private static void createDir() {

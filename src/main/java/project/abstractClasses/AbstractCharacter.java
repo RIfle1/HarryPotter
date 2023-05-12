@@ -7,7 +7,7 @@ import project.classes.Potion;
 import project.classes.Spell;
 import project.classes.Wizard;
 import project.enums.*;
-import project.javafx.controllers.GameSceneController;
+import project.fx.controllers.GameSceneController;
 
 import java.util.ArrayList;
 import java.util.HashMap;

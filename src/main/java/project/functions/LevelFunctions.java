@@ -5,7 +5,7 @@ import project.classes.Enemy;
 import project.classes.Spell;
 import project.classes.Wizard;
 import project.enums.*;
-import project.javafx.controllers.GameSceneController;
+import project.fx.controllers.GameSceneController;
 
 import java.util.*;
 
@@ -220,24 +220,35 @@ public class LevelFunctions {
         boolean dodgeSuccess = spellSuccess <= enemyVictim.returnDodgeChance(wizard, dodgeChance);
         boolean parrySuccess = enemyVictim.returnParryChance() > wizardCalculatedDamage;
 
-        wizardCombatSystem(wizardChosenSpell, enemyVictim, attackSucceeded, isVulnerableSpell, dodgeSuccess, parrySuccess, wizardCalculatedDamage);
+        MoveType enemyMoveType = returnEnemyMoveType();
+
+        wizardCombatSystem(wizardChosenSpell, enemyVictim, attackSucceeded, isVulnerableSpell, dodgeSuccess, parrySuccess, wizardCalculatedDamage, enemyMoveType);
         ConsoleFunctions.continuePromptExtra();
+    }
+
+    public static MoveType returnEnemyMoveType() {
+        // CREATE A LIST OF MOVE TYPES THAT THE ENEMY CAN USE
+        List<String> moveTypeList = MoveType.returnMoveTypeListExcept(new ArrayList<>(Arrays.asList(MoveType.ATTACK, MoveType.FOLLOW_UP)));
+        // GENERATE A RANDOM MOVE TYPE
+        int generateRandomMoveType = (int) GeneralFunctions.generateDoubleBetween(0, moveTypeList.size() - 1);
+        // ENEMY RANDOM MOVE TYPE
+        return MoveType.setMoveType(moveTypeList.get(generateRandomMoveType));
     }
 
     // CONSOLE AND GUI FUNCTION
     public static void wizardCombatSystem(Spell wizardChosenSpell, Enemy enemyVictim,
                                           boolean attackSucceeded, boolean isVulnerableSpell,
                                           boolean enemyDodgeSuccess, boolean enemyParrySuccess,
-                                          double wizardCalculatedDamage) {
-        MoveType enemyMoveType;
+                                          double wizardCalculatedDamage, MoveType enemyMoveType) {
+//        MoveType enemyMoveType;
         // INITIALIZE VARIABLE
         boolean enemyDodgeOrParrySuccess = false;
 
         // CREATE A LIST OF MOVE TYPES THAT THE ENEMY CAN USE
-        List<String> moveTypeList = MoveType.returnMoveTypeListExcept(new ArrayList<>(Arrays.asList(MoveType.ATTACK, MoveType.FOLLOW_UP)));
+//        List<String> moveTypeList = MoveType.returnMoveTypeListExcept(new ArrayList<>(Arrays.asList(MoveType.ATTACK, MoveType.FOLLOW_UP)));
 
         // GENERATE A RANDOM MOVE TYPE
-        int generateRandomMoveType = (int) GeneralFunctions.generateDoubleBetween(0, moveTypeList.size() - 1);
+//        int generateRandomMoveType = (int) GeneralFunctions.generateDoubleBetween(0, moveTypeList.size() - 1);
 
         String spellName = wizardChosenSpell.getSpellName();
         String spellNameText = returnColoredText(spellName + "!", wizardChosenSpell.getSpellColor());
@@ -249,7 +260,7 @@ public class LevelFunctions {
             GameSceneController.updateConsoleTaStatic(spellNameText, false);
 
             // ENEMY RANDOM MOVE TYPE
-            enemyMoveType = MoveType.setMoveType(moveTypeList.get(generateRandomMoveType));
+//            enemyMoveType = MoveType.setMoveType(moveTypeList.get(generateRandomMoveType));
 
 
             // EXECUTE ACTION BASED ON RANDOM CHOICE

@@ -6,7 +6,7 @@ import lombok.Setter;
 import project.abstractClasses.AbstractCharacter;
 import project.enums.*;
 import project.functions.GeneralFunctions;
-import project.javafx.controllers.GameSceneController;
+import project.fx.controllers.GameSceneController;
 
 import java.util.ArrayList;
 import java.util.HashMap;

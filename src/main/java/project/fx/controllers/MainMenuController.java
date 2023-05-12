@@ -1,4 +1,4 @@
-package project.javafx.controllers;
+package project.fx.controllers;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -8,14 +8,14 @@ import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import project.javafx.GuiMain;
+import project.fx.GuiMain;
 
 import java.io.IOException;
 import java.util.Objects;
 
 import static project.functions.SaveFunctions.continueGame;
-import static project.javafx.controllers.CharacterCreationController.characterCreationScene;
-import static project.javafx.controllers.LoadGameController.loadGameScene;
+import static project.fx.controllers.CharacterCreationController.characterCreationScene;
+import static project.fx.controllers.LoadGameController.loadGameScene;
 
 public class MainMenuController {
     @FXML

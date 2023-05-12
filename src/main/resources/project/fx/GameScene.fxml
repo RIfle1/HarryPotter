@@ -18,7 +18,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane fx:id="gameSceneMainAnchorPane" maxHeight="1010.0" maxWidth="1920.0" minHeight="1010.0" minWidth="1920.0" onKeyPressed="#onKeyPressed" prefHeight="1010.0" prefWidth="1920.0" stylesheets="@generalStyles.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="project.javafx.controllers.GameSceneController">
+<AnchorPane maxHeight="1010.0" maxWidth="1920.0" minHeight="1010.0" minWidth="1920.0" onKeyPressed="#onKeyPressed" prefHeight="1010.0" prefWidth="1920.0" stylesheets="@generalStyles.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="project.fx.controllers.GameSceneController">
    <children>
       <GridPane fx:id="gameMainGrid" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1010.0" prefWidth="1920.0">
         <columnConstraints>
@@ -221,8 +221,8 @@
                   <GridPane fx:id="combatGridPane" alignment="CENTER" prefHeight="758.0" prefWidth="1158.0">
                     <columnConstraints>
                       <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" percentWidth="20.0" prefWidth="100.0" />
-                      <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" percentWidth="50.0" prefWidth="100.0" />
-                        <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" percentWidth="30.0" prefWidth="100.0" />
+                      <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" percentWidth="44.0" prefWidth="100.0" />
+                        <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" percentWidth="36.0" prefWidth="100.0" />
                     </columnConstraints>
                     <rowConstraints>
                       <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />

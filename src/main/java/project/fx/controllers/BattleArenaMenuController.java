@@ -1,4 +1,4 @@
-package project.javafx.controllers;
+package project.fx.controllers;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -11,21 +11,17 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import project.abstractClasses.AbstractCharacter;
-import project.classes.Enemy;
 import project.enums.Level;
-import project.javafx.GuiMain;
+import project.fx.GuiMain;
 
 import java.net.URL;
 import java.util.ResourceBundle;
 
 import static project.classes.Enemy.generateEnemies;
-import static project.functions.CharacterCreation.characterInit;
 import static project.functions.GeneralFunctions.checkPositiveInt;
-import static project.functions.GeneralFunctions.checkString;
-import static project.javafx.controllers.GameMenuController.gameMenuScene;
-import static project.javafx.controllers.GameSceneController.gameScene;
-import static project.javafx.controllers.MainMenuController.mainMenuScene;
-import static project.javafx.functions.JavaFxFunctions.sendToScene;
+import static project.fx.controllers.GameMenuController.gameMenuScene;
+import static project.fx.controllers.GameSceneController.gameScene;
+import static project.fx.functions.JavaFxFunctions.sendToScene;
 
 public class BattleArenaMenuController implements Initializable {
 
