@@ -5,3 +5,7 @@ target/
 *.idea
 *.iml
 
+saves/
+
+out/
+
