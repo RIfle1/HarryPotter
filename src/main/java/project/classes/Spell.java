@@ -1,19 +1,17 @@
 package project.classes;
 
-import project.enums.CharacterState;
-import project.enums.MoveType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import project.enums.CharacterState;
+import project.enums.MoveType;
 import project.functions.ConsoleFunctions;
 import project.functions.GeneralFunctions;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-
-import static project.classes.Color.returnColoredText;
 
 @Getter
 @Setter
@@ -32,8 +30,9 @@ public class Spell implements Cloneable{
     private int spellCooldown;
     private int spellReadyIn;
     private String spellColor;
+    private String spellImg;
     final public static double maxDefenseReductionPercent = 0.2;
-    final public static double parryMultiplier = 0.3;
+    final public static double parryMultiplier = 1;
 
     public static Spell wingardiumLeviosa = Spell.builder()
             .spellName("Wingardium Leviosa")
@@ -41,26 +40,28 @@ public class Spell implements Cloneable{
             .spellDescription("Summons and then throws special environmental objects at the targeted enemy.")
             .spellSpecialAttackLine("You've thrown an object at the enemy!")
             .spellLevelRequirement(0)
-            .spellDamage(new double[]{50, 120})
+            .spellDamage(new double[]{50, 90})
             .characterState(CharacterState.LEVITATING)
             .spellChance(0.9)
             .spellCooldown(0)
             .spellReadyIn(0)
             .spellColor(Color.ANSI_RED)
+            .spellImg("Damage Spell")
             .build();
 
     public static Spell basicCast = Spell.builder()
             .spellName("Basic Cast")
             .spellType(MoveType.ATTACK)
             .spellDescription("Deals minor damage to enemies and objects.")
-            .spellSpecialAttackLine("Basic Cast!")
+            .spellSpecialAttackLine("A bright light rushes towards the enemy!")
             .spellLevelRequirement(0)
-            .spellDamage(new double[]{40, 80})
+            .spellDamage(new double[]{65, 70})
             .characterState(CharacterState.STANDING)
             .spellChance(0.9)
             .spellCooldown(0)
             .spellReadyIn(0)
             .spellColor(Color.ANSI_RED)
+            .spellImg("Damage Spell")
             .build();
 
 //    public static Spell protego = Spell.builder()
@@ -89,6 +90,7 @@ public class Spell implements Cloneable{
             .spellCooldown(1)
             .spellReadyIn(0)
             .spellColor(Color.ANSI_YELLOW)
+            .spellImg("FollowUp Spell")
             .build();
 
     public static Spell glacius = Spell.builder()
@@ -97,12 +99,13 @@ public class Spell implements Cloneable{
             .spellDescription("Stuns enemies, making them easy targets for follow-up spells.")
             .spellSpecialAttackLine("You've cancelled the enemy's spell!")
             .spellLevelRequirement(5)
-            .spellDamage(new double[]{60, 80})
+            .spellDamage(new double[]{80, 100})
             .characterState(CharacterState.FROZEN)
             .spellChance(0.6)
             .spellCooldown(2)
             .spellReadyIn(0)
             .spellColor(Color.ANSI_RED)
+            .spellImg("Damage Spell")
             .build();
 
 //    public static Spell transformation = Spell.builder()
@@ -125,27 +128,29 @@ public class Spell implements Cloneable{
             .spellDescription("Summon a variety of objects and enemies to close range.")
             .spellSpecialAttackLine("The enemy has been pulled close to you!")
             .spellLevelRequirement(1)
-            .spellDamage(new double[]{50, 80})
+            .spellDamage(new double[]{60, 90})
             .characterState(CharacterState.LEVITATING)
             .spellChance(0.7)
             .spellCooldown(2)
             .spellReadyIn(0)
             .spellColor(Color.ANSI_RED)
+            .spellImg("Damage Spell")
             .build();
 
-    public static Spell descendo = Spell.builder()
-            .spellName("Descendo")
-            .spellType(MoveType.ATTACK)
-            .spellDescription("Deals no direct damage, but objects and enemies that are slammed to the ground will suffer considerable impact damage. Airborne enemies will take even greater damage upon hitting the ground.")
-            .spellSpecialAttackLine("You've slammed the enemy into the ground!")
-            .spellLevelRequirement(4)
-            .spellDamage(new double[]{70, 90})
-            .characterState(CharacterState.KNOCKED)
-            .spellChance(0.7)
-            .spellCooldown(2)
-            .spellReadyIn(0)
-            .spellColor(Color.ANSI_RED)
-            .build();
+//    public static Spell descendo = Spell.builder()
+//            .spellName("Descendo")
+//            .spellType(MoveType.ATTACK)
+//            .spellDescription("Deals no direct damage, but objects and enemies that are slammed to the ground will suffer considerable impact damage. Airborne enemies will take even greater damage upon hitting the ground.")
+//            .spellSpecialAttackLine("You've slammed the enemy into the ground!")
+//            .spellLevelRequirement(4)
+//            .spellDamage(new double[]{70, 90})
+//            .characterState(CharacterState.KNOCKED)
+//            .spellChance(0.7)
+//            .spellCooldown(2)
+//            .spellReadyIn(0)
+//            .spellColor(Color.ANSI_RED)
+//            .spellImg("Damage Spell")
+//            .build();
 
     public static Spell depulso = Spell.builder()
             .spellName("Depulso")
@@ -153,12 +158,13 @@ public class Spell implements Cloneable{
             .spellDescription("Repels many types of objects and enemies with considerable force.")
             .spellSpecialAttackLine("You've kicked the enemy into the wall!")
             .spellLevelRequirement(6)
-            .spellDamage(new double[]{80, 100})
+            .spellDamage(new double[]{80, 110})
             .characterState(CharacterState.KNOCKED)
             .spellChance(0.6)
             .spellCooldown(2)
             .spellReadyIn(0)
             .spellColor(Color.ANSI_RED)
+            .spellImg("Damage Spell")
             .build();
 
     public static Spell bombarda = Spell.builder()
@@ -167,12 +173,13 @@ public class Spell implements Cloneable{
             .spellDescription("Deals heavy damage on impact, accompanied by an explosion that can destroy heavy objects and hit surrounding enemies.")
             .spellSpecialAttackLine("You send an explosion towards your enemies!")
             .spellLevelRequirement(8)
-            .spellDamage(new double[]{100, 200})
+            .spellDamage(new double[]{150, 200})
             .characterState(CharacterState.ON_FIRE)
             .spellChance(0.4)
             .spellCooldown(3)
             .spellReadyIn(0)
             .spellColor(Color.ANSI_RED)
+            .spellImg("Damage Spell")
             .build();
 
     public static Spell confringo = Spell.builder()
@@ -181,12 +188,13 @@ public class Spell implements Cloneable{
             .spellDescription("A long-range bolt that deals damage on impact, and set enemies on fire.")
             .spellSpecialAttackLine("Your enemy is on fire!")
             .spellLevelRequirement(5)
-            .spellDamage(new double[]{60, 80})
+            .spellDamage(new double[]{90, 110})
             .characterState(CharacterState.ON_FIRE)
             .spellChance(0.6)
             .spellCooldown(2)
             .spellReadyIn(0)
             .spellColor(Color.ANSI_RED)
+            .spellImg("Damage Spell")
             .build();
 
     public static Spell diffindo = Spell.builder()
@@ -195,12 +203,13 @@ public class Spell implements Cloneable{
             .spellDescription("Slashes objects and enemies from afar dealing considerable damage.")
             .spellSpecialAttackLine("Your enemy has been slashed!")
             .spellLevelRequirement(7)
-            .spellDamage(new double[]{60, 80})
+            .spellDamage(new double[]{70, 110})
             .characterState(CharacterState.STANDING)
             .spellChance(0.6)
             .spellCooldown(2)
             .spellReadyIn(0)
             .spellColor(Color.ANSI_RED)
+            .spellImg("Damage Spell")
             .build();
 
     public static Spell incendio = Spell.builder()
@@ -209,12 +218,13 @@ public class Spell implements Cloneable{
             .spellDescription("Deals significant damage and lights certain objects on fire, but its range is short and requires you to be close to the target.")
             .spellSpecialAttackLine("Your enemy has been slashed!")
             .spellLevelRequirement(7)
-            .spellDamage(new double[]{60, 80})
+            .spellDamage(new double[]{80, 110})
             .characterState(CharacterState.ON_FIRE)
             .spellChance(0.6)
             .spellCooldown(2)
             .spellReadyIn(0)
             .spellColor(Color.ANSI_RED)
+            .spellImg("Damage Spell")
             .build();
 
     public static Spell avadaKedavra = Spell.builder()
@@ -229,6 +239,7 @@ public class Spell implements Cloneable{
             .spellCooldown(6)
             .spellReadyIn(0)
             .spellColor(Color.ANSI_RED)
+            .spellImg("Forbidden Spell")
             .build();
 
     public static Spell crucio = Spell.builder()
@@ -237,12 +248,13 @@ public class Spell implements Cloneable{
             .spellDescription("Curses the victim, cursed enemies take extra damage.")
             .spellSpecialAttackLine("You've cursed the enemy!")
             .spellLevelRequirement(8)
-            .spellDamage(new double[]{50, 70})
+            .spellDamage(new double[]{200, 350})
             .characterState(CharacterState.CURSED)
             .spellChance(0.8)
             .spellCooldown(4)
             .spellReadyIn(0)
             .spellColor(Color.ANSI_RED)
+            .spellImg("Forbidden Spell")
             .build();
 
     public static Spell legendarySword = Spell.builder()
@@ -257,6 +269,7 @@ public class Spell implements Cloneable{
             .spellCooldown(0)
             .spellReadyIn(0)
             .spellColor(Color.ANSI_YELLOW)
+            .spellImg("Damage Spell")
             .build();
 
     public static Spell expectroPatronum = Spell.builder()
@@ -271,6 +284,7 @@ public class Spell implements Cloneable{
             .spellCooldown(0)
             .spellReadyIn(0)
             .spellColor(Color.ANSI_BLUE)
+            .spellImg("Damage Spell")
             .build();
 
     public static Spell sectumsempra = Spell.builder()
@@ -285,6 +299,7 @@ public class Spell implements Cloneable{
             .spellCooldown(0)
             .spellReadyIn(0)
             .spellColor(Color.ANSI_RED)
+            .spellImg("Damage Spell")
             .build();
 
     public static Spell expelliarmus = Spell.builder()
@@ -299,6 +314,7 @@ public class Spell implements Cloneable{
             .spellCooldown(2)
             .spellReadyIn(0)
             .spellColor(Color.ANSI_RED)
+            .spellImg("Damage Spell")
             .build();
 
 //    public static Spell oneClap = Spell.builder()

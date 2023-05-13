@@ -1,9 +1,10 @@
 package project.classes;
-import project.enums.Core;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import project.enums.Core;
 
 @Getter
 @Setter

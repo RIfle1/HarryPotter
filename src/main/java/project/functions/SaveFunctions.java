@@ -2,16 +2,27 @@ package project.functions;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.security.AnyTypePermission;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
+import javafx.event.ActionEvent;
+import javafx.scene.control.Alert;
+import javafx.scene.input.MouseEvent;
+//import org.json.simple.JSONObject;
+//import org.json.simple.parser.JSONParser;
+import project.classes.Levels;
 import project.classes.Wizard;
-import project.enums.Level;
+import project.classes.Level;
 
 import java.io.*;
-import java.util.List;
-import java.util.Objects;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static project.classes.Level.returnAllLevels;
+import static project.functions.GeneralFunctions.generateRandomString;
+import static project.functions.GeneralFunctions.returnFileAttribute;
+import static project.fx.functions.JavaFxFunctions.createPopup;
+import static project.fx.controllers.GameMenuController.gameMenuScene;
 
 public class SaveFunctions {
     private static void createDir() {
@@ -19,83 +30,59 @@ public class SaveFunctions {
         if (f.mkdir()) {
             System.out.println("Directory has been created successfully");
         }
-        else {
-            System.out.println("Directory cannot be created");
-        }
     }
-
-
 
     public static void checkSaves() {
         createDir();
-        List<String> saveFiles = returnFormattedSaveFiles("saves");
+        List<String> saveFiles = returnFormattedSaveFiles();
 
         if(saveFiles.size() > 0) {
             ConsoleFunctions.printColoredHeader("Saved games have been found, would you like to load one?");
             if(ConsoleFunctions.returnYesOrNo()) {
-                loadGame();
+                loadGamePrompt();
             }
             else {
                 ConsoleFunctions.gameCredits();
-                CharacterCreation.characterInit();
+                CharacterCreation.characterInitPrompts();
             }
         }
         else {
             ConsoleFunctions.gameCredits();
             ConsoleFunctions.printColoredHeader("No saved characters have been found, new character creation will now proceed.");
             ConsoleFunctions.continuePrompt();
-            CharacterCreation.characterInit();
+            CharacterCreation.characterInitPrompts();
         }
     }
 
-    public static void saveObject(String JSONString, String fileName) {
+    public static void continueGame(MouseEvent event) {
+        createDir();
+        List<String> saveFiles = returnFormattedSaveFiles();
+
         try {
-            FileWriter file = new FileWriter("saves/" + fileName + ".json");
-            file.write(JSONString);
-            file.flush();
-            file.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
+            String lastModifiedSaveFile = returnLastModifiedSaveFile(saveFiles);
+            loadProgress(lastModifiedSaveFile);
+            ActionEvent actionEvent = new ActionEvent(event.getSource(), event.getTarget());
+            gameMenuScene(actionEvent);
+        }
+        catch (IndexOutOfBoundsException e) {
+            ActionEvent actionEvent = new ActionEvent(event.getSource(), event.getTarget());
+            createPopup(actionEvent, Alert.AlertType.WARNING, "No save files found");
         }
     }
 
-    public static JSONObject getJSONObject(Class<?> c, Object object) {
-        JSONObject jsonObject = getJSONObjectSub(c, object);
+    private static String returnLastModifiedSaveFile(List<String> saveFiles) {
+        Optional<String> lastModifiedSaveFile = saveFiles.stream().max((a, b) -> {
+            String fileModifiedTimeA = returnFileAttribute("saves", a, "lastModifiedTime");
+            String fileModifiedTimeB = returnFileAttribute("saves", b, "lastModifiedTime");
 
-        for(Class<?> c1 : GeneralFunctions.findAllClasses("project/abstractClasses")) {
-            if(c.getSuperclass().equals(c1)) {
-                JSONObject jsonObject2 = getJSONObjectSub(c.getSuperclass(), object);
-                jsonObject.putAll(jsonObject2);
-            }
-        }
-        return jsonObject;
-    }
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+            LocalDate dateTimeA = LocalDate.parse(fileModifiedTimeA, formatter);
+            LocalDate dateTimeB = LocalDate.parse(fileModifiedTimeB, formatter);
 
-    private static JSONObject getJSONObjectSub(Class<?> c, Object object) {
-        JSONObject jsonObject = new JSONObject();
-        GeneralFunctions.returnStringGettersList(c).forEach(string -> {
-            String string2 = returnFieldFromMethod(string, "get");
-            jsonObject.put(string2, GeneralFunctions.runGetterMethod(c, object, string));
-        });
-        return jsonObject;
-    }
-
-
-    public static JSONObject getJSONEnum(Object enumList) {
-        JSONObject jsonObject = new JSONObject();
-        Class<?> enuM = ((List<?>) enumList).get(0).getClass();
-
-        ((List<?>) enumList).forEach(o -> {
-            JSONObject jsonObject1 = new JSONObject();
-            GeneralFunctions.returnStringGettersList(enuM).stream().filter(string -> !string.equals("getRequiredSpellList")).forEach(string -> {
-                String string2 = returnFieldFromMethod(string, "is");
-                jsonObject1.put(string2, GeneralFunctions.runGetterMethod(enuM, o, string));
-            });
-            jsonObject.put(o.toString(), jsonObject1);
+            return dateTimeA.compareTo(dateTimeB);
         });
 
-        return jsonObject;
+        return lastModifiedSaveFile.orElseThrow(IndexOutOfBoundsException::new);
     }
 
     // OTHER METHOD OF SAVING OBJECT
@@ -112,45 +99,68 @@ public class SaveFunctions {
         }
     }
 
+    public static void saveObject2(String filename, Object objects, Class<?> objectClass, List<String> fieldsToOmit) {
+        XStream xstream = new XStream();
+        xstream.addPermission(AnyTypePermission.ANY);
+
+        for(String field : fieldsToOmit) {
+            xstream.omitField(objectClass, field);
+        }
+
+        File xmlFile = new File("saves/" + filename + ".xml");
+        try (OutputStream out = new FileOutputStream(xmlFile)) {
+            xstream.toXML(objects, out);
+        } catch (IOException e) {
+            System.err.println("Failed to write using xstream");
+            e.printStackTrace();
+        }
+    }
+
     // OTHER METHOD OF LOADING OBJECT
-    public static void loadWizard(String filename) {
+    public static Object returnLoadedObject(String filename) {
         XStream xstream = new XStream();
         xstream.addPermission(AnyTypePermission.ANY);
 
         File xmlFile = new File("saves/" + filename + ".xml");
         try {
-            System.out.println(Wizard.class.getName());
-
-            Wizard.wizard = (Wizard) xstream.fromXML(xmlFile);
-
+            return xstream.fromXML(xmlFile);
         } catch(Exception ex) {
             ex.printStackTrace();
+            return null;
         }
     }
 
+    public static void loadWizard(String filename) {
+        Wizard.wizard = (Wizard) returnLoadedObject("wizard-" + filename);
+    }
+
+    public static void loadLevel(String filename) {
+        Levels levels = (Levels) returnLoadedObject("levels-" + filename);
+
+        assert levels != null;
+        levels.getLevels().forEach(l -> {
+            returnAllLevels().forEach(l2 -> {
+                if(l2.getLevelName().equals(l.getLevelName())) {
+                    l2.setUnlocked(l.isUnlocked());
+                }
+            });
+        });
+    }
+
+
     public static void saveWizard(String filename) {
-//        ObjectMapper om = new ObjectMapper();
-//        om.configure(SerializationFeature.INDENT_OUTPUT, true);
-//        try {
-//            om.writeValue(new File("saves/" + filename+".2.json"), Wizard.wizard);
-//        } catch (IOException e) {
-//            System.err.println("Failed to write using jackson");
-//            e.printStackTrace();
-//        }
-//        try {
-//            Wizard reloaded = om.readValue(new File("saves/" + filename + ".2.json"), Wizard.class);
-//            System.out.println("Wizard is back from file ... magic? ");
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-        JSONObject wizardJSONObject =  getJSONObject(Wizard.class, Wizard.wizard);
-        saveObject(wizardJSONObject.toJSONString(), "wizard" + filename);
+        saveObject("wizard-" + filename, Wizard.wizard);
     }
 
     public static void saveLevel(String filename) {
+        Levels levels = new Levels();
 
-        JSONObject levelJSONObject =  getJSONEnum(Level.returnAllLevels());
-        saveObject(levelJSONObject.toJSONString(), "level" + filename);
+        saveObject2("levels-" + filename, levels, Level.class, Level.returnFieldsToOmit());
+
+    }
+
+    public static void autoSaveProgress() {
+        saveProgress("autoSave-" + generateRandomString(5));
     }
 
     public static void saveProgress(String filename) {
@@ -158,52 +168,56 @@ public class SaveFunctions {
         saveLevel(filename);
     }
 
-    public static List<String> returnSaveFiles(String dir) {
-        return Stream.of(Objects.requireNonNull(new File(dir).listFiles()))
+    public static void saveProgress() {
+        String randomString = generateRandomString(5);
+
+        saveWizard("save-" + randomString);
+        saveLevel("save-" + randomString);
+    }
+
+    public static void loadProgress(String filenameCompressed) {
+        loadWizard(filenameCompressed);
+        loadLevel(filenameCompressed);
+    }
+
+    public static List<String> returnLastModifiedFiles(String path) {
+        File[] files = new File(path).listFiles();
+
+        assert files != null;
+        Arrays.sort(files, Comparator.comparingLong(File::lastModified).reversed());
+
+        return Stream.of(files)
                 .filter(file -> !file.isDirectory())
                 .map(File::getName)
                 .collect(Collectors.toList());
     }
 
-    public static List<String> returnFormattedSaveFiles(String dir) {
-        return returnSaveFiles("saves").stream()
-                .map(s -> s.replace("level", "")
-                        .replace("wizard","")
-                        .replace(".json", ""))
+    public static List<String> returnFiles(String path) {
+        File[] files = new File(path).listFiles();
+
+        assert files != null;
+        return Stream.of(files)
+                .filter(file -> !file.isDirectory())
+                .map(File::getName)
+                .collect(Collectors.toList());
+    }
+
+    public static List<String> returnFormattedSaveFiles() {
+
+        return returnLastModifiedFiles("saves").stream()
+                .map(s -> s.replace("levels-", "")
+                        .replace("wizard-","")
+                        .replace(".xml", ""))
                 .distinct().toList();
     }
 
-    public static void loadProgress(String filename) {
-        List<String> saves = returnSaveFiles("saves").stream().filter(s -> s.contains(filename)).toList();
-        JSONParser parser = new JSONParser();
+    public static List<String> returnSaves(String filenameCompressed) {
+        List<String> saves = returnLastModifiedFiles("saves").stream().filter(s -> s.contains(filenameCompressed)).toList();
+
         String wizardString = saves.stream().filter(s -> s.contains("wizard")).toList().get(0);
         String levelString = saves.stream().filter(s -> s.contains("level")).toList().get(0);
 
-        JSONObject wizardJSONObject = null;
-        JSONObject levelJSONObject = null;
-
-        try {
-            wizardJSONObject = (JSONObject) parser.parse(new FileReader("saves/" + wizardString));
-            levelJSONObject = (JSONObject) parser.parse(new FileReader("saves/" + levelString));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        loadClass(Wizard.class, Wizard.wizard, (JSONObject) wizardJSONObject);
-        loadEnum(Level.class, (JSONObject) levelJSONObject);
-    }
-
-    public static void loadClass(Class<?> c, Object object, JSONObject jsonObject) {
-        GeneralFunctions.returnStringSettersList(c).forEach(methodString -> {
-            String fieldString = returnFieldFromMethod(methodString, "set");
-
-            GeneralFunctions.runSetterMethod(c, object, methodString, jsonObject.get(fieldString));
-        });
-    }
-
-    public static void loadEnum(Class<?> c, JSONObject jsonObject) {
-        GeneralFunctions.returnStringSettersList(c).forEach(methodString -> {
-            GeneralFunctions.runSetterMethod(c, c, methodString, jsonObject);
-        });
+        return Arrays.asList(wizardString, levelString);
     }
 
     private static String returnFieldFromMethod(String methodString, String set) {
@@ -212,7 +226,7 @@ public class SaveFunctions {
     }
 
     public static void saveGame() {
-        List<String> saves = returnFormattedSaveFiles("saves");
+        List<String> saves = returnFormattedSaveFiles();
 
         ConsoleFunctions.printTitle("Current Save Games: ");
         ConsoleFunctions.printChoices(saves);
@@ -231,8 +245,8 @@ public class SaveFunctions {
         ConsoleFunctions.printTitle("Save file " + filename + " has been saved.");
     }
 
-    public static void loadGame() {
-        List<String> saves = returnFormattedSaveFiles("saves");
+    public static void loadGamePrompt() {
+        List<String> saves = returnFormattedSaveFiles();
 
         ConsoleFunctions.printTitle("Select a game to load: ");
         ConsoleFunctions.printChoices(saves);
@@ -246,5 +260,23 @@ public class SaveFunctions {
                 ConsoleFunctions.printTitle("Game " + filename + " has been loaded.");
             }
         }
+    }
+
+    public static Wizard returnWizardInstance(String filenameCompressed) {
+        return (Wizard) returnLoadedObject("wizard-" + filenameCompressed);
+    }
+
+    public static void deleteSaveFile(String filenameCompressed) {
+        List<String> saves = returnSaves(filenameCompressed);
+
+        saves.forEach(s -> {
+            File file = new File("saves/" + s);
+            if(file.delete()) {
+                System.out.println("File " + s + " has been deleted.");
+            } else {
+                System.out.println("Failed to delete file " + s);
+            }
+        });
+
     }
 }

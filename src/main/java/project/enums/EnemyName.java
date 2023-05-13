@@ -1,66 +1,35 @@
 package project.enums;
 
-import project.classes.Spell;
 import lombok.Getter;
+import project.classes.Spell;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 
 import static project.enums.EnumMethods.returnFormattedEnum;
 
 @Getter
 public enum EnemyName {
-    GOBLIN(EnemyCombat.MELEE, EnemyType.BASIC, null, 50, 0, 1, 30, 20, null),
-    DARK_WIZARD(EnemyCombat.SPELL, EnemyType.BASIC, null, 70, 0.1, 1, 60, 30, null),
-    TROLL(EnemyCombat.MELEE, EnemyType.BOSS, new ArrayList<>(), 200, 0.2, 0.1, 60, 120, new Object() {
-        List<String> evaluate() {
-            List<String> strings = new ArrayList<>();
-            strings.add(trollDeathLine);
-            return strings;
-        }
-    }.evaluate()),
-    BASILISK(EnemyCombat.MELEE, EnemyType.BOSS, new ArrayList<>(), 250, 0.5, 0.4, 100, 180, new Object() {
-        List<String> evaluate() {
-            List<String> strings = new ArrayList<>();
-            strings.add(basiliskDeathLine1);
-            strings.add(basiliskDeathLine2);
-            return strings;
-        }
-    }.evaluate()),
-    DEMENTOR(EnemyCombat.MELEE, EnemyType.BOSS, new ArrayList<>(), 100, 0, 0.3, 110, 30, null),
-    PETER_PETTIGREW(EnemyCombat.SPELL, EnemyType.BOSS, new ArrayList<>(), 300, 0.2, 0, 80, 40, new Object() {
-        List<String> evaluate() {
-            List<String> strings = new ArrayList<>();
-            strings.add(peterPettigrewDeathLine);
-            return strings;
-        }
-    }.evaluate()),
-    DOLORES_UMBRIDGE(EnemyCombat.SPELL, EnemyType.BOSS, new ArrayList<>(), 10000, 0, 0, 80, 40, new Object() {
-        List<String> evaluate() {
-            List<String> strings = new ArrayList<>();
-            strings.add(doloresUmbridgeDeathLine1);
-            strings.add(doloresUmbridgeDeathLine2);
-            return strings;
-        }
-    }.evaluate()),
-    DEATH_EATER(EnemyCombat.MELEE, EnemyType.BOSS, new ArrayList<>(), 150, 0, 0.4, 120, 40, null),
-    VOLDEMORT(EnemyCombat.SPELL, EnemyType.BOSS, new ArrayList<>(), 300, 0, 0, 120, 40, new Object() {
-        List<String> evaluate() {
-            List<String> strings = new ArrayList<>();
-            strings.add(voldemortDeathLine);
-            return strings;
-        }
-    }.evaluate()),
-    BELLATRIX_LESTRANGE(EnemyCombat.SPELL, EnemyType.BOSS, new ArrayList<>(), 200, 0, 0, 120, 40, new Object() {
-        List<String> evaluate() {
-            List<String> strings = new ArrayList<>();
-            strings.add(bellatrixLestrangeDeathLine);
-            return strings;
-        }
-    }.evaluate());
-
-
-
-
+    GOBLIN(EnemyCombat.MELEE, EnemyType.BASIC, new ArrayList<>(), 50, 0, 1, 30, 20, new ArrayList<>()),
+    DARK_WIZARD(EnemyCombat.SPELL, EnemyType.BASIC, new ArrayList<>(), 70, 0.1, 1, 60, 30, new ArrayList<>()),
+    TROLL(EnemyCombat.MELEE, EnemyType.BOSS, new ArrayList<>(), 200, 0.2, 0.6, 60, 200,
+            List.of("You threw an object at the Troll and he finally collapsed.")),
+    BASILISK(EnemyCombat.MELEE, EnemyType.BOSS, new ArrayList<>(), 250, 0.5, 0.6, 100, 180,
+            List.of("You removed one of the Basilisk's teeth and stabbed Tom Riddle's journal with it. The Basilisk suddenly collapsed.",
+                    "You stabbed the Basilisk with Godric Gryffindor's Legendary sword. The Basilisk isn't moving anymore.")),
+    DEMENTOR(EnemyCombat.MELEE, EnemyType.BOSS, new ArrayList<>(), 100, 0, 0.7, 110, 30, new ArrayList<>()),
+    PETER_PETTIGREW(EnemyCombat.SPELL, EnemyType.BOSS, new ArrayList<>(), 300, 0.2, 0, 80, 40,
+            List.of("You stole Peter Pettigrew's keys and you escaped the cemetery.")),
+    DOLORES_UMBRIDGE(EnemyCombat.SPELL, EnemyType.BOSS, new ArrayList<>(), 10000, 0, 0, 80, 40,
+            List.of("You distracted Dolores Umbridge long enough for the fireworks to go off.",
+                    "Damn, you actually killed her. The cops are coming for you. jk she just got knocked out.")),
+    DEATH_EATER(EnemyCombat.MELEE, EnemyType.BOSS, new ArrayList<>(), 150, 0, 0.3, 120, 40, new ArrayList<>()),
+    VOLDEMORT(EnemyCombat.SPELL, EnemyType.BOSS, new ArrayList<>(), 300, 0, 0, 140, 40,
+            List.of("Voldemort was sent back to the netherworld. He will come back stronger though.")),
+    BELLATRIX_LESTRANGE(EnemyCombat.SPELL, EnemyType.BOSS, new ArrayList<>(), 200, 0, 0, 120, 40,
+            List.of("Bellatrix Lestrange disappeared in a puff of smoke."));
 
     private final EnemyCombat enemyCombat;
     private final EnemyType enemyType;
@@ -72,14 +41,7 @@ public enum EnemyName {
     private final int enemyXp;
     private final List<String> enemyDeathLine;
 
-    private static final String trollDeathLine = "You threw an object at the Troll and he finally collapsed.";
-    private static final String basiliskDeathLine1 = "You stabbed the Basilisk with Godric Gryffindor's Legendary sword. The Basilisk isn't moving anymore.";
-    private static final String basiliskDeathLine2 = "You removed one of the Basilisk's teeth and stabbed Tom Riddle's journal with it. The Basilisk suddenly collapsed.";
-    private static final String peterPettigrewDeathLine = "You stole Peter Pettigrew's keys and you escaped the cemetery.";
-    private static final String doloresUmbridgeDeathLine1 = "You distracted Dolores Umbridge long enough for the fireworks to go off.";
-    private static final String doloresUmbridgeDeathLine2 = "Damn you actually killed her. The cops are coming for you. jk she was actually annoying af";
-    private static final String voldemortDeathLine = "Voldemort was sent back to the netherworld. He will come back stronger though.";
-    private static final String bellatrixLestrangeDeathLine = "Bellatrix Lestrange disappeared in a puff of smoke.";
+    public static final String timeoutDeathLine = "You Took Too Long To Defeat The Enemies. Just go to the next level already...";
 
     EnemyName(EnemyCombat enemyCombat, EnemyType enemyType, List<Spell> vulnerableSpellList, int enemyBaseHp, double enemyDmgMultiplier, double enemyHpLimitRatio, int enemyBaseDp, int enemyXp, List<String> enemyDeathLine) {
         this.enemyCombat = enemyCombat;
@@ -91,15 +53,6 @@ public enum EnemyName {
         this.enemyBaseDp = enemyBaseDp;
         this.enemyXp = enemyXp;
         this.enemyDeathLine = enemyDeathLine;
-    }
-
-    public void addVulnerableSpell(Spell spell) {
-        this.vulnerableSpellList.add(spell);
-    }
-
-    public void resetVulnerableSpellsList() {
-        List<Spell> vulnerableSpellList = new ArrayList<>(this.vulnerableSpellList);
-        vulnerableSpellList.forEach(this.vulnerableSpellList::remove);
     }
 
     public static void resetBossVulnerableSpellsList() {
@@ -128,9 +81,18 @@ public enum EnemyName {
         HashMap<String, EnemyName> enemyNameHashMap = new HashMap<>();
         EnemyName[] enemyNameValues = EnemyName.values();
 
-        for(EnemyName enemyNameValue:enemyNameValues) {
+        for (EnemyName enemyNameValue : enemyNameValues) {
             enemyNameHashMap.put(returnFormattedEnum(enemyNameValue), enemyNameValue);
         }
         return enemyNameHashMap.get(enemyName);
+    }
+
+    public void addVulnerableSpell(Spell spell) {
+        this.vulnerableSpellList.add(spell);
+    }
+
+    public void resetVulnerableSpellsList() {
+        List<Spell> vulnerableSpellList = new ArrayList<>(this.vulnerableSpellList);
+        vulnerableSpellList.forEach(this.vulnerableSpellList::remove);
     }
 }

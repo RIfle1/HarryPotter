@@ -1,10 +1,15 @@
 package project.classes;
 
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 import project.abstractClasses.AbstractCharacter;
-import lombok.*;
 import project.enums.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 
 import static project.classes.Color.*;
 import static project.enums.EnumMethods.returnFormattedEnum;
@@ -67,6 +72,7 @@ public class Wizard extends AbstractCharacter {
         this.luck = luck;
     }
 
+
     private String firstName;
     private String lastName;
     private Gender gender;
@@ -103,13 +109,16 @@ public class Wizard extends AbstractCharacter {
     }
 
     public String returnAllStringStats(int extraNameLength) {
-        this.updateStats();
         return this.returnStringStats(extraNameLength) + this.returnStringSpecs();
     }
 
     public void printAllStringStats(int extraNameLength) {
         System.out.println(this.returnAllStringStats(extraNameLength));
         continuePromptExtra();
+    }
+
+    public List<String> returnSpecList() {
+        return Arrays.asList("Charisma", "Strength", "Intelligence", "Luck");
     }
 
     public HashMap<String, Double> returnWizardSpecsPercent() {
@@ -129,13 +138,21 @@ public class Wizard extends AbstractCharacter {
         return WizardStatsPercent;
     }
 
-    public void setWizardSpec(String spec, int specPoints) {
-        switch (spec) {
-            case "strength" -> this.setStrength(this.getStrength() + specPoints);
-            case "luck" -> this.setLuck(this.getLuck() + specPoints);
-            case "intelligence" -> this.setIntelligence(this.getIntelligence() + specPoints);
-            case "charisma" -> this.setCharisma(this.getCharisma() + specPoints);
+    public boolean setWizardSpec(String spec, int specPoints) {
+        if(this.getSpecPoints() >= specPoints) {
+            switch (spec) {
+                case "strength" -> this.setStrength(this.getStrength() + specPoints);
+                case "luck" -> this.setLuck(this.getLuck() + specPoints);
+                case "intelligence" -> this.setIntelligence(this.getIntelligence() + specPoints);
+                case "charisma" -> this.setCharisma(this.getCharisma() + specPoints);
+            }
+            this.setSpecPoints(this.getSpecPoints() - specPoints);
+            return true;
         }
+        return false;
+
+
+
     }
 
     public void upgradeSpec(Runnable func) {
@@ -151,7 +168,6 @@ public class Wizard extends AbstractCharacter {
             int specPoints =  returnChoiceInt(1, (int) this.getSpecPoints(), true, func);
 
             setWizardSpec(spec, specPoints);
-            this.setSpecPoints(this.getSpecPoints() - specPoints);
         }
         else {
             printTitle("You have no spec points.");

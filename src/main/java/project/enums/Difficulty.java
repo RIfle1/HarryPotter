@@ -1,7 +1,7 @@
 package project.enums;
 
-import project.abstractClasses.AbstractCharacter;
 import lombok.Getter;
+import project.abstractClasses.AbstractCharacter;
 
 import java.util.HashMap;
 import java.util.List;

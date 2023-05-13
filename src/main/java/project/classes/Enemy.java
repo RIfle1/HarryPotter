@@ -1,16 +1,22 @@
 package project.classes;
 
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 import project.abstractClasses.AbstractCharacter;
-
-import lombok.*;
 import project.enums.*;
+import project.functions.GeneralFunctions;
+import project.fx.controllers.GameSceneController;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static project.classes.Color.*;
 import static project.classes.Wizard.wizard;
 import static project.enums.EnumMethods.returnFormattedEnum;
-import static project.functions.ConsoleFunctions.printTitle;
+import static project.functions.ConsoleFunctions.*;
 import static project.functions.GeneralFunctions.generateDoubleBetween;
 
 
@@ -31,7 +37,7 @@ public class Enemy extends AbstractCharacter {
     private double experiencePoints;
     public static HashMap<String, Enemy> enemiesHashMap = new HashMap<>();
     public static List<String> enemiesKeyList = new ArrayList<>();
-    private static final double enemyXpIncrement = 0.2;
+    private static final double enemyXpIncrement = 0.5;
 
     public static void clearEnemies() {
         enemiesKeyList.forEach(key -> enemiesHashMap.remove(key));
@@ -56,7 +62,7 @@ public class Enemy extends AbstractCharacter {
         wizard.setPotionList(newPotionList);
     }
 
-    public void killEnemy() {
+    public void delete() {
         enemiesHashMap.remove(this.getName());
         enemiesKeyList.remove(this.getName());
     }
@@ -69,11 +75,11 @@ public class Enemy extends AbstractCharacter {
         return allEnemyNames.get(randomInt);
     }
 
-    public void checkHealth(Wizard wizard) {
-        if (this.getHealthPoints() <= 0) {
-            this.killEnemy();
+    public void checkHealth() {
+        if (this.checkIfDead()) {
             wizard.addExperience(this.getExperiencePoints());
             this.givePotion(wizard);
+            this.delete();
         }
     }
 
@@ -84,8 +90,8 @@ public class Enemy extends AbstractCharacter {
 
         for (int y = 0; y < potionNumber; y++) {
             double potionChance = Math.random();
-            int potionIndex = (int) generateDoubleBetween(0, allPotionsList.toArray().length);
-            Potion chosenPotion = allPotionsList.get(potionIndex - 1);
+            int potionIndex = (int) generateDoubleBetween(0, allPotionsList.toArray().length - 1);
+            Potion chosenPotion = allPotionsList.get(potionIndex);
 
             if (potionChance <= chosenPotion.getItemDropChance()) {
                 try {
@@ -170,12 +176,6 @@ public class Enemy extends AbstractCharacter {
     }
 
 
-    public void meleeAttack(AbstractCharacter attackedCharacter, double calculatedDamage, boolean attackAfterCast) {
-        // CONSOLE STUFF
-        System.out.println(returnColoredText(returnFormattedEnum(this.getEnemyName()) + " melee attack!", ANSI_RED));
-        castAttack(this.getEnemyName().getEnemyCombat().getCombatChance(), CharacterState.STANDING, attackedCharacter, calculatedDamage, attackAfterCast);
-    }
-
     public String getVulnerableSpellsList() {
         StringBuilder vulnerableSpellsList = new StringBuilder();
         this.getEnemyName().getVulnerableSpellList()
@@ -183,6 +183,7 @@ public class Enemy extends AbstractCharacter {
                         .append("- ")
                         .append(returnColoredText(vulnerableSpell.getSpellName(), vulnerableSpell.getSpellColor()))
                         .append("\n"));
+        vulnerableSpellsList.replace(vulnerableSpellsList.length() - 1, vulnerableSpellsList.length(), "");
         return vulnerableSpellsList.toString();
     }
 
@@ -199,8 +200,6 @@ public class Enemy extends AbstractCharacter {
             isVulnerableSpell = true;
         }
 
-
-
         if(!isVulnerableSpell) {
             String text = returnFormattedEnum(this.getEnemyName()) +
                     " is not affected by " +
@@ -208,49 +207,57 @@ public class Enemy extends AbstractCharacter {
                     " Try to use:\n" +
                     getVulnerableSpellsList();
             printTitle(text);
+            GameSceneController.updateConsoleTaStatic(text, true);
         }
-
-
         return isVulnerableSpell;
     }
 
-    public void updateBossVulnerableSpellsList() throws CloneNotSupportedException {
-        if(this.getEnemyName() == EnemyName.BASILISK) {
-            if(wizard.getHouseName() == HouseName.GRYFFINDOR) {
-                EnemyName.BASILISK.addVulnerableSpell(Spell.legendarySword.clone());
+    public void updateBossVulnerableSpellsList(){
+        try {
+            if(this.getEnemyName().getVulnerableSpellList().isEmpty()) {
+                if(this.getEnemyName() == EnemyName.BASILISK) {
+                    if(wizard.getHouseName() == HouseName.GRYFFINDOR) {
+                        EnemyName.BASILISK.addVulnerableSpell(Spell.legendarySword.clone());
+                    }
+                    else {
+                        EnemyName.BASILISK.addVulnerableSpell(Spell.accio.clone());
+                    }
+                }
+                else if(this.getEnemyName() == EnemyName.TROLL) {
+                    EnemyName.TROLL.addVulnerableSpell(Spell.wingardiumLeviosa.clone());
+                }
+                else if(this.getEnemyName() == EnemyName.DEMENTOR) {
+                    EnemyName.DEMENTOR.addVulnerableSpell(Spell.expectroPatronum.clone());
+                }
+                else if(this.getEnemyName() == EnemyName.DEATH_EATER) {
+                    EnemyName.DEATH_EATER.addVulnerableSpell(Spell.sectumsempra.clone());
+                }
             }
-            else {
-                EnemyName.BASILISK.addVulnerableSpell(Spell.accio.clone());
-            }
         }
-        else if(this.getEnemyName() == EnemyName.TROLL) {
-            EnemyName.TROLL.addVulnerableSpell(Spell.wingardiumLeviosa.clone());
-        }
-        else if(this.getEnemyName() == EnemyName.DEMENTOR) {
-            EnemyName.DEMENTOR.addVulnerableSpell(Spell.expectroPatronum.clone());
-        }
-        else if(this.getEnemyName() == EnemyName.DEATH_EATER) {
-            EnemyName.DEATH_EATER.addVulnerableSpell(Spell.sectumsempra.clone());
+        catch (CloneNotSupportedException e) {
+            e.printStackTrace();
         }
     }
 
     public void checkHpRatio() {
         double hpLimit = this.getMaxHealthPoints() * this.getEnemyName().getEnemyHpLimitRatio();
 
-        if(this.getEnemyName().getEnemyType() == EnemyType.BOSS && this.getHealthPoints() <= hpLimit && this.getEnemyName().getVulnerableSpellList().size() == 0) {
-            try {
-                this.updateBossVulnerableSpellsList();
-            }
-            catch (CloneNotSupportedException e) {
-                e.printStackTrace();
-            }
+        if(this.getEnemyName().getEnemyType() == EnemyType.BOSS && this.getHealthPoints() <= hpLimit) {
+
+            this.updateBossVulnerableSpellsList();
 
             String text = returnFormattedEnum(this.getEnemyName()) + " is only " +  returnColoredText("vulnerable ", ANSI_YELLOW) + "to: \n" + getVulnerableSpellsList();
             printTitle(text);
+            GameSceneController.updateConsoleTaStatic(text, true);
 
             if(this.getEnemyName() == EnemyName.BASILISK && wizard.getHouseName() == HouseName.GRYFFINDOR) {
-                printTitle(returnColoredText("You see a shiny object in the distance... You pick it up and realize it's Godric Gryffindor's legendary sword.", ANSI_GREEN));
-                printTitle(returnColoredText("You can now use this legendary sword to defeat the Basilisk", ANSI_BLUE));
+                String text1 = returnColoredText("You see a shiny object in the distance... You pick it up and realize it's Godric Gryffindor's legendary sword.", ANSI_GREEN);
+                String text2 = returnColoredText("You can now use this legendary sword to defeat the Basilisk", ANSI_BLUE);
+                printTitleTop(text1);
+                printTitleBottom(text2);
+                GameSceneController.updateConsoleTaStatic(text1, false);
+                GameSceneController.updateConsoleTaStatic(text2, true);
+
                 try {
                     wizard.putSpellsHashMap(Spell.legendarySword.clone());
                 }
@@ -277,6 +284,55 @@ public class Enemy extends AbstractCharacter {
             }
         }
         return maxLength;
+    }
+
+    public String returnAttackName(Spell enemyChosenSpell) {
+        String attackName = "";
+
+        if(this.getEnemyName().getEnemyCombat() == EnemyCombat.SPELL) {
+            attackName = enemyChosenSpell.getSpellName();
+        }
+        else if(this.getEnemyName().getEnemyCombat() == EnemyCombat.MELEE) {
+            attackName = returnFormattedEnum(this.getEnemyName()) + " melee attack";
+        }
+
+        return attackName;
+    }
+
+    public String returnChosenSpellName(Spell enemyChosenSpell) {
+        String chosenSpellName = "";
+
+        if(this.getEnemyName().getEnemyCombat() == EnemyCombat.SPELL) {
+            chosenSpellName = returnColoredText(enemyChosenSpell.getSpellName(), enemyChosenSpell.getSpellColor());
+        }
+        else if(this.getEnemyName().getEnemyCombat() == EnemyCombat.MELEE) {
+            chosenSpellName = returnColoredText("melee attack", ANSI_RED);
+        }
+
+        return chosenSpellName;
+    }
+
+    public static Spell getEnemyRandomSpell(Enemy attackingEnemy) {
+        // CHOOSE A RANDOM SPELL FROM THE ENEMY'S SPELL LIST
+        MoveType attackMoveType = MoveType.ATTACK;
+
+        int randomEnemySpellIndex = (int) GeneralFunctions.generateDoubleBetween(0, attackingEnemy.returnTypedSpellsList(attackMoveType).size() - 1);
+        return attackingEnemy.returnTypedSpellsFromInt(attackMoveType, randomEnemySpellIndex);
+    }
+
+    public static Enemy getRandomEnemy() {
+        // CHOOSE A RANDOM ENEMY FROM THE ENEMY LIST TO ATTACK BACK
+        int randomEnemyIndex = (int) GeneralFunctions.generateDoubleBetween(0, Enemy.enemiesKeyList.toArray().length - 1);
+        return Enemy.enemiesHashMap.get(Enemy.enemiesKeyList.get(randomEnemyIndex));
+    }
+
+    public static void notifyEnemyChosenSpell(String chosenSpellName, Enemy attackingEnemy) {
+        // NOTIFY THE PLAYER WHAT SPELL THE ENEMY WILL CHOOSE
+        String text = returnColoredText(returnFormattedEnum(attackingEnemy.getEnemyName()), ANSI_PURPLE) +
+                returnColoredText(" Level " + (int) attackingEnemy.getLevel(), ANSI_YELLOW) + " will attack you with " +
+                chosenSpellName;
+        printTitleTop(text);
+        GameSceneController.updateConsoleTaStatic(text, false);
     }
 
 }

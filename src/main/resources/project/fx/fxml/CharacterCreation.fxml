@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane onKeyPressed="#onKeyPressed" stylesheets="@generalStyles.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="project.fx.controllers.CharacterCreationController">
+   <children>
+      <Text layoutY="61.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Character Creation" textAlignment="CENTER" wrappingWidth="1920.0">
+         <font>
+            <Font name="Bell MT" size="73.0" />
+         </font>
+      </Text>
+      <GridPane alignment="CENTER" layoutX="728.0" layoutY="234.0" prefHeight="542.0" prefWidth="484.0">
+         <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="457.0" minWidth="10.0" prefWidth="161.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="540.0" minWidth="10.0" prefWidth="224.0" />
+         </columnConstraints>
+         <rowConstraints>
+            <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+         </rowConstraints>
+         <children>
+            <Text strokeType="INSIDE" strokeWidth="0.0" styleClass="infoItemText" text="First Name:">
+               <font>
+                  <Font name="Bell MT" size="29.0" />
+               </font>
+               <GridPane.margin>
+                  <Insets bottom="10.0" right="20.0" top="10.0" />
+               </GridPane.margin>
+            </Text>
+            <Text strokeType="INSIDE" strokeWidth="0.0" styleClass="infoItemText" text="Gender:" GridPane.rowIndex="2">
+               <font>
+                  <Font name="Bell MT" size="29.0" />
+               </font>
+               <GridPane.margin>
+                  <Insets bottom="10.0" right="20.0" top="10.0" />
+               </GridPane.margin>
+            </Text>
+            <Text strokeType="INSIDE" strokeWidth="0.0" styleClass="infoItemText" text="Pet:" GridPane.rowIndex="3">
+               <font>
+                  <Font name="Bell MT" size="29.0" />
+               </font>
+               <GridPane.margin>
+                  <Insets bottom="10.0" right="20.0" top="10.0" />
+               </GridPane.margin>
+            </Text>
+            <Text strokeType="INSIDE" strokeWidth="0.0" styleClass="infoItemText" text="Last Name:" GridPane.rowIndex="1">
+               <font>
+                  <Font name="Bell MT" size="29.0" />
+               </font>
+               <GridPane.margin>
+                  <Insets bottom="10.0" right="20.0" top="10.0" />
+               </GridPane.margin>
+            </Text>
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="infoItemText" text="Wand Core:" GridPane.rowIndex="4">
+               <font>
+                  <Font name="Bell MT" size="29.0" />
+               </font>
+               <GridPane.margin>
+                  <Insets bottom="10.0" right="20.0" top="10.0" />
+               </GridPane.margin>
+            </Text>
+            <Text strokeType="INSIDE" strokeWidth="0.0" styleClass="infoItemText" text="Wand Size:" GridPane.rowIndex="5">
+               <font>
+                  <Font name="Bell MT" size="29.0" />
+               </font>
+               <GridPane.margin>
+                  <Insets bottom="10.0" right="20.0" top="10.0" />
+               </GridPane.margin>
+            </Text>
+            <Text strokeType="INSIDE" strokeWidth="0.0" styleClass="infoItemText" text="Difficulty:" GridPane.rowIndex="7">
+               <font>
+                  <Font name="Bell MT" size="29.0" />
+               </font>
+               <GridPane.margin>
+                  <Insets bottom="10.0" right="20.0" top="10.0" />
+               </GridPane.margin>
+            </Text>
+            <TextField fx:id="firstNameTf" prefHeight="35.0" prefWidth="224.0" styleClass="bellMTText" GridPane.columnIndex="1">
+               <font>
+                  <Font name="Bell MT" size="12.0" />
+               </font></TextField>
+            <TextField fx:id="lastNameTf" prefHeight="35.0" styleClass="bellMTText" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <ChoiceBox fx:id="genderCb" prefHeight="35.0" prefWidth="621.0" styleClass="bellMTText" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <ChoiceBox fx:id="petCb" prefHeight="35.0" prefWidth="621.0" styleClass="bellMTText" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <ChoiceBox fx:id="wandCoreCb" prefHeight="35.0" prefWidth="621.0" styleClass="bellMTText" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+            <ChoiceBox fx:id="wandSizeCb" prefHeight="35.0" prefWidth="621.0" styleClass="bellMTText" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+            <ChoiceBox fx:id="difficultyCb" prefHeight="35.0" prefWidth="621.0" styleClass="bellMTText" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+            <Text strokeType="INSIDE" strokeWidth="0.0" styleClass="infoItemText" text="House:" GridPane.rowIndex="6">
+               <font>
+                  <Font name="Bell MT" size="29.0" />
+               </font>
+               <GridPane.margin>
+                  <Insets bottom="10.0" right="20.0" top="10.0" />
+               </GridPane.margin>
+            </Text>
+            <ChoiceBox fx:id="houseCb" prefHeight="35.0" prefWidth="621.0" styleClass="bellMTText" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+         </children>
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+      </GridPane>
+      <Button layoutX="834.0" layoutY="845.0" mnemonicParsing="false" onAction="#createOnClick" prefHeight="32.0" prefWidth="253.0" text="Create">
+         <font>
+            <Font name="Bell MT" size="29.0" />
+         </font>
+      </Button>
+      <Text fx:id="ccErrorT" fill="#e86565" layoutX="715.0" layoutY="810.0" strokeType="INSIDE" strokeWidth="0.0" text="First and Last name can't be empty" textAlignment="CENTER" visible="false" wrappingWidth="509.0">
+         <font>
+            <Font name="Bell MT" size="21.0" />
+         </font>
+      </Text>
+      <Button layoutX="834.0" layoutY="918.0" mnemonicParsing="false" onAction="#backOnClick" prefHeight="32.0" prefWidth="253.0" text="Back">
+         <font>
+            <Font name="Bell MT" size="29.0" />
+         </font>
+      </Button>
+   </children>
+   <styleClass>
+      <String fx:value="mainWindow" />
+      <String fx:value="papyrusBackground" />
+   </styleClass>
+</AnchorPane>

@@ -1,22 +1,23 @@
 package project.functions;
 
 import project.classes.Color;
-import project.enums.Level;
 import project.classes.Enemy;
-import project.classes.Wizard;
+import project.classes.Level;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
+import java.util.Scanner;
 
-import static project.classes.Color.*;
-import static project.classes.Color.returnColoredText;
-import static project.classes.Spell.returnAllSpells;
-import static project.functions.LevelFunctions.levelHashMap;
-import static project.enums.Level.*;
-import static project.functions.SaveFunctions.loadGame;
-import static project.functions.SaveFunctions.saveGame;
 import static java.lang.System.exit;
+import static project.classes.Color.*;
+import static project.classes.Spell.returnAllSpells;
+import static project.classes.Wizard.wizard;
+import static project.classes.Level.*;
+import static project.functions.LevelFunctions.levelHashMap;
+import static project.functions.SaveFunctions.loadGamePrompt;
+import static project.functions.SaveFunctions.saveGame;
 
 public class ConsoleFunctions {
     static Scanner scanner = new Scanner(System.in);
@@ -95,11 +96,8 @@ public class ConsoleFunctions {
         }
     }
 
-    public static void printLineSeparator(int n) {
-        for(int i=0; i<n; i++) {
-            System.out.print("-");
-        }
-        System.out.println();
+    public static String returnLineSeparator(int n) {
+        return "-".repeat(Math.max(0, n));
     }
 
     public static String printColumnSeparator(String separator) {
@@ -108,31 +106,34 @@ public class ConsoleFunctions {
 
     public static void printColoredHeader(String header){
         clearConsole();
-        printLineSeparator(header.length());
+        System.out.println(returnLineSeparator(header.length()));
         System.out.println(Color.returnColoredText(header, ANSI_GREEN));
-        printLineSeparator(header.length());
-    }
-
-    public static void printHeader(String header) {
-        clearConsole();
-        printLineSeparator(header.length());
-        System.out.println(header);
-        printLineSeparator(header.length());
+        System.out.println(returnLineSeparator(header.length()));
     }
 
     public static void printTitle(String title) {
-        printLineSeparator(title.length());
+        System.out.println(returnLineSeparator(title.length()));
         System.out.println(title);
-        printLineSeparator(title.length());
+        System.out.println(returnLineSeparator(title.length()));
+    }
+
+    public static void printTitleTop(String title) {
+        System.out.println(returnLineSeparator(title.length()));
+        System.out.println(title);
+    }
+
+    public static void printTitleBottom(String title) {
+        System.out.println(title);
+        System.out.println(returnLineSeparator(title.length()));
     }
 
     // Method to continue
     public static void continuePrompt(){
         String continuePromptText = "Press 'Enter' to continue...";
 
-        printLineSeparator(continuePromptText.length());
+        System.out.println(returnLineSeparator(continuePromptText.length()));
         System.out.println(returnColoredText(continuePromptText, ANSI_BLUE));
-        printLineSeparator(continuePromptText.length());
+        System.out.println(returnLineSeparator(continuePromptText.length()));
         System.out.println(returnColoredText("->", ANSI_YELLOW));
 
         System.out.print(scanner.nextLine());
@@ -141,9 +142,9 @@ public class ConsoleFunctions {
     public static void continuePromptExtra(){
         String continuePromptText = "Press 'Enter' to continue...";
 
-        printLineSeparator(continuePromptText.length());
+        System.out.println(returnLineSeparator(continuePromptText.length()));
         System.out.println(returnColoredText(continuePromptText, ANSI_BLUE));
-        printLineSeparator(continuePromptText.length());
+        System.out.println(returnLineSeparator(continuePromptText.length()));
         System.out.println(returnColoredText("->", ANSI_YELLOW));
 
         System.out.print(scanner.nextLine());
@@ -166,19 +167,19 @@ public class ConsoleFunctions {
         Level chosenLevel = setLevel(chosenLevelString);
         levelHashMap.get(chosenLevel).run();
 
-        Wizard.wizard.reduceSpellsCooldown();
+//        wizard.reduceSpellsCooldown();
         ConsoleFunctions.chooseAction();
     }
 
     public static void chooseAction() {
-        Wizard.wizard.updateStats();
-        Wizard.wizard.restoreWizardHpDf();
+        wizard.updateStats();
+        wizard.restoreWizardHpDf();
 
         String[] actionList = {
                 "Choose Level (" + Level.returnUnlockedLevelsList().size() + "/" + returnAllLevels().size() + " unlocked)",
-                "Upgrade Specs" + (Wizard.wizard.getSpecPoints() > 0 ? " (" + (int) Wizard.wizard.getSpecPoints() + " points available)" : " (No points available)"),
+                "Upgrade Specs" + (wizard.getSpecPoints() > 0 ? " (" + (int) wizard.getSpecPoints() + " points available)" : " (No points available)"),
                 "Check Stats",
-                "Check Available Spells (" + Wizard.wizard.getSpellsKeyList().size() + "/" + returnAllSpells().size() + " available)",
+                "Check Available Spells (" + wizard.getSpellsKeyList().size() + "/" + returnAllSpells().size() + " available)",
                 "Save Game",
                 "Load Game"
         };
@@ -188,11 +189,11 @@ public class ConsoleFunctions {
 
         switch (returnChoiceInt(1, actionList.length, false, null)) {
             case 1 -> chooseLevel();
-            case 2 -> Wizard.wizard.upgradeSpec(ConsoleFunctions::chooseAction);
-            case 3 -> System.out.println(Wizard.wizard.returnAllStringStats(0));
-            case 4 -> Wizard.wizard.printAllCharacterSpells();
+            case 2 -> wizard.upgradeSpec(ConsoleFunctions::chooseAction);
+            case 3 -> System.out.println(wizard.returnAllStringStats(0));
+            case 4 -> wizard.printAllCharacterSpells();
             case 5 -> saveGame();
-            case 6 -> loadGame();
+            case 6 -> loadGamePrompt();
         }
         continuePromptExtra();
         chooseAction();

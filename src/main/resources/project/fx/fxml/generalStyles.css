@@ -1,0 +1,183 @@
+.mainWindow {
+    -fx-pref-height: 1010px;
+    -fx-max-height: 1010px;
+    -fx-min-height: 1010px;
+    -fx-pref-width: 1920px;
+    -fx-max-width: 1920px;
+    -fx-min-width: 1920px;
+    -fx-background-color: grey;
+}
+
+.menuItemText {
+    -fx-transition: 1.5s ease;
+    -fx-font-family: "Bell MT", sans-serif;
+    -fx-font-size: 43;
+}
+
+.menuItemText:hover {
+    -fx-fill: #062172;
+    -fx-font-family: "Bell MT", sans-serif;
+    -fx-font-size: 43;
+}
+
+.bellMTText {
+    -fx-font-family: "Bell MT", sans-serif;
+    -fx-font-size: 20;
+}
+
+.infoItemTextSmall {
+    -fx-font-family: "Bell MT", sans-serif;
+    -fx-font-size: 15;
+}
+
+.infoItemText {
+    -fx-font-family: "Bell MT", sans-serif;
+    -fx-font-size: 29;
+}
+
+.infoItemText2 {
+    -fx-transition: 1.5s ease;
+    -fx-font-family: "Bell MT", sans-serif;
+    -fx-font-size: 35;
+    -fx-font-style: italic;
+    -fx-fill: #062172;
+}
+
+.infoItemTextHover {
+    -fx-transition: 1.5s ease;
+    -fx-font-family: "Bell MT", sans-serif;
+    -fx-font-size: 29;
+}
+
+.infoItemTextHover:hover {
+    -fx-fill: #062172;
+    -fx-font-family: "Bell MT", sans-serif;
+    -fx-font-size: 29;
+}
+
+.gridPaneSize {
+    -fx-vgap: 22;
+    -fx-pref-height: 30;
+    -fx-max-height: 30;
+}
+
+.gridPaneSize2 {
+    -fx-vgap: 40;
+    -fx-pref-height: 30;
+    -fx-max-height: 30;
+}
+
+.saveInfoItemText:hover {
+    -fx-font-family: "Bell MT", sans-serif;
+    -fx-font-size: 25;
+}
+
+.saveInfoGridPane {
+    -fx-font-family: "Bell MT", sans-serif;
+    -fx-font-size: 25;
+}
+
+.saveInfoGridPane:hover {
+    -fx-border-color: #062172;
+    -fx-border-width: 2;
+}
+
+.healthBar {
+    -fx-accent: #318a16;
+    -fx-border-radius: 100;
+}
+
+.simpleEnabledNode {
+    -fx-font-family: "Bell MT", sans-serif;
+    -fx-font-size: 20;
+    -fx-fill: #062172;
+}
+
+.simpleDisabledNode {
+    -fx-font-family: "Bell MT", sans-serif;
+    -fx-font-size: 20;
+    -fx-fill: darkred;
+}
+
+.scrollPane {
+    -fx-background-color: transparent;
+}
+
+.defaultAnchorPane {
+    -fx-background-color: transparent;
+}
+
+.clickableNode {
+    -fx-border-color: transparent;
+    -fx-border-width: 3;
+    -fx-border-radius: 15;
+}
+
+.clickableNode:hover {
+    -fx-border-color: darkred;
+    -fx-border-width: 3;
+    -fx-border-radius: 15;
+}
+
+.clickableNodePressed {
+    -fx-border-color: darkred;
+    -fx-border-width: 3;
+    -fx-border-radius: 15;
+}
+
+.consoleText {
+    -fx-font-family: "Bell MT", sans-serif;
+    -fx-font-size: 15;
+    -fx-text-fill: #062172;
+}
+
+.characterGridPaneText{
+    -fx-font-family: "Bell MT", sans-serif;
+    -fx-font-size: 16;
+    -fx-text-fill: #062172;
+    -fx-text-alignment: center;
+    -fx-wrap-text: 100px;
+}
+
+.characterGridPaneHealthBar {
+    -fx-accent: #318a16;
+    -fx-padding: 0px;
+}
+
+.characterTopGridPaneBackground {
+    -fx-background-color: #db954a;
+    -fx-background-radius: 15 15 0 0;
+    -fx-opacity: 0.6;
+}
+
+.characterBottomGridPaneBackground {
+    -fx-background-color: #db954a;
+    -fx-background-radius: 0 0 15 15;
+    -fx-opacity: 0.6;
+}
+
+
+.papyrusBackground {
+    -fx-background-image: url('../images/Papyrus.png');
+    -fx-background-size: 100% 100%;
+}
+
+.mainMenuBackground {
+    -fx-background-image: url('../images/MainMenu.jpg');
+    -fx-background-size: 100% 100%;
+}
+
+.mainMenuObject {
+    -fx-background-color: black;
+    -fx-opacity: 0.5;
+    -fx-background-radius: 100;
+}
+
+.levelBackground {
+    -fx-background-radius: 50;
+}
+
+.mainMenuTitleBackground {
+    -fx-background-image: url('../images/TitleBackground.png');
+    -fx-background-size: 100% 100%;
+}
