@@ -69,8 +69,6 @@ public class SaveProgressController implements Initializable {
                     displaySaveFilesInfo();
                 }
 
-
-
             });
 
             saveProgressGrid.add(saveInfoGridPane, 0, index.get());

@@ -2,6 +2,7 @@ package project.functions;
 
 import project.abstractClasses.AbstractCharacter;
 import project.classes.Enemy;
+import project.classes.Level;
 import project.classes.Spell;
 import project.classes.Wizard;
 import project.enums.*;
@@ -336,7 +337,7 @@ public class LevelFunctions {
         }
 
         if (wizardHasRequiredSpell(level)) {
-            String levelName = returnFormattedEnum(level);
+            String levelName = level.getLevelName();
             ConsoleFunctions.printColoredHeader(levelName);
             printTitle(objective);
             Enemy.checkEnemiesHpRatio();

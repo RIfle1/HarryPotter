@@ -11,8 +11,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import project.abstractClasses.AbstractCharacter;
-import project.enums.Level;
-import project.fx.GuiMain;
+import project.classes.Level;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -21,6 +20,7 @@ import static project.classes.Enemy.generateEnemies;
 import static project.functions.GeneralFunctions.checkPositiveInt;
 import static project.fx.controllers.GameMenuController.gameMenuScene;
 import static project.fx.controllers.GameSceneController.gameScene;
+import static project.fx.functions.JavaFxFunctions.returnFXMLURL;
 import static project.fx.functions.JavaFxFunctions.sendToScene;
 
 public class BattleArenaMenuController implements Initializable {
@@ -45,7 +45,7 @@ public class BattleArenaMenuController implements Initializable {
     }
 
     public static void battleArenaScene(ActionEvent event) {
-        FXMLLoader gameSceneFxmlLoader = new FXMLLoader(GuiMain.class.getResource("BattleArenaMenu.fxml"));
+        FXMLLoader gameSceneFxmlLoader = new FXMLLoader(returnFXMLURL("BattleArenaMenu.fxml"));
         sendToScene(event, gameSceneFxmlLoader);
     }
 
@@ -87,6 +87,10 @@ public class BattleArenaMenuController implements Initializable {
             }
             else if(enemyMinLevelInt < 1) {
                 ccErrorT.setText("Enemy min level is 1");
+                ccErrorT.setVisible(true);
+            }
+            else if(enemyMinLevelInt > 10) {
+                ccErrorT.setText("Enemy min level can't be greater than 10");
                 ccErrorT.setVisible(true);
             }
             else {

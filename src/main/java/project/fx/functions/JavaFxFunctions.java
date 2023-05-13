@@ -27,17 +27,18 @@ import project.abstractClasses.AbstractCharacter;
 import project.classes.Enemy;
 import project.classes.Wizard;
 import project.enums.EnemyCombat;
+import project.fx.GuiLauncherMain;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.*;
 import java.util.List;
 
 import static project.enums.EnumMethods.returnFormattedEnum;
 import static project.functions.GeneralFunctions.chooseRandomDouble;
 import static project.functions.GeneralFunctions.returnFileAttribute;
-import static project.functions.SaveFunctions.createWizardInstance;
+import static project.functions.SaveFunctions.returnWizardInstance;
 
 public class JavaFxFunctions {
 
@@ -99,9 +100,7 @@ public class JavaFxFunctions {
         column1.setPercentWidth(100);
         saveInfoGridPane.getColumnConstraints().add(column1);
 
-
-        Wizard wizardInstance = Wizard.builder().build();
-        createWizardInstance(filename, wizardInstance);
+        Wizard wizardInstance = returnWizardInstance(filename);
 
         String fileCreationTime = returnFileAttribute("saves", filename, "creationTime");
         String fileModifiedTime = returnFileAttribute("saves", filename, "lastModifiedTime");
@@ -142,18 +141,27 @@ public class JavaFxFunctions {
     }
 
     public static Image returnObjectImage(String objectName) {
-        FileInputStream imgInputStream = null;
+        String imgPath;
         try {
-            imgInputStream = new FileInputStream("src/main/resources/icons/" + objectName + ".png");
-        } catch (FileNotFoundException e) {
+            imgPath = returnImagePath(objectName);
+        } catch (Exception e) {
             System.out.println("Image not found");
-            try {
-                imgInputStream = new FileInputStream("src/main/resources/icons/unknown.png");
-            } catch (FileNotFoundException ex) {
-                throw new RuntimeException(ex);
-            }
+            imgPath = returnImagePath("unknown");
         }
-        return new Image(imgInputStream);
+        return new Image(imgPath);
+    }
+
+    public static String returnImagePath(String objectName) {
+        return Objects.requireNonNull(GuiLauncherMain.class.getClassLoader().getResource("project/fx/images/"))  + objectName + ".png";
+    }
+
+    public static URL returnFXMLURL(String fxmlName) {
+        try {
+            return new URL(Objects.requireNonNull(GuiLauncherMain.class.getClassLoader().getResource("project/fx/fxml/")) + fxmlName);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     public static GridPane generateCharacterGridPane(AbstractCharacter abstractCharacter) {
@@ -288,11 +296,15 @@ public class JavaFxFunctions {
         StringBuilder stringBuilder = new StringBuilder();
         playerName = playerName.toLowerCase();
 
-        Arrays.stream(playerName.split(" ")).toList().forEach(word ->
-                stringBuilder.append(word.substring(0, 1).toUpperCase())
-                        .append(word.substring(1))
-                        .append(" ")
-        );
+        try {
+            Arrays.stream(playerName.split(" ")).toList().forEach(word ->
+                    stringBuilder.append(word.substring(0, 1).toUpperCase())
+                            .append(word.substring(1))
+                            .append(" ")
+            );
+        } catch (Exception e) {
+            System.out.println("Error while checking player name length: " + e.getMessage());
+        }
 
         playerName = stringBuilder.toString();
 

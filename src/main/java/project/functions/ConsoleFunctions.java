@@ -2,8 +2,7 @@ package project.functions;
 
 import project.classes.Color;
 import project.classes.Enemy;
-import project.classes.Wizard;
-import project.enums.Level;
+import project.classes.Level;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -15,7 +14,7 @@ import static java.lang.System.exit;
 import static project.classes.Color.*;
 import static project.classes.Spell.returnAllSpells;
 import static project.classes.Wizard.wizard;
-import static project.enums.Level.*;
+import static project.classes.Level.*;
 import static project.functions.LevelFunctions.levelHashMap;
 import static project.functions.SaveFunctions.loadGamePrompt;
 import static project.functions.SaveFunctions.saveGame;

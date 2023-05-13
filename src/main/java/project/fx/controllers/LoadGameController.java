@@ -11,7 +11,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import project.functions.SaveFunctions;
-import project.fx.GuiMain;
+import project.fx.GuiLauncherMain;
 
 import java.net.URL;
 import java.util.List;
@@ -40,7 +40,7 @@ public class LoadGameController implements Initializable {
     }
 
     public static void loadGameScene(MouseEvent event) {
-        FXMLLoader FXMLLoader = new FXMLLoader(GuiMain.class.getResource("LoadGame.fxml"));
+        FXMLLoader FXMLLoader = new FXMLLoader(returnFXMLURL("LoadGame.fxml"));
         ActionEvent actionEvent = new ActionEvent(event.getSource(), event.getTarget());
         sendToScene(actionEvent, FXMLLoader);
     }

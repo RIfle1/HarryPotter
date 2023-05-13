@@ -14,7 +14,7 @@ import static project.enums.EnumMethods.returnFormattedEnum;
 public enum EnemyName {
     GOBLIN(EnemyCombat.MELEE, EnemyType.BASIC, new ArrayList<>(), 50, 0, 1, 30, 20, new ArrayList<>()),
     DARK_WIZARD(EnemyCombat.SPELL, EnemyType.BASIC, new ArrayList<>(), 70, 0.1, 1, 60, 30, new ArrayList<>()),
-    TROLL(EnemyCombat.MELEE, EnemyType.BOSS, new ArrayList<>(), 200, 0.2, 0.6, 60, 120,
+    TROLL(EnemyCombat.MELEE, EnemyType.BOSS, new ArrayList<>(), 200, 0.2, 0.6, 60, 200,
             List.of("You threw an object at the Troll and he finally collapsed.")),
     BASILISK(EnemyCombat.MELEE, EnemyType.BOSS, new ArrayList<>(), 250, 0.5, 0.6, 100, 180,
             List.of("You removed one of the Basilisk's teeth and stabbed Tom Riddle's journal with it. The Basilisk suddenly collapsed.",

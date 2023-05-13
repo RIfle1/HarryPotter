@@ -3,13 +3,16 @@ package project.enums;
 import lombok.Getter;
 import project.classes.Spell;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 
 import static project.classes.Wizard.wizard;
 import static project.enums.EnumMethods.returnFormattedEnum;
 
 @Getter
-public enum Level {
+public enum LevelBackup {
     The_Philosophers_Stone(true,
             List.of(Spell.wingardiumLeviosa),
             List.of(EnemyName.TROLL),
@@ -105,7 +108,7 @@ public enum Level {
     private final int combatTimeout;
     private final boolean switchTeams;
 
-    Level(boolean unlocked, List<Spell> requiredSpellList, List<EnemyName> enemyNameList, List<String> objectiveList, int enemyMinLevel, int enemyMaxLevel, int enemyAmount, String graduationLine, int combatTimeout, boolean switchTeams) {
+    LevelBackup(boolean unlocked, List<Spell> requiredSpellList, List<EnemyName> enemyNameList, List<String> objectiveList, int enemyMinLevel, int enemyMaxLevel, int enemyAmount, String graduationLine, int combatTimeout, boolean switchTeams) {
         this.unlocked = unlocked;
         this.requiredSpellList = requiredSpellList;
         this.enemyNameList = enemyNameList;
@@ -123,35 +126,35 @@ public enum Level {
     }
 
     public static List<String> returnLevelList() {
-        Level[] levelValues = Level.values();
+        LevelBackup[] levelValues = LevelBackup.values();
         return EnumMethods.getEnumList(levelValues);
     }
 
     public static List<String> returnUnlockedLevelsList() {
-        Level[] levelValues = Arrays.stream(Level.values()).filter(Level::isUnlocked).toList().toArray(new Level[0]);
+        LevelBackup[] levelValues = Arrays.stream(LevelBackup.values()).filter(LevelBackup::isUnlocked).toList().toArray(new LevelBackup[0]);
         return EnumMethods.getEnumList(levelValues);
     }
 
-    public static List<Level> returnAllUnlockedLevelsList() {
-        return Arrays.stream(Level.values()).filter(Level::isUnlocked).toList();
+    public static List<LevelBackup> returnAllUnlockedLevelsList() {
+        return Arrays.stream(LevelBackup.values()).filter(LevelBackup::isUnlocked).toList();
     }
 
-    public static List<Level> returnAllLevels() {
-        return Arrays.stream(Level.values()).toList();
+    public static List<LevelBackup> returnAllLevels() {
+        return Arrays.stream(LevelBackup.values()).toList();
     }
 
-    public static void unlockNextLevel(Level previousLevel) {
-        if(!previousLevel.equals(Level.Battle_Arena)) {
-            Level nextLevel = setLevel(returnLevelList().get(returnLevelList().indexOf(returnFormattedEnum(previousLevel)) + 1));
+    public static void unlockNextLevel(LevelBackup previousLevel) {
+        if(!previousLevel.equals(LevelBackup.Battle_Arena)) {
+            LevelBackup nextLevel = setLevel(returnLevelList().get(returnLevelList().indexOf(returnFormattedEnum(previousLevel)) + 1));
             nextLevel.setUnlocked(true);
         }
     }
 
-    public static Level setLevel(String level) {
-        HashMap<String, Level> levelHashMap = new HashMap<>();
-        Level[] levelValues = Level.values();
+    public static LevelBackup setLevel(String level) {
+        HashMap<String, LevelBackup> levelHashMap = new HashMap<>();
+        LevelBackup[] levelValues = LevelBackup.values();
 
-        for(Level levelValue:levelValues) {
+        for(LevelBackup levelValue:levelValues) {
             levelHashMap.put(returnFormattedEnum(levelValue), levelValue);
         }
         return levelHashMap.get(level);

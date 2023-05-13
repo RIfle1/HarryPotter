@@ -158,12 +158,12 @@
 
 
 .papyrusBackground {
-    -fx-background-image: url('../../icons/Papyrus.png');
+    -fx-background-image: url('../images/Papyrus.png');
     -fx-background-size: 100% 100%;
 }
 
 .mainMenuBackground {
-    -fx-background-image: url('../../icons/MainMenu.jpg');
+    -fx-background-image: url('../images/MainMenu.jpg');
     -fx-background-size: 100% 100%;
 }
 
@@ -178,6 +178,6 @@
 }
 
 .mainMenuTitleBackground {
-    -fx-background-image: url('../../icons/TitleBackground.png');
+    -fx-background-image: url('../images/TitleBackground.png');
     -fx-background-size: 100% 100%;
 }

@@ -16,8 +16,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import project.classes.Spell;
-import project.enums.Level;
-import project.fx.GuiMain;
+import project.classes.Level;
 
 import java.net.URL;
 import java.util.HashMap;
@@ -28,6 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static project.classes.Wizard.wizard;
 import static project.enums.EnumMethods.returnFormattedEnum;
 import static project.functions.GeneralFunctions.checkPositiveInt;
+import static project.functions.LevelFunctions.wizardHasRequiredSpell;
 import static project.fx.controllers.BattleArenaMenuController.battleArenaScene;
 import static project.fx.functions.JavaFxFunctions.*;
 import static project.fx.controllers.GameSceneController.gameScene;
@@ -115,17 +115,17 @@ public class GameMenuController implements Initializable {
 
     @FXML
     void saveProgressOnClick(ActionEvent event) {
-        FXMLLoader FXMLLoader = new FXMLLoader(GuiMain.class.getResource("SaveProgress.fxml"));
+        FXMLLoader FXMLLoader = new FXMLLoader(returnFXMLURL("SaveProgress.fxml"));
         sendToScene(event, FXMLLoader);
     }
 
     public static void gameMenuScene(ActionEvent event) {
-        FXMLLoader FXMLLoader = new FXMLLoader(GuiMain.class.getResource("GameMenu.fxml"));
+        FXMLLoader FXMLLoader = new FXMLLoader(returnFXMLURL("GameMenu.fxml"));
         sendToScene(event, FXMLLoader);
     }
 
     public static void gameMenuScene(Stage stage) {
-        FXMLLoader FXMLLoader = new FXMLLoader(GuiMain.class.getResource("GameMenu.fxml"));
+        FXMLLoader FXMLLoader = new FXMLLoader(returnFXMLURL("GameMenu.fxml"));
         sendToScene(stage, FXMLLoader);
     }
 
@@ -158,16 +158,23 @@ public class GameMenuController implements Initializable {
         // UNLOCKED LEVELS
         AtomicInteger index1 = new AtomicInteger();
 
-        Level.returnAllUnlockedLevelsList().forEach(level -> {
-            Text levelText = new Text(returnFormattedEnum(level));
+        Level.returnAllUnlockedLevels().forEach(level -> {
+            Text levelText = new Text(level.getLevelName());
             levelText.getStyleClass().add("infoItemTextHover");
             levelText.onMouseReleasedProperty().set(event -> {
+
                 ActionEvent actionEvent = new ActionEvent(event.getSource(), event.getTarget());
-                if(!level.equals(Level.Battle_Arena)) {
-                    gameScene(actionEvent, level);
+
+                if(wizardHasRequiredSpell(level)) {
+                    if(!level.equals(Level.Battle_Arena)) {
+                        gameScene(actionEvent, level);
+                    }
+                    else {
+                        battleArenaScene(actionEvent);
+                    }
                 }
                 else {
-                    battleArenaScene(actionEvent);
+                    createPopup(actionEvent, Alert.AlertType.WARNING, "You don't have the required spell to enter this level.");
                 }
 
             });

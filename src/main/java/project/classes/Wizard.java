@@ -72,6 +72,7 @@ public class Wizard extends AbstractCharacter {
         this.luck = luck;
     }
 
+
     private String firstName;
     private String lastName;
     private Gender gender;

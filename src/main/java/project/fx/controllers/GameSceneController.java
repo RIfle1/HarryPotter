@@ -25,7 +25,6 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import project.classes.*;
 import project.enums.*;
-import project.fx.GuiMain;
 
 import java.net.URL;
 import java.util.*;
@@ -123,7 +122,7 @@ public class GameSceneController implements Initializable {
 
         gameSceneStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
 
-        FXMLLoader gameSceneFxmlLoader = new FXMLLoader(GuiMain.class.getResource("GameScene.fxml"));
+        FXMLLoader gameSceneFxmlLoader = new FXMLLoader(returnFXMLURL("GameScene.fxml"));
         sendToScene(event, gameSceneFxmlLoader);
     }
 
@@ -135,7 +134,7 @@ public class GameSceneController implements Initializable {
 
         gameSceneStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
 
-        FXMLLoader gameSceneFxmlLoader = new FXMLLoader(GuiMain.class.getResource("GameScene.fxml"));
+        FXMLLoader gameSceneFxmlLoader = new FXMLLoader(returnFXMLURL("GameScene.fxml"));
         sendToScene(event, gameSceneFxmlLoader);
     }
 
@@ -573,14 +572,11 @@ public class GameSceneController implements Initializable {
         psDefenseT.setText(String.valueOf((int) wizard.getDefensePoints()));
         psLevelT.setText(String.valueOf((int) wizard.getLevel()));
 
-//        ImageView levelImg = returnObjectImageView(returnFormattedEnum(level), 725, 1132, 1);
-//        middleGridPane.add(levelImg, 0, 0);
-        Image img = returnObjectImage(returnFormattedEnum(level));
+        Image img = returnObjectImage(level.getLevelName());
 
         BackgroundImage levelBackgroundImage = new BackgroundImage(img, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
         Background levelBackground = new Background(levelBackgroundImage);
 
-//        middleGridPane.setStyle("-fx-background-radius: 50");
         middleGridPane.setBackground(levelBackground);
 
     }
