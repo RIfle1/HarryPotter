@@ -275,7 +275,7 @@ public class GameSceneController implements Initializable {
     }
 
     private void switchTeams() {
-        if (level.isSwitchTeams()) {
+        if (level.isSwitchTeams() && wizard.getHouseName().equals(HouseName.SLYTHERIN)) {
             Optional<ButtonType> result = createPopup(gameSceneStage, Alert.AlertType.CONFIRMATION, "You have the possibility the join the enemies. Do you want to join them?");
 
             if (result.get() == ButtonType.OK) {

@@ -12,7 +12,7 @@
    <AnchorPane layoutX="701.0" layoutY="162.0" prefHeight="688.0" prefWidth="519.0" styleClass="mainMenuObject" stylesheets="@generalStyles.css" />
    <AnchorPane layoutX="378.0" layoutY="7.0" prefHeight="130.0" prefWidth="1157.0" styleClass="mainMenuTitleBackground" stylesheets="@generalStyles.css" />
 
-                <Text fill="#0e2128" layoutX="1.0" layoutY="92.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Harry Potter: The Text RPG" textAlignment="CENTER" wrappingWidth="1920.0">
+                <Text fill="#0e2128" layoutX="1.0" layoutY="92.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Harry Potter: The GUI" textAlignment="CENTER" wrappingWidth="1920.0">
         <font>
             <Font name="Bell MT" size="73.0" />
         </font>

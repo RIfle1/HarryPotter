@@ -53,7 +53,7 @@ public class MainMenuController {
 
             Image icon = new Image(returnImagePath("icon"));
             stage.getIcons().add(icon);
-            stage.setTitle("Harry Potter: The Text RPG");
+            stage.setTitle("Harry Potter: THE GUI");
 
             stage.setResizable(false);
             stage.show();

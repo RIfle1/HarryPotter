@@ -19,7 +19,7 @@ public enum EnemyName {
     BASILISK(EnemyCombat.MELEE, EnemyType.BOSS, new ArrayList<>(), 250, 0.5, 0.6, 100, 180,
             List.of("You removed one of the Basilisk's teeth and stabbed Tom Riddle's journal with it. The Basilisk suddenly collapsed.",
                     "You stabbed the Basilisk with Godric Gryffindor's Legendary sword. The Basilisk isn't moving anymore.")),
-    DEMENTOR(EnemyCombat.MELEE, EnemyType.BOSS, new ArrayList<>(), 100, 0, 0.3, 110, 30, new ArrayList<>()),
+    DEMENTOR(EnemyCombat.MELEE, EnemyType.BOSS, new ArrayList<>(), 100, 0, 0.7, 110, 30, new ArrayList<>()),
     PETER_PETTIGREW(EnemyCombat.SPELL, EnemyType.BOSS, new ArrayList<>(), 300, 0.2, 0, 80, 40,
             List.of("You stole Peter Pettigrew's keys and you escaped the cemetery.")),
     DOLORES_UMBRIDGE(EnemyCombat.SPELL, EnemyType.BOSS, new ArrayList<>(), 10000, 0, 0, 80, 40,

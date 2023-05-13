@@ -37,7 +37,7 @@ public class Enemy extends AbstractCharacter {
     private double experiencePoints;
     public static HashMap<String, Enemy> enemiesHashMap = new HashMap<>();
     public static List<String> enemiesKeyList = new ArrayList<>();
-    private static final double enemyXpIncrement = 0.2;
+    private static final double enemyXpIncrement = 0.5;
 
     public static void clearEnemies() {
         enemiesKeyList.forEach(key -> enemiesHashMap.remove(key));
